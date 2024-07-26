@@ -14,11 +14,11 @@ import { seo } from '~/lib/seo'
 export const metadata: Metadata = {
   metadataBase: seo.url,
   title: {
-    template: '%s | Cali Castle',
+    template: '%s | 辛壬癸的命理笔记',
     default: seo.title,
   },
   description: seo.description,
-  keywords: 'Cali,Cali Castle,郭晓楠,佐玩,创始人,CEO,开发者,设计师,细节控,创新',
+  keywords: '生活记录,命理研究,杂谈,个人博客,辛壬癸,日常笔记,命运解析,生活智慧,命理学,日常生活',
   manifest: '/site.webmanifest',
   robots: {
     index: true,
@@ -37,10 +37,10 @@ export const metadata: Metadata = {
       template: '%s | Cali Castle',
     },
     description: seo.description,
-    siteName: 'Cali Castle',
+    siteName: '辛壬癸的命理笔记',
     locale: 'zh_CN',
     type: 'website',
-    url: 'https://cali.so',
+    url: 'https://xinrengui.eu.org',
   },
   twitter: {
     site: '@thecalicastle',
