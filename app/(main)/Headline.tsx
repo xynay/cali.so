@@ -84,50 +84,6 @@ export function Headline() {
     在这里，我通过文字记录生活的点滴，探索命理的奥秘，并分享我的见解和思考。
         </Balancer>
       </motion.p>
-      <motion.div
-        className="mt-6 flex gap-6"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          type: 'spring',
-          damping: 50,
-          stiffness: 90,
-          duration: 0.35,
-          delay: 0.25,
-        }}
-      >
-        <SocialLink
-          href="https://xinrengui.eu.org/twitter"
-          aria-label="我的推特"
-          platform="twitter"
-        />
-        <SocialLink
-          href="https://xinrengui.eu.org/youtube"
-          aria-label="我的 YouTube"
-          platform="youtube"
-        />
-        <SocialLink
-          href="https://xinrengui.eu.org/bilibili"
-          aria-label="我的 Bilibili"
-          platform="bilibili"
-        />
-        <SocialLink
-          href="https://xinrengui.eu.org/github"
-          aria-label="我的 GitHub"
-          platform="github"
-        />
-        <SocialLink
-          href="https://xinrengui.eu.org/tg"
-          aria-label="我的 Telegram"
-          platform="telegram"
-        />
-        <SocialLink href="/feed.xml" platform="rss" aria-label="RSS 订阅" />
-        <SocialLink
-          href="geek@0008.life"
-          aria-label="我的邮箱"
-          platform="mail"
-        />
-      </motion.div>
     </div>
   )
 }
