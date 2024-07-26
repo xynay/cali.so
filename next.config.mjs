@@ -26,37 +26,37 @@ const nextConfig = {
       {
         "source": "/twitter",
         "destination": "https://x.com/thecalicastle",
-        "permanent": true
+        "permanent": false
       },
       {
         "source": "/x",
         "destination": "https://x.com/thecalicastle",
-        "permanent": true
+        "permanent": false
       },
       {
         "source": "/youtube",
         "destination": "https://youtube.com/@calicastle",
-        "permanent": true
+        "permanent": false
       },
       {
         "source": "/tg",
         "destination": "https://t.me/cali_so",
-        "permanent": true
+        "permanent": false
       },
       {
         "source": "/linkedin",
         "destination": "https://www.linkedin.com/in/calicastle/",
-        "permanent": true
+        "permanent": false
       },
       {
         "source": "/github",
         "destination": "https://github.com/CaliCastle",
-        "permanent": true
+        "permanent": false
       },
       {
         "source": "/bilibili",
         "destination": "https://space.bilibili.com/8350251",
-        "permanent": true
+        "permanent": false
       }
     ]
   },
