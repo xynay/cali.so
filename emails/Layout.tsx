@@ -44,38 +44,38 @@ export default function Layout({
               />
               <Text className="text-center">
                 <Link
-                  href="https://cali.so"
+                  href="https://xinrengui.eu.org"
                   className="text-zinc-700 underline"
                 >
                   <strong>Cali Castle</strong>
                 </Link>
                 <br />
-                开发者、设计师、细节控、创始人
+                探索者、生活家、记录者、思考者
               </Text>
               <Text className="text-center">
                 <Link
-                  href="https://cali.so/twitter"
+                  href="https://xinrengui.eu.org/twitter"
                   className="text-xs text-zinc-600 underline"
                 >
                   Twitter
                 </Link>{' '}
                 |&nbsp;
                 <Link
-                  href="https://cali.so/youtube"
+                  href="https://xinrengui.eu.org/youtube"
                   className="text-xs text-zinc-600 underline"
                 >
                   YouTube
                 </Link>{' '}
                 |&nbsp;
                 <Link
-                  href="https://cali.so/github"
+                  href="https://xinrengui.eu.org/github"
                   className="text-xs text-zinc-600 underline"
                 >
                   GitHub
                 </Link>{' '}
                 |&nbsp;
                 <Link
-                  href="https://cali.so/bilibili"
+                  href="https://xinrengui.eu.org/bilibili"
                   className="text-xs text-zinc-600 underline"
                 >
                   哔哩哔哩

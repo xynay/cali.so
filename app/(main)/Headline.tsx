@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import Balancer from 'react-wrap-balancer'
-
 import { SparkleIcon, UserSecurityIcon } from '~/assets'
 import { SocialLink } from '~/components/links/SocialLink'
 
@@ -79,8 +78,8 @@ export function Headline() {
         }}
       >
         <Balancer>
-    我是新人鬼，一个热爱生活、喜欢记录和思考的人。
-    我的博客“新人鬼的日常笔记”主要分享生活记录、命理研究和个人杂谈。
+    我是辛壬癸，一个热爱生活、喜欢记录和思考的人。
+    我的博客“辛壬癸的日常笔记”主要分享生活记录、命理研究和个人杂谈。
     在这里，我通过文字记录生活的点滴，探索命理的奥秘，并分享我的见解和思考。
         </Balancer>
       </motion.p>
