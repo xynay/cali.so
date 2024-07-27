@@ -13,8 +13,7 @@ import { env } from '~/env.mjs'
 import { prettifyNumber } from '~/lib/math'
 import { redis } from '~/lib/redis'
 
-import { Newsletter } from './Newsletter'
-
+// 导航链接组件
 function NavLink({
   href,
   children,
@@ -32,6 +31,7 @@ function NavLink({
   )
 }
 
+// 导航链接列表组件
 function Links() {
   return (
     <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
@@ -44,14 +44,8 @@ function Links() {
   )
 }
 
-async function TotalPageViews() {
-  let views: number
-  if (env.VERCEL_ENV === 'production') {
-    views = await redis.incr(kvKeys.totalPageViews)
-  } else {
-    views = 345678
-  }
-
+// 总浏览量组件
+function TotalPageViews({ views }: { views: number }) {
   return (
     <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
       <UsersIcon className="h-4 w-4" />
@@ -63,41 +57,47 @@ async function TotalPageViews() {
   )
 }
 
-type VisitorGeolocation = {
-  country: string
-  city?: string
-  flag: string
-}
-async function LastVisitorInfo() {
-  let lastVisitor: VisitorGeolocation | undefined = undefined
-  if (env.VERCEL_ENV === 'production') {
-    const [lv, cv] = await redis.mget<VisitorGeolocation[]>(
-      kvKeys.lastVisitor,
-      kvKeys.currentVisitor
-    )
-    lastVisitor = lv
-    await redis.set(kvKeys.lastVisitor, cv)
-  }
-
-  if (!lastVisitor) {
-    lastVisitor = {
-      country: 'US',
-      flag: '🇺🇸',
-    }
-  }
-
+// 最近访客信息组件
+function LastVisitorInfo({ visitor }: { visitor: VisitorGeolocation }) {
   return (
     <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
       <CursorClickIcon className="h-4 w-4" />
       <span>
         最近访客来自&nbsp;
-        {[lastVisitor.city, lastVisitor.country].filter(Boolean).join(', ')}
+        {[visitor.city, visitor.country].filter(Boolean).join(', ')}
       </span>
-      <span className="font-medium">{lastVisitor.flag}</span>
+      <span className="font-medium">{visitor.flag}</span>
     </span>
   )
 }
 
+// 计算总浏览量和最近访客信息
+async function fetchPageStats() {
+  let views: number
+  let lastVisitor: VisitorGeolocation
+
+  if (env.VERCEL_ENV === 'production') {
+    const [viewCount, currentVisitor] = await redis.mget<number, VisitorGeolocation>(
+      kvKeys.totalPageViews,
+      kvKeys.currentVisitor
+    )
+    
+    // 更新总浏览量
+    views = viewCount || 0
+    await redis.set(kvKeys.totalPageViews, (views + 1).toString())
+
+    // 设置最近访客信息
+    lastVisitor = currentVisitor || { country: 'US', flag: '🇺🇸' }
+    await redis.set(kvKeys.lastVisitor, JSON.stringify(lastVisitor))
+  } else {
+    views = 345678
+    lastVisitor = { country: 'US', flag: '🇺🇸' }
+  }
+
+  return { views, lastVisitor }
+}
+
+// 页脚组件
 export async function Footer() {
   const [subs] = await db
     .select({
@@ -105,6 +105,9 @@ export async function Footer() {
     })
     .from(subscribers)
     .where(isNotNull(subscribers.subscribedAt))
+
+  // 获取浏览量和访客信息
+  const { views, lastVisitor } = await fetchPageStats()
 
   return (
     <footer className="mt-32">
@@ -126,12 +129,8 @@ export async function Footer() {
           </Container.Inner>
           <Container.Inner className="mt-6">
             <div className="flex flex-col items-center justify-start gap-2 sm:flex-row">
-              <React.Suspense>
-                <TotalPageViews />
-              </React.Suspense>
-              <React.Suspense>
-                <LastVisitorInfo />
-              </React.Suspense>
+              <TotalPageViews views={views} />
+              <LastVisitorInfo visitor={lastVisitor} />
             </div>
           </Container.Inner>
         </div>
