@@ -172,11 +172,6 @@ export function BlogPostPage({
             </Prose>
           </article>
         </div>
-        <aside className="hidden w-[90px] shrink-0 lg:block">
-          <div className="sticky top-2 flex justify-end pt-20">
-            {/* BlogReactions 组件已被删除 */}
-          </div>
-        </aside>
       </div>
 
       {post.related && post.related.length > 0 ? (
