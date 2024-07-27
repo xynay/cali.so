@@ -13,6 +13,8 @@ import { env } from '~/env.mjs'
 import { prettifyNumber } from '~/lib/math'
 import { redis } from '~/lib/redis'
 
+import { Newsletter } from './Newsletter'
+
 // 定义 VisitorGeolocation 类型
 type VisitorGeolocation = {
   country: string
