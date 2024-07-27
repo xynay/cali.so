@@ -7,7 +7,6 @@ import React from 'react'
 import Balancer from 'react-wrap-balancer'
 
 import { BlogPostStateLoader } from '~/app/(main)/blog/BlogPostStateLoader'
-import { BlogReactions } from '~/app/(main)/blog/BlogReactions'
 import {
   CalendarIcon,
   CursorClickIcon,
@@ -30,12 +29,10 @@ import { BlogPostTableOfContents } from './BlogPostTableOfContents'
 export function BlogPostPage({
   post,
   views,
-  reactions,
   relatedViews,
 }: {
   post: PostDetail
   views?: number
-  reactions?: number[]
   relatedViews: number[]
 }) {
   return (
@@ -177,11 +174,7 @@ export function BlogPostPage({
         </div>
         <aside className="hidden w-[90px] shrink-0 lg:block">
           <div className="sticky top-2 flex justify-end pt-20">
-            <BlogReactions
-              _id={post._id}
-              mood={post.mood}
-              reactions={reactions}
-            />
+            {/* BlogReactions 组件已被删除 */}
           </div>
         </aside>
       </div>
