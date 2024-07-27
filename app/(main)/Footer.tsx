@@ -84,18 +84,18 @@ async function fetchPageStats() {
   let lastVisitor: VisitorGeolocation
 
   if (env.VERCEL_ENV === 'production') {
-    // 获取多个键的值
-    const [viewCount, currentVisitor] = await redis.mget(
+    // 获取多个键的值，并进行类型断言
+    const [viewCountRaw, currentVisitorRaw] = await redis.mget(
       kvKeys.totalPageViews,
       kvKeys.currentVisitor
-    )
+    ) as [string | null, string | null]
 
     // 更新总浏览量
-    views = parseInt(viewCount || '0', 10) + 1
+    views = parseInt(viewCountRaw ?? '0', 10) + 1
     await redis.set(kvKeys.totalPageViews, views.toString())
 
     // 设置最近访客信息
-    lastVisitor = JSON.parse(currentVisitor || '{}') || { country: 'US', flag: '🇺🇸' }
+    lastVisitor = JSON.parse(currentVisitorRaw ?? '{}') || { country: 'US', flag: '🇺🇸' }
     await redis.set(kvKeys.lastVisitor, JSON.stringify(lastVisitor))
   } else {
     views = 345678
