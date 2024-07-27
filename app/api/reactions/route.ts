@@ -1,20 +1,42 @@
-import { Ratelimit } from '@upstash/ratelimit'
 import { revalidateTag } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 
-// Mock in-memory store
+// Mock in-memory store for reactions and rate limiting
 const reactionsStore: { [key: string]: number[] } = {}
-
-export const runtime = 'edge'
+const rateLimitStore: { [key: string]: number } = {}
+const RATE_LIMIT_WINDOW_MS = 10000 // 10 seconds
+const RATE_LIMIT_MAX_REQUESTS = 30 // Max requests per window
 
 function getKey(id: string) {
   return `reactions:${id}`
 }
 
-const ratelimit = new Ratelimit({
-  limiter: Ratelimit.slidingWindow(30, '10 s'),
-  analytics: true,
-})
+function getRateLimitKey(ip: string) {
+  return `rate_limit:${ip}`
+}
+
+function checkRateLimit(ip: string): boolean {
+  const key = getRateLimitKey(ip)
+  const now = Date.now()
+
+  // Cleanup expired entries
+  for (const [timestamp] of Object.entries(rateLimitStore)) {
+    if (now - Number(timestamp) > RATE_LIMIT_WINDOW_MS) {
+      delete rateLimitStore[timestamp]
+    }
+  }
+
+  const requests = Object.keys(rateLimitStore).filter(timestamp => {
+    return now - Number(timestamp) <= RATE_LIMIT_WINDOW_MS
+  }).length
+
+  if (requests >= RATE_LIMIT_MAX_REQUESTS) {
+    return false
+  }
+
+  rateLimitStore[now] = (rateLimitStore[now] || 0) + 1
+  return true
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -27,8 +49,8 @@ export async function GET(req: NextRequest) {
     reactionsStore[key] = [0, 0, 0, 0]
   }
 
-  const { success } = await ratelimit.limit(key + `_${req.ip ?? ''}`)
-  if (!success) {
+  const ip = req.ip ?? ''
+  if (!checkRateLimit(ip)) {
     return new Response('Too Many Requests', {
       status: 429,
     })
@@ -47,8 +69,8 @@ export async function PATCH(req: NextRequest) {
 
   const key = getKey(id)
 
-  const { success } = await ratelimit.limit(key + `_${req.ip ?? ''}`)
-  if (!success) {
+  const ip = req.ip ?? ''
+  if (!checkRateLimit(ip)) {
     return new Response('Too Many Requests', {
       status: 429,
     })
@@ -58,7 +80,7 @@ export async function PATCH(req: NextRequest) {
   if (!current) {
     current = [0, 0, 0, 0]
   }
-  // increment the array value at the index
+  // Increment the array value at the index
   current[parseInt(index)] += 1
 
   reactionsStore[key] = current
