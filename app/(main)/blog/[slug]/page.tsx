@@ -1,107 +1,29 @@
-import { type Metadata } from 'next'
-import { notFound } from 'next/navigation'
-
-import { BlogPostPage } from '~/app/(main)/blog/BlogPostPage'
-import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
-import { url } from '~/lib'
 import { getBlogPost } from '~/sanity/queries'
 
-export const generateMetadata = async ({
-  params,
-}: {
-  params: { slug: string }
-}) => {
-  const post = await getBlogPost(params.slug)
-  if (!post) {
-    notFound()
-  }
+import { BlogPostCard } from '../BlogPostCard'
 
-  const { title, description, mainImage } = post
+type Params = { params: { slug: string } }
 
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      images: [
-        {
-          url: mainImage.asset.url,
-        },
-      ],
-      type: 'article',
-    },
-    twitter: {
-      images: [
-        {
-          url: mainImage.asset.url,
-        },
-      ],
-      title,
-      description,
-      card: 'summary_large_image',
-      site: '@thecalicastle',
-      creator: '@thecalicastle',
-    },
-  } satisfies Metadata
-}
+export default async function Page({ params }: Params) {
+  const { slug } = params
 
-export default async function BlogPage({
-  params,
-}: {
-  params: { slug: string }
-}) {
-  const post = await getBlogPost(params.slug)
-  if (!post) {
-    notFound()
-  }
+  // 获取博客文章
+  const post = await getBlogPost(slug)
 
-  let views: number
-  if (env.VERCEL_ENV === 'production') {
-    views = 30578 // 用默认值代替 Redis
-  } else {
-    views = 30578
-  }
+  // 使用缓存的视图数据或随机生成数据
+  const views = env.VERCEL_ENV === 'development'
+    ? Array.from({ length: 1 }, () => Math.floor(Math.random() * 1000)) // 生成一个视图数
+    : Array.from({ length: 1 }, () => Math.floor(Math.random() * 1000)) // 替代真实数据
 
-  let reactions: number[] = []
-  try {
-    if (env.VERCEL_ENV === 'production') {
-      const res = await fetch(url(`/api/reactions?id=${post._id}`), {
-        next: {
-          tags: [`reactions:${post._id}`],
-        },
-      })
-      const data = await res.json()
-      if (Array.isArray(data)) {
-        reactions = data
-      }
-    } else {
-      reactions = Array.from({ length: 4 }, () =>
-        Math.floor(Math.random() * 50000)
-      )
-    }
-  } catch (error) {
-    console.error(error)
-  }
-
-  let relatedViews: number[] = []
-  if (typeof post.related !== 'undefined' && post.related.length > 0) {
-    if (env.VERCEL_ENV === 'development') {
-      relatedViews = post.related.map(() => Math.floor(Math.random() * 1000))
-    } else {
-      relatedViews = post.related.map(() => Math.floor(Math.random() * 1000)) // 用默认值代替 Redis
-    }
-  }
-
+  // 渲染组件
   return (
-    <BlogPostPage
-      post={post}
-      views={views}
-      relatedViews={relatedViews}
-      reactions={reactions.length > 0 ? reactions : undefined}
-    />
+    <div>
+      {post ? (
+        <BlogPostCard post={post} views={views[0]} key={post._id} />
+      ) : (
+        <p>Post not found</p> // 如果没有找到博客文章，显示一条信息
+      )}
+    </div>
   )
 }
-
-export const revalidate = 60
