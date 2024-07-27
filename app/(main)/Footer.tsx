@@ -1,7 +1,6 @@
-import Link from 'next/link'
-import React, { Suspense, memo } from 'react'
-
 import { count, isNotNull } from 'drizzle-orm'
+import Link from 'next/link'
+import React from 'react'
 
 import { CursorClickIcon, UsersIcon } from '~/assets'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
@@ -16,20 +15,16 @@ import { redis } from '~/lib/redis'
 
 import { Newsletter } from './Newsletter'
 
-type VisitorGeolocation = {
-  country: string
-  city?: string
-  flag: string
-}
-
-const NavLink = memo(({ href, children }: { href: string; children: React.ReactNode }) => (
-  <Link href={href} className="transition hover:text-lime-500 dark:hover:text-lime-400">
+const NavLink = React.memo(({ href, children }: { href: string; children: React.ReactNode }) => (
+  <Link
+    href={href}
+    className="transition hover:text-lime-500 dark:hover:text-lime-400"
+  >
     {children}
   </Link>
 ))
-NavLink.displayName = 'NavLink'
 
-const Links = memo(() => (
+const Links = React.memo(() => (
   <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
     {navigationItems.map(({ href, text }) => (
       <NavLink key={href} href={href}>
@@ -38,9 +33,8 @@ const Links = memo(() => (
     ))}
   </nav>
 ))
-Links.displayName = 'Links'
 
-const TotalPageViews = memo(async () => {
+const TotalPageViews = React.lazy(async () => {
   let views: number
   if (env.VERCEL_ENV === 'production') {
     views = await redis.incr(kvKeys.totalPageViews)
@@ -58,9 +52,14 @@ const TotalPageViews = memo(async () => {
     </span>
   )
 })
-TotalPageViews.displayName = 'TotalPageViews'
 
-const LastVisitorInfo = memo(async () => {
+type VisitorGeolocation = {
+  country: string
+  city?: string
+  flag: string
+}
+
+const LastVisitorInfo = React.lazy(async () => {
   let lastVisitor: VisitorGeolocation | undefined = undefined
   if (env.VERCEL_ENV === 'production') {
     const [lv, cv] = await redis.mget<VisitorGeolocation[]>(
@@ -89,7 +88,6 @@ const LastVisitorInfo = memo(async () => {
     </span>
   )
 })
-LastVisitorInfo.displayName = 'LastVisitorInfo'
 
 export async function Footer() {
   const [subs] = await db
@@ -109,7 +107,7 @@ export async function Footer() {
             </div>
             <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
               <p className="text-sm text-zinc-500/80 dark:text-zinc-400/80">
-                &copy; {new Date().getFullYear()} xinrengui. 网站已开源：
+                &copy; {new Date().getFullYear()} Cali Castle. 网站已开源：
                 <PeekabooLink href="https://github.com/CaliCastle/cali.so">
                   GitHub
                 </PeekabooLink>
@@ -119,12 +117,12 @@ export async function Footer() {
           </Container.Inner>
           <Container.Inner className="mt-6">
             <div className="flex flex-col items-center justify-start gap-2 sm:flex-row">
-              <Suspense fallback={<div>Loading...</div>}>
+              <React.Suspense fallback={<div>Loading...</div>}>
                 <TotalPageViews />
-              </Suspense>
-              <Suspense fallback={<div>Loading...</div>}>
+              </React.Suspense>
+              <React.Suspense fallback={<div>Loading...</div>}>
                 <LastVisitorInfo />
-              </Suspense>
+              </React.Suspense>
             </div>
           </Container.Inner>
         </div>
