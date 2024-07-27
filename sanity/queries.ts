@@ -1,14 +1,16 @@
 import { groq } from 'next-sanity'
-
 import { getDate } from '~/lib/date'
 import { client } from '~/sanity/lib/client'
 import { type Post, type PostDetail } from '~/sanity/schemas/post'
 import { type Project } from '~/sanity/schemas/project'
 
+// 预先计算当前日期
+const currentDate = getDate().toISOString()
+
 export const getAllLatestBlogPostSlugsQuery = () =>
   groq`
   *[_type == "post" && !(_id in path("drafts.**"))
-  && publishedAt <="${getDate().toISOString()}"
+  && publishedAt <= "${currentDate}"
   && defined(slug.current)] | order(publishedAt desc).slug.current
   `
 
@@ -21,12 +23,13 @@ type GetBlogPostsOptions = {
   offset?: number
   forDisplay?: boolean
 }
+
 export const getLatestBlogPostsQuery = ({
   limit = 5,
   forDisplay = true,
 }: GetBlogPostsOptions) =>
   groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${getDate().toISOString()}"
+  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${currentDate}"
   && defined(slug.current)] | order(publishedAt desc)[0...${limit}] {
     _id,
     title,
@@ -39,16 +42,13 @@ export const getLatestBlogPostsQuery = ({
       _ref,
       asset->{
         url,
-        ${
-          forDisplay
-            ? '"lqip": metadata.lqip, "dominant": metadata.palette.dominant,'
-            : ''
-        }
+        ${forDisplay ? '"lqip": metadata.lqip, "dominant": metadata.palette.dominant,' : ''}
       }
     }
   }`
+
 export const getLatestBlogPosts = (options: GetBlogPostsOptions) =>
-  client.fetch<Post[] | null>(getLatestBlogPostsQuery(options))
+  client.fetch<Post[]>(getLatestBlogPostsQuery(options))
 
 export const getBlogPostQuery = groq`
   *[_type == "post" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
@@ -94,6 +94,7 @@ export const getBlogPostQuery = groq`
       },
     }
   }`
+
 export const getBlogPost = (slug: string) =>
   client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, {
     slug,
@@ -117,18 +118,17 @@ export const getSettingsQuery = () =>
       end,
       "logo": logo.asset->url
     }
-}`
+  }`
+
 export const getSettings = () =>
   client.fetch<{
     projects: Project[] | null
     heroPhotos?: string[] | null
-    resume?:
-      | {
-          company: string
-          title: string
-          logo: string
-          start: string
-          end?: string
-        }[]
-      | null
+    resume?: {
+      company: string
+      title: string
+      logo: string
+      start: string
+      end?: string
+    }[] | null
   }>(getSettingsQuery())
