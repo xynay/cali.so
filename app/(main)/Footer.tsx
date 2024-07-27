@@ -13,6 +13,13 @@ import { env } from '~/env.mjs'
 import { prettifyNumber } from '~/lib/math'
 import { redis } from '~/lib/redis'
 
+
+type VisitorGeolocation = {
+  country: string
+  city?: string
+  flag: string
+}
+
 // 导航链接组件
 function NavLink({
   href,
