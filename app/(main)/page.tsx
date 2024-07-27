@@ -9,9 +9,8 @@ import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
 
-// Define the type for the settings object to match the actual data structure
 interface Settings {
-  heroPhotos?: string[];  // Change to string[] if that's the actual type
+  heroPhotos?: string[];
   resume?: { 
     company: string; 
     title: string; 
@@ -61,6 +60,9 @@ const BlogHomePageContent: React.FC = React.memo(async () => {
     </>
   );
 });
+
+// Add a display name to the component
+BlogHomePageContent.displayName = 'BlogHomePageContent';
 
 export default function BlogHomePage() {
   return (
