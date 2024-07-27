@@ -1,11 +1,11 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
-import Image from 'next/image'
-import React from 'react'
-import { useQuery } from 'react-query'
+import { AnimatePresence, motion } from 'framer-motion';
+import Image from 'next/image';
+import React from 'react';
+import { useQuery } from 'react-query';
 
-import { Tooltip } from '~/components/ui/Tooltip'
+import { Tooltip } from '~/components/ui/Tooltip';
 
 const appLabels: { [app: string]: string } = {
   slack: 'Slack',
@@ -28,26 +28,29 @@ const appLabels: { [app: string]: string } = {
   live: 'Ableton Live',
   screenflow: 'ScreenFlow',
   resolve: 'DaVinci Resolve',
-}
+};
+
+const fetchActivity = async () => {
+  const response = await fetch('/api/activity');
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+};
+
 export function Activity() {
-  const { data } = useQuery<{ app: string }>(
-    'activity',
-    () => fetch('/api/activity').then((res) => res.json()),
-    {
-      refetchInterval: 5000,
-      enabled:
-        typeof window === 'undefined'
-          ? false
-          : new URL(window.location.href).hostname === 'cali.so',
-    }
-  )
-  const [open, setOpen] = React.useState(false)
+  const { data } = useQuery<{ app: string }>('activity', fetchActivity, {
+    refetchInterval: 5000,
+    enabled: typeof window !== 'undefined' && new URL(window.location.href).hostname === 'cali.so',
+  });
+
+  const [open, setOpen] = React.useState(false);
 
   if (!data) {
-    return null
+    return null;
   }
 
-  const { app } = data
+  const { app } = data;
 
   return (
     <Tooltip.Provider disableHoverableContent>
@@ -79,7 +82,7 @@ export function Activity() {
             <Tooltip.Portal forceMount>
               <Tooltip.Content asChild>
                 <motion.div
-                    className="mt-1"
+                  className="mt-1"
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
@@ -92,5 +95,5 @@ export function Activity() {
         </AnimatePresence>
       </Tooltip.Root>
     </Tooltip.Provider>
-  )
+  );
 }
