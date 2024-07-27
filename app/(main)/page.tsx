@@ -1,17 +1,27 @@
-import React from 'react'
+import React, { Suspense } from 'react';
 
-import { BlogPosts } from '~/app/(main)/blog/BlogPosts'
-import { Headline } from '~/app/(main)/Headline'
-import { Newsletter } from '~/app/(main)/Newsletter'
-import { Photos } from '~/app/(main)/Photos'
-import { Resume } from '~/app/(main)/Resume'
-import { PencilSwooshIcon } from '~/assets'
-import { Container } from '~/components/ui/Container'
-import { getSettings } from '~/sanity/queries'
+import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
+import { Headline } from '~/app/(main)/Headline';
+import { Newsletter } from '~/app/(main)/Newsletter';
+import { Photos } from '~/app/(main)/Photos';
+import { Resume } from '~/app/(main)/Resume';
+import { PencilSwooshIcon } from '~/assets';
+import { Container } from '~/components/ui/Container';
+import { getSettings } from '~/sanity/queries';
 
-export default async function BlogHomePage() {
-  const settings = await getSettings()
-  const { heroPhotos, resume } = settings || {}
+const fetchSettings = async () => {
+  try {
+    const settings = await getSettings();
+    return settings || {};
+  } catch (error) {
+    console.error('Failed to fetch settings', error);
+    return {};
+  }
+};
+
+const BlogHomePageContent = React.memo(async () => {
+  const settings = await fetchSettings();
+  const { heroPhotos, resume } = settings;
 
   return (
     <>
@@ -37,7 +47,15 @@ export default async function BlogHomePage() {
         </div>
       </Container>
     </>
-  )
+  );
+});
+
+export default function BlogHomePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BlogHomePageContent />
+    </Suspense>
+  );
 }
 
-export const revalidate = 60
+export const revalidate = 60;
