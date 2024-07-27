@@ -1,7 +1,7 @@
-import { count, isNotNull } from 'drizzle-orm'
-import Link from 'next/link'
 import React, { Suspense, memo } from 'react'
+import Link from 'next/link'
 
+import { count, isNotNull } from 'drizzle-orm'
 import { CursorClickIcon, UsersIcon } from '~/assets'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
 import { Container } from '~/components/ui/Container'
@@ -26,6 +26,7 @@ const NavLink = memo(({ href, children }: { href: string; children: React.ReactN
     {children}
   </Link>
 ))
+NavLink.displayName = 'NavLink'
 
 const Links = memo(() => (
   <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
@@ -36,6 +37,7 @@ const Links = memo(() => (
     ))}
   </nav>
 ))
+Links.displayName = 'Links'
 
 const TotalPageViews = memo(async () => {
   let views: number
@@ -55,6 +57,7 @@ const TotalPageViews = memo(async () => {
     </span>
   )
 })
+TotalPageViews.displayName = 'TotalPageViews'
 
 const LastVisitorInfo = memo(async () => {
   let lastVisitor: VisitorGeolocation | undefined = undefined
@@ -85,6 +88,7 @@ const LastVisitorInfo = memo(async () => {
     </span>
   )
 })
+LastVisitorInfo.displayName = 'LastVisitorInfo'
 
 export async function Footer() {
   const [subs] = await db
