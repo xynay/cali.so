@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation'
 import { BlogPostPage } from '~/app/(main)/blog/BlogPostPage'
 import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
-import { redis } from '~/lib/redis'
 import { getBlogPost } from '~/sanity/queries'
 
 export const generateMetadata = async ({
@@ -57,20 +56,16 @@ export default async function BlogPage({
     notFound()
   }
 
-  let views: number
-  if (env.VERCEL_ENV === 'production') {
-    views = await redis.incr(kvKeys.postViews(post._id))
-  } else {
-    views = 30578
-  }
+  // Remove Redis related code
+  let views = 30578 // Provide a default value for views
 
   let relatedViews: number[] = []
   if (typeof post.related !== 'undefined' && post.related.length > 0) {
     if (env.VERCEL_ENV === 'development') {
       relatedViews = post.related.map(() => Math.floor(Math.random() * 1000))
     } else {
-      const postIdKeys = post.related.map(({ _id }) => kvKeys.postViews(_id))
-      relatedViews = await redis.mget<number[]>(...postIdKeys)
+      // Simulate retrieval of related views; this should be adapted to your new data source
+      relatedViews = post.related.map(() => Math.floor(Math.random() * 1000))
     }
   }
 

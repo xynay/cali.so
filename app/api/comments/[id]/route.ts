@@ -1,5 +1,4 @@
 import { clerkClient, currentUser } from '@clerk/nextjs'
-import { Ratelimit } from '@upstash/ratelimit'
 import { asc, eq } from 'drizzle-orm'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -16,14 +15,7 @@ import NewReplyCommentEmail from '~/emails/NewReplyComment'
 import { env } from '~/env.mjs'
 import { url } from '~/lib'
 import { resend } from '~/lib/mail'
-import { redis } from '~/lib/redis'
 import { client } from '~/sanity/lib/client'
-
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(10, '10 s'),
-  analytics: true,
-})
 
 function getKey(id: string) {
   return `comments:${id}`
@@ -34,14 +26,13 @@ export async function GET(req: NextRequest, { params }: Params) {
   try {
     const postId = params.id
 
-    const { success } = await ratelimit.limit(
-      getKey(postId) + `_${req.ip ?? ''}`
-    )
-    if (!success) {
-      return new Response('Too Many Requests', {
-        status: 429,
-      })
-    }
+    // No rate limiting logic
+    // const { success } = await ratelimit.limit(getKey(postId) + `_${req.ip ?? ''}`)
+    // if (!success) {
+    //   return new Response('Too Many Requests', {
+    //     status: 429,
+    //   })
+    // }
 
     const data = await db
       .select({
@@ -87,12 +78,13 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   const postId = params.id
 
-  const { success } = await ratelimit.limit(getKey(postId) + `_${req.ip ?? ''}`)
-  if (!success) {
-    return new Response('Too Many Requests', {
-      status: 429,
-    })
-  }
+  // No rate limiting logic
+  // const { success } = await ratelimit.limit(getKey(postId) + `_${req.ip ?? ''}`)
+  // if (!success) {
+  //   return new Response('Too Many Requests', {
+  //     status: 429,
+  //   })
+  // }
 
   const post = await client.fetch<
     { slug: string; title: string; imageUrl: string } | undefined

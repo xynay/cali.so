@@ -6,7 +6,6 @@ import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
 import countries from '~/lib/countries.json'
 import { getIP } from '~/lib/ip'
-import { redis } from '~/lib/redis'
 
 export const config = {
   matcher: ['/((?!_next|studio|.*\\..*).*)'],
@@ -45,7 +44,8 @@ async function beforeAuthMiddleware(req: NextRequest) {
     const countryInfo = countries.find((x) => x.cca2 === country)
     if (countryInfo) {
       const flag = countryInfo.flag
-      await redis.set(kvKeys.currentVisitor, { country, city, flag })
+      // Remove the Redis interaction
+      // await redis.set(kvKeys.currentVisitor, { country, city, flag })
     }
   }
 

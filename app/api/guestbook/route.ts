@@ -11,21 +11,10 @@ import NewGuestbookEmail from '~/emails/NewGuestbook'
 import { env } from '~/env.mjs'
 import { url } from '~/lib'
 import { resend } from '~/lib/mail'
-import { ratelimit } from '~/lib/redis'
-
-function getKey(id?: string) {
-  return `guestbook${id ? `:${id}` : ''}`
-}
 
 export async function GET(req: NextRequest) {
   try {
-    const { success } = await ratelimit.limit(getKey(req.ip ?? ''))
-    if (!success) {
-      return new Response('Too Many Requests', {
-        status: 429,
-      })
-    }
-
+    // Directly respond with guestbook messages without rate limiting
     return NextResponse.json(await fetchGuestbookMessages())
   } catch (error) {
     return NextResponse.json({ error }, { status: 400 })
@@ -40,13 +29,6 @@ export async function POST(req: NextRequest) {
   const user = await currentUser()
   if (!user) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-  }
-
-  const { success } = await ratelimit.limit(getKey(user.id))
-  if (!success) {
-    return new Response('Too Many Requests', {
-      status: 429,
-    })
   }
 
   try {

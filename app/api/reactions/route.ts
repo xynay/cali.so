@@ -2,7 +2,8 @@ import { Ratelimit } from '@upstash/ratelimit'
 import { revalidateTag } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 
-import { redis } from '~/lib/redis'
+// Mock in-memory store
+const reactionsStore: { [key: string]: number[] } = {}
 
 export const runtime = 'edge'
 
@@ -11,7 +12,6 @@ function getKey(id: string) {
 }
 
 const ratelimit = new Ratelimit({
-  redis,
   limiter: Ratelimit.slidingWindow(30, '10 s'),
   analytics: true,
 })
@@ -21,12 +21,13 @@ export async function GET(req: NextRequest) {
   const id = searchParams.get('id')
   if (!id) return new Response('Missing id', { status: 400 })
 
-  const value = await redis.get<number[]>(`reactions:${id}`)
+  const key = getKey(id)
+  const value = reactionsStore[key]
   if (!value) {
-    await redis.set(getKey(id), [0, 0, 0, 0])
+    reactionsStore[key] = [0, 0, 0, 0]
   }
 
-  const { success } = await ratelimit.limit(getKey(id) + `_${req.ip ?? ''}`)
+  const { success } = await ratelimit.limit(key + `_${req.ip ?? ''}`)
   if (!success) {
     return new Response('Too Many Requests', {
       status: 429,
@@ -53,14 +54,14 @@ export async function PATCH(req: NextRequest) {
     })
   }
 
-  let current = await redis.get<number[]>(key)
+  let current = reactionsStore[key]
   if (!current) {
     current = [0, 0, 0, 0]
   }
   // increment the array value at the index
   current[parseInt(index)] += 1
 
-  await redis.set(key, current)
+  reactionsStore[key] = current
 
   revalidateTag(key)
 

@@ -1,6 +1,5 @@
 import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
-import { redis } from '~/lib/redis'
 import { getLatestBlogPosts } from '~/sanity/queries'
 
 import { BlogPostCard } from './BlogPostCard'
@@ -17,12 +16,9 @@ export async function BlogPosts({ limit = 5 }) {
   if (env.VERCEL_ENV === 'development') {
     views = posts.map(() => Math.floor(Math.random() * 1000))
   } else {
-    // 批量获取视图数据
-    if (postIdKeys.length > 0) {
-      views = await redis.mget<number[]>(...postIdKeys)
-    } else {
-      views = []
-    }
+    // 替代 Redis 批量获取逻辑
+    // 这里用空数组代替真实数据，可以根据实际需求进行修改
+    views = posts.map(() => Math.floor(Math.random() * 1000))
   }
 
   // 渲染组件

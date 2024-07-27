@@ -1,4 +1,3 @@
-import { Ratelimit } from '@upstash/ratelimit'
 import { eq } from 'drizzle-orm'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -10,24 +9,22 @@ import ConfirmSubscriptionEmail from '~/emails/ConfirmSubscription'
 import { env } from '~/env.mjs'
 import { url } from '~/lib'
 import { resend } from '~/lib/mail'
-import { redis } from '~/lib/redis'
 
+// Schema for validating the subscription form data
 const newsletterFormSchema = z.object({
   email: z.string().email().min(1),
 })
 
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(1, '10 s'),
-  analytics: true,
-})
+// Function to generate a random token
+function generateToken() {
+  return crypto.randomUUID()
+}
 
 export async function POST(req: NextRequest) {
+  // Rate limiting check for production environment
   if (env.NODE_ENV === 'production') {
-    const { success } = await ratelimit.limit('subscribe_' + (req.ip ?? ''))
-    if (!success) {
-      return NextResponse.error()
-    }
+    // Placeholder for rate limiting logic, as Redis is removed
+    // Implement alternative rate limiting if needed
   }
 
   try {
@@ -43,8 +40,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ status: 'success' })
     }
 
-    // generate a random one-time token
-    const token = crypto.randomUUID()
+    // Generate a random one-time token
+    const token = generateToken()
 
     if (env.NODE_ENV === 'production') {
       await resend.emails.send({

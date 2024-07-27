@@ -2,14 +2,8 @@ import * as cheerio from 'cheerio'
 import { ImageResponse } from 'next/og'
 import { type NextRequest, NextResponse } from 'next/server'
 
-import { ratelimit, redis } from '~/lib/redis'
-
 export const runtime = 'edge'
 export const revalidate = 259200 // 3 days
-
-function getKey(url: string) {
-  return `favicon:${url}`
-}
 
 const faviconMapper: { [key: string]: string } = {
   '((?:zolplay.cn)|(?:zolplay.com)|(?:cn.zolplay.com))':
@@ -58,22 +52,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.error()
   }
 
-  const { success } = await ratelimit.limit('favicon' + `_${req.ip ?? ''}`)
-  if (!success) {
-    return NextResponse.error()
-  }
-
   let iconUrl = 'https://xinrengui.eu.org/favicon_blank.png'
 
   try {
     const predefinedIcon = getPredefinedIconForUrl(url)
     if (predefinedIcon) {
       return renderFavicon(predefinedIcon)
-    }
-
-    const cachedFavicon = await redis.get<string>(getKey(url))
-    if (cachedFavicon) {
-      return renderFavicon(cachedFavicon)
     }
 
     const res = await fetch(new URL(`https://${url}`).href, {
@@ -95,14 +79,10 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    await redis.set(getKey(url), iconUrl, { ex: revalidate })
-
     return renderFavicon(iconUrl)
   } catch (e) {
     console.error(e)
   }
-
-  await redis.set(getKey(url), iconUrl, { ex: revalidate })
 
   return renderFavicon(iconUrl)
 }
