@@ -15,6 +15,12 @@ import { redis } from '~/lib/redis'
 
 import { Newsletter } from './Newsletter'
 
+type VisitorGeolocation = {
+  country: string
+  city?: string
+  flag: string
+}
+
 const NavLink = memo(({ href, children }: { href: string; children: React.ReactNode }) => (
   <Link href={href} className="transition hover:text-lime-500 dark:hover:text-lime-400">
     {children}
