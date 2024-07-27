@@ -1,3 +1,4 @@
+import { count, isNotNull } from 'drizzle-orm'
 import Link from 'next/link'
 import React from 'react'
 
@@ -6,6 +7,7 @@ import { Container } from '~/components/ui/Container'
 import { navigationItems } from '~/config/nav'
 import { db } from '~/db'
 import { subscribers } from '~/db/schema'
+
 import { Newsletter } from './Newsletter'
 
 function NavLink({
