@@ -7,10 +7,6 @@ const rateLimitStore: { [key: string]: number } = {}
 const RATE_LIMIT_WINDOW_MS = 10000 // 10 seconds
 const RATE_LIMIT_MAX_REQUESTS = 30 // Max requests per window
 
-function getKey(id: string) {
-  return `reactions:${id}`
-}
-
 function getRateLimitKey(ip: string) {
   return `rate_limit:${ip}`
 }
@@ -38,15 +34,14 @@ function checkRateLimit(ip: string): boolean {
   return true
 }
 
-export async function GET(req: NextRequest) {
+export function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')
   if (!id) return new Response('Missing id', { status: 400 })
 
-  const key = getKey(id)
-  const value = reactionsStore[key]
+  const value = reactionsStore[id]
   if (!value) {
-    reactionsStore[key] = [0, 0, 0, 0]
+    reactionsStore[id] = [0, 0, 0, 0]
   }
 
   const ip = req.headers.get('x-forwarded-for') ?? '' // Use 'x-forwarded-for' header for IP
@@ -57,7 +52,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(value ?? [0, 0, 0, 0])
 }
 
-export async function PATCH(req: NextRequest) {
+export function PATCH(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')
   const index = searchParams.get('index')
@@ -65,23 +60,21 @@ export async function PATCH(req: NextRequest) {
     return new Response('Missing id or index', { status: 400 })
   }
 
-  const key = getKey(id)
-
   const ip = req.headers.get('x-forwarded-for') ?? '' // Use 'x-forwarded-for' header for IP
   if (!checkRateLimit(ip)) {
     return new Response('Too Many Requests', { status: 429 })
   }
 
-  let current = reactionsStore[key]
+  let current = reactionsStore[id]
   if (!current) {
     current = [0, 0, 0, 0]
   }
   // Increment the array value at the index
   current[parseInt(index)] += 1
 
-  reactionsStore[key] = current
+  reactionsStore[id] = current
 
-  revalidateTag(key)
+  revalidateTag(id)
 
   return NextResponse.json({ data: current })
 }
