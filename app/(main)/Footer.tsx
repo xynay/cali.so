@@ -1,26 +1,26 @@
-import { count, isNotNull } from 'drizzle-orm'
-import Link from 'next/link'
-import React from 'react'
+import { count, isNotNull } from 'drizzle-orm';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
 
-import { CursorClickIcon, UsersIcon } from '~/assets'
-import { PeekabooLink } from '~/components/links/PeekabooLink'
-import { Container } from '~/components/ui/Container'
-import { kvKeys } from '~/config/kv'
-import { navigationItems } from '~/config/nav'
-import { db } from '~/db'
-import { subscribers } from '~/db/schema'
-import { env } from '~/env.mjs'
-import { prettifyNumber } from '~/lib/math'
-import { redis } from '~/lib/redis'
+import { CursorClickIcon, UsersIcon } from '~/assets';
+import { PeekabooLink } from '~/components/links/PeekabooLink';
+import { Container } from '~/components/ui/Container';
+import { kvKeys } from '~/config/kv';
+import { navigationItems } from '~/config/nav';
+import { db } from '~/db';
+import { subscribers } from '~/db/schema';
+import { env } from '~/env.mjs';
+import { prettifyNumber } from '~/lib/math';
+import { redis } from '~/lib/redis';
 
-import { Newsletter } from './Newsletter'
+import { Newsletter } from './Newsletter';
 
 function NavLink({
   href,
   children,
 }: {
-  href: string
-  children: React.ReactNode
+  href: string;
+  children: React.ReactNode;
 }) {
   return (
     <Link
@@ -29,7 +29,7 @@ function NavLink({
     >
       {children}
     </Link>
-  )
+  );
 }
 
 function Links() {
@@ -41,24 +41,45 @@ function Links() {
         </NavLink>
       ))}
     </nav>
-  )
+  );
+}
+
+async function fetchTotalPageViews(): Promise<number> {
+  if (env.VERCEL_ENV === 'production') {
+    return await redis.incr(kvKeys.totalPageViews);
+  } else {
+    return 345678;
+  }
+}
+
+async function fetchLastVisitorInfo(): Promise<VisitorGeolocation> {
+  if (env.VERCEL_ENV === 'production') {
+    const [lv, cv] = await redis.mget<VisitorGeolocation[]>(
+      kvKeys.lastVisitor,
+      kvKeys.currentVisitor
+    );
+    await redis.set(kvKeys.lastVisitor, cv);
+    return lv ?? { country: 'US', flag: '🇺🇸' };
+  } else {
+    return { country: 'US', flag: '🇺🇸' };
+  }
 }
 
 function TotalPageViews() {
-  const [views, setViews] = React.useState<number>(0)
+  const [views, setViews] = useState<number | null>(null);
 
-  React.useEffect(() => {
-    const fetchTotalPageViews = async () => {
-      let totalViews: number
-      if (env.VERCEL_ENV === 'production') {
-        totalViews = await redis.incr(kvKeys.totalPageViews)
-      } else {
-        totalViews = 345678
-      }
-      setViews(totalViews)
+  useEffect(() => {
+    async function loadViews() {
+      const result = await fetchTotalPageViews();
+      setViews(result);
     }
-    fetchTotalPageViews()
-  }, [])
+
+    loadViews();
+  }, []);
+
+  if (views === null) {
+    return <span>Loading...</span>; // 或者可以使用一个 Skeleton 组件
+  }
 
   return (
     <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
@@ -68,35 +89,24 @@ function TotalPageViews() {
         <span className="font-medium">{prettifyNumber(views, true)}</span>
       </span>
     </span>
-  )
-}
-
-type VisitorGeolocation = {
-  country: string
-  city?: string
-  flag: string
+  );
 }
 
 function LastVisitorInfo() {
-  const [lastVisitor, setLastVisitor] = React.useState<VisitorGeolocation>({
-    country: 'US',
-    flag: '🇺🇸'
-  })
+  const [lastVisitor, setLastVisitor] = useState<VisitorGeolocation | null>(null);
 
-  React.useEffect(() => {
-    const fetchLastVisitorInfo = async () => {
-      let lastVisitor: VisitorGeolocation
-      if (env.VERCEL_ENV === 'production') {
-        const [lv, cv] = await redis.mget<VisitorGeolocation[]>(kvKeys.lastVisitor, kvKeys.currentVisitor)
-        lastVisitor = lv || { country: 'US', flag: '🇺🇸' }
-        await redis.set(kvKeys.lastVisitor, cv)
-      } else {
-        lastVisitor = { country: 'US', flag: '🇺🇸' }
-      }
-      setLastVisitor(lastVisitor)
+  useEffect(() => {
+    async function loadLastVisitorInfo() {
+      const result = await fetchLastVisitorInfo();
+      setLastVisitor(result);
     }
-    fetchLastVisitorInfo()
-  }, [])
+
+    loadLastVisitorInfo();
+  }, []);
+
+  if (lastVisitor === null) {
+    return <span>Loading...</span>; // 或者可以使用一个 Skeleton 组件
+  }
 
   return (
     <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
@@ -107,16 +117,16 @@ function LastVisitorInfo() {
       </span>
       <span className="font-medium">{lastVisitor.flag}</span>
     </span>
-  )
+  );
 }
 
-export default async function Footer() {
+export async function Footer() {
   const [subs] = await db
     .select({
       subCount: count(),
     })
     .from(subscribers)
-    .where(isNotNull(subscribers.subscribedAt))
+    .where(isNotNull(subscribers.subscribedAt));
 
   return (
     <footer className="mt-32">
@@ -145,5 +155,5 @@ export default async function Footer() {
         </div>
       </Container.Outer>
     </footer>
-  )
+  );
 }
