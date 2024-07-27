@@ -15,128 +15,63 @@ import { redis } from '~/lib/redis'
 
 import { Newsletter } from './Newsletter'
 
-// 定义 VisitorGeolocation 类型
-type VisitorGeolocation = {
-  country: string
-  city?: string
-  flag: string
-}
+const NavLink: React.FC<{ href: string }> = ({ href, children }) => (
+  <Link
+    href={href}
+    className="transition hover:text-lime-500 dark:hover:text-lime-400"
+  >
+    {children}
+  </Link>
+)
 
-// 导航链接组件
-function NavLink({
-  href,
-  children,
-}: {
-  href: string
-  children: React.ReactNode
-}) {
-  return (
-    <Link
-      href={href}
-      className="transition hover:text-lime-500 dark:hover:text-lime-400"
-    >
-      {children}
-    </Link>
-  )
-}
+const Links: React.FC = () => (
+  <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+    {navigationItems.map(({ href, text }) => (
+      <NavLink key={href} href={href}>
+        {text}
+      </NavLink>
+    ))}
+  </nav>
+)
 
-// 导航链接列表组件
-function Links() {
-  return (
-    <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
-      {navigationItems.map(({ href, text }) => (
-        <NavLink key={href} href={href}>
-          {text}
-        </NavLink>
-      ))}
-    </nav>
-  )
-}
-
-// 总浏览量组件
-function TotalPageViews({ views }: { views: number }) {
-  return (
-    <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
-      <UsersIcon className="h-4 w-4" />
-      <span title={`${Intl.NumberFormat('en-US').format(views)}次浏览`}>
-        总浏览量&nbsp;
-        <span className="font-medium">{prettifyNumber(views, true)}</span>
-      </span>
-    </span>
-  )
-}
-
-// 最近访客信息组件
-function LastVisitorInfo({ visitor }: { visitor: VisitorGeolocation }) {
-  return (
-    <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
-      <CursorClickIcon className="h-4 w-4" />
-      <span>
-        最近访客来自&nbsp;
-        {[visitor.city, visitor.country].filter(Boolean).join(', ')}
-      </span>
-      <span className="font-medium">{visitor.flag}</span>
-    </span>
-  )
-}
-
-// 计算总浏览量和最近访客信息
-async function fetchPageStats() {
-  let views: number
-  let lastVisitor: VisitorGeolocation
-
-  try {
-    if (env.VERCEL_ENV === 'production') {
-      // 获取多个键的值，并进行类型断言
-      const [viewCountRaw, currentVisitorRaw] = await redis.mget(
-        kvKeys.totalPageViews,
-        kvKeys.currentVisitor
-      ) as [string | null, string | null]
-
-      // 更新总浏览量
-      views = parseInt(viewCountRaw ?? '0', 10) + 1
-      await redis.set(kvKeys.totalPageViews, views.toString())
-
-      // 处理最近访客信息
-      if (currentVisitorRaw) {
-        try {
-          lastVisitor = JSON.parse(currentVisitorRaw)
-          if (!lastVisitor.country || !lastVisitor.flag) {
-            throw new Error('Invalid visitor data')
-          }
-        } catch (e) {
-          console.error("Failed to parse JSON for lastVisitor:", e)
-          lastVisitor = { country: 'US', flag: '🇺🇸' }
-        }
-      } else {
-        lastVisitor = { country: 'US', flag: '🇺🇸' }
-      }
-
-      // 将更新后的最近访客信息存回 Redis
-      await redis.set(kvKeys.lastVisitor, JSON.stringify(lastVisitor))
-    } else {
-      views = 345678
-      lastVisitor = { country: 'US', flag: '🇺🇸' }
-    }
-  } catch (e) {
-    console.error("Error fetching page stats:", e)
-    views = 0
-    lastVisitor = { country: 'US', flag: '🇺🇸' }
+const fetchPageStats = async () => {
+  if (env.VERCEL_ENV === 'production') {
+    const views = await redis.incr(kvKeys.totalPageViews)
+    const [lastVisitorRaw, currentVisitorRaw] = await redis.mget(kvKeys.lastVisitor, kvKeys.currentVisitor)
+    const lastVisitor = lastVisitorRaw ? JSON.parse(lastVisitorRaw) : { country: 'US', flag: '🇺🇸' }
+    await redis.set(kvKeys.lastVisitor, currentVisitorRaw || JSON.stringify(lastVisitor))
+    return { views, lastVisitor }
   }
-
-  return { views, lastVisitor }
+  return { views: 345678, lastVisitor: { country: 'US', flag: '🇺🇸' } }
 }
 
-// 页脚组件
+const TotalPageViews: React.FC<{ views: number }> = ({ views }) => (
+  <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
+    <UsersIcon className="h-4 w-4" />
+    <span title={`${Intl.NumberFormat('en-US').format(views)}次浏览`}>
+      总浏览量&nbsp;
+      <span className="font-medium">{prettifyNumber(views, true)}</span>
+    </span>
+  </span>
+)
+
+const LastVisitorInfo: React.FC<{ visitor: { country: string; city?: string; flag: string } }> = ({ visitor }) => (
+  <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
+    <CursorClickIcon className="h-4 w-4" />
+    <span>
+      最近访客来自&nbsp;
+      {[visitor.city, visitor.country].filter(Boolean).join(', ')}
+    </span>
+    <span className="font-medium">{visitor.flag}</span>
+  </span>
+)
+
 export async function Footer() {
   const [subs] = await db
-    .select({
-      subCount: count(),
-    })
+    .select({ subCount: count() })
     .from(subscribers)
     .where(isNotNull(subscribers.subscribedAt))
 
-  // 获取浏览量和访客信息
   const { views, lastVisitor } = await fetchPageStats()
 
   return (
