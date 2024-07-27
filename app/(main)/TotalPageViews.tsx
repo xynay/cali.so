@@ -1,9 +1,10 @@
+// src/components/TotalPageViews.tsx
 import React from 'react'
 import { UsersIcon } from '~/assets'
 import { kvKeys } from '~/config/kv'
-import { redis } from '~/lib/redis'
-import { prettifyNumber } from '~/lib/math'
 import { env } from '~/env.mjs'
+import { prettifyNumber } from '~/lib/math'
+import { redis } from '~/lib/redis'
 
 async function loadTotalPageViews() {
   let views: number
