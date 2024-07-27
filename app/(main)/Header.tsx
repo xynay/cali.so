@@ -30,9 +30,9 @@ import { Container } from '~/components/ui/Container'
 import { Tooltip } from '~/components/ui/Tooltip'
 import { url } from '~/lib'
 import { clamp } from '~/lib/math'
+
 export function Header() {
   const isHomePage = usePathname() === '/'
-
   const headerRef = React.useRef<HTMLDivElement>(null)
   const avatarRef = React.useRef<HTMLDivElement>(null)
   const isInitial = React.useRef(true)
@@ -46,18 +46,16 @@ export function Header() {
     const downDelay = avatarRef.current?.offsetTop ?? 0
     const upDelay = 64
 
-    function setProperty(property: string, value: string | null) {
+    const setProperty = (property: string, value: string | null) => {
       document.documentElement.style.setProperty(property, value)
     }
 
-    function removeProperty(property: string) {
+    const removeProperty = (property: string) => {
       document.documentElement.style.removeProperty(property)
     }
 
-    function updateHeaderStyles() {
-      if (!headerRef.current) {
-        return
-      }
+    const updateHeaderStyles = () => {
+      if (!headerRef.current) return
 
       const { top, height } = headerRef.current.getBoundingClientRect()
       const scrollY = clamp(
@@ -95,10 +93,8 @@ export function Header() {
       }
     }
 
-    function updateAvatarStyles() {
-      if (!isHomePage) {
-        return
-      }
+    const updateAvatarStyles = () => {
+      if (!isHomePage) return
 
       const fromScale = 1
       const toScale = 36 / 64
@@ -124,7 +120,7 @@ export function Header() {
       setProperty('--avatar-border-opacity', scale === toScale ? '1' : '0')
     }
 
-    function updateStyles() {
+    const updateStyles = () => {
       updateHeaderStyles()
       updateAvatarStyles()
       isInitial.current = false
@@ -138,7 +134,6 @@ export function Header() {
       window.removeEventListener('scroll', updateStyles)
       window.removeEventListener('resize', updateStyles)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHomePage])
 
   const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
@@ -280,22 +275,6 @@ export function Header() {
                   <ThemeSwitcher />
                 </div>
               </motion.div>
-              {/* 
-              <AnimatePresence>
-                {!isHomePage && (
-                  <motion.div
-                    className="absolute left-14 top-1 flex h-8 items-center"
-                    initial={{ opacity: 0, scale: 0.3 }}
-                    animate={{
-                      opacity: 1,
-                      scale: 1,
-                      transition: { delay: 1 },
-                    }}
-                  >
-                    <Activity />
-                  </motion.div>
-                )}
-              </AnimatePresence> */}
             </div>
           </Container>
         </div>
@@ -311,15 +290,11 @@ function UserInfo() {
   const { user } = useUser()
   const StrategyIcon = React.useMemo(() => {
     const strategy = user?.primaryEmailAddress?.verification.strategy
-    if (!strategy) {
-      return null
-    }
+    if (!strategy) return null
 
     switch (strategy) {
       case 'from_oauth_github':
-        return GitHubBrandIcon as (
-          props: React.ComponentProps<'svg'>
-        ) => JSX.Element
+        return GitHubBrandIcon
       case 'from_oauth_google':
         return GoogleBrandIcon
       default:
