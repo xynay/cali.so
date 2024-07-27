@@ -1,16 +1,22 @@
+// CSS Imports
 import './globals.css'
 import './clerk.css'
 import './prism.css'
 
-import { ClerkProvider } from '@clerk/nextjs'
+// Next.js Imports
 import type { Metadata, Viewport } from 'next'
 
+// Clerk Imports
+import { ClerkProvider } from '@clerk/nextjs'
+
+// Local Imports
 import { ThemeProvider } from '~/app/(main)/ThemeProvider'
 import { url } from '~/lib'
 import { zhCN } from '~/lib/clerkLocalizations'
 import { sansFont } from '~/lib/font'
 import { seo } from '~/lib/seo'
 
+// Metadata Configuration
 export const metadata: Metadata = {
   metadataBase: seo.url,
   title: {
@@ -57,6 +63,7 @@ export const metadata: Metadata = {
   },
 }
 
+// Viewport Configuration
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#000212' },
@@ -64,11 +71,8 @@ export const viewport: Viewport = {
   ],
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+// Root Layout Component
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider localization={zhCN}>
       <html
