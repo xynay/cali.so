@@ -1,10 +1,9 @@
 'use client'
 
-import Spline from '@splinetool/react-spline'
-import { motion } from 'framer-motion'
-import Link from 'next/link'
-
-import { url } from '~/lib'
+import Spline from '@splinetool/react-spline';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { url } from '~/lib';
 
 export default function NotFoundPage() {
   return (
@@ -30,5 +29,5 @@ export default function NotFoundPage() {
         </Link>
       </div>
     </main>
-  )
+  );
 }

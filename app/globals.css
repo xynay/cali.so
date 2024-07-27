@@ -13,6 +13,7 @@ body {
 html.light {
   --bg-color: theme('colors.zinc.50');
 }
+
 html.dark {
   --bg-color: theme('colors.primary.900');
 }
@@ -31,8 +32,7 @@ html.dark {
 }
 
 @keyframes typing-pulse {
-  0%,
-  100% {
+  0%, 100% {
     opacity: 1;
   }
   50% {
