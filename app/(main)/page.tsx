@@ -9,7 +9,13 @@ import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
 
-const fetchSettings = async () => {
+// Define the type for the settings object
+interface Settings {
+  heroPhotos?: { url: string }[];  // Adjust according to the actual shape of heroPhotos
+  resume?: { content: string };    // Adjust according to the actual shape of resume
+}
+
+const fetchSettings = async (): Promise<Settings> => {
   try {
     const settings = await getSettings();
     return settings || {};
@@ -19,7 +25,7 @@ const fetchSettings = async () => {
   }
 };
 
-const BlogHomePageContent = React.memo(async () => {
+const BlogHomePageContent: React.FC = React.memo(async () => {
   const settings = await fetchSettings();
   const { heroPhotos, resume } = settings;
 
