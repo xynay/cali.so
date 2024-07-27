@@ -10,8 +10,8 @@ import { db } from '~/db'
 import { subscribers } from '~/db/schema'
 import { env } from '~/env.mjs'
 
-const TotalPageViews = React.lazy(() => import('~/components/TotalPageViews'))
-const LastVisitorInfo = React.lazy(() => import('~/components/LastVisitorInfo'))
+const TotalPageViews = React.lazy(() => import('./TotalPageViews'))
+const LastVisitorInfo = React.lazy(() => import('./LastVisitorInfo'))
 
 function NavLink({
   href,
