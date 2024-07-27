@@ -15,26 +15,35 @@ import { redis } from '~/lib/redis'
 
 import { Newsletter } from './Newsletter'
 
-const NavLink = React.memo(({ href, children }: { href: string; children: React.ReactNode }) => (
-  <Link
-    href={href}
-    className="transition hover:text-lime-500 dark:hover:text-lime-400"
-  >
-    {children}
-  </Link>
-))
+function NavLink({
+  href,
+  children,
+}: {
+  href: string
+  children: React.ReactNode
+}) {
+  return (
+    <Link
+      href={href}
+      className="transition hover:text-lime-500 dark:hover:text-lime-400"
+    >
+      {children}
+    </Link>
+  )
+}
 
-const Links = React.memo(() => (
-  <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
-    {navigationItems.map(({ href, text }) => (
-      <NavLink key={href} href={href}>
-        {text}
-      </NavLink>
-    ))}
-  </nav>
-))
+function Links() {
+  return (
+    <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+      {navigationItems.map(({ href, text }) => (
+        <NavLink key={href} href={href}>
+          {text}
+        </NavLink>
+      ))}
+    </nav>
+  )
+}
 
-// The Client Component that uses `useState` and `useEffect`
 function TotalPageViews() {
   const [views, setViews] = React.useState<number>(0)
 
@@ -68,7 +77,6 @@ type VisitorGeolocation = {
   flag: string
 }
 
-// The Client Component that uses `useState` and `useEffect`
 function LastVisitorInfo() {
   const [lastVisitor, setLastVisitor] = React.useState<VisitorGeolocation>({
     country: 'US',
@@ -120,7 +128,7 @@ export default async function Footer() {
             </div>
             <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
               <p className="text-sm text-zinc-500/80 dark:text-zinc-400/80">
-                &copy; {new Date().getFullYear()} Cali Castle. 网站已开源：
+                &copy; {new Date().getFullYear()} xinrengui. 网站已开源：
                 <PeekabooLink href="https://github.com/CaliCastle/cali.so">
                   GitHub
                 </PeekabooLink>
