@@ -43,7 +43,7 @@ export function BlogPostPage({
             <BlogPostTableOfContents headings={post.headings} />
           </div>
         </aside>
-        <div className="max-w-2xl md:flex-1 md:shrink-0">
+        <div className="max-w-2xl md:flex-1 md:shrink-0 mx-auto">
           <Button
             href="/blog"
             variant="secondary"
@@ -52,7 +52,7 @@ export function BlogPostPage({
           >
             <UTurnLeftIcon className="h-8 w-8 stroke-zinc-500 transition group-hover:stroke-zinc-700 dark:stroke-zinc-500 dark:group-hover:stroke-zinc-400" />
           </Button>
-          <article data-postid={post._id}>
+          <article data-postid={post._id} className="mx-auto">
             <header className="relative flex flex-col items-center pb-5 after:absolute after:-bottom-1 after:block after:h-px after:w-full after:rounded after:bg-gradient-to-r after:from-zinc-400/20 after:via-zinc-200/10 after:to-transparent dark:after:from-zinc-600/20 dark:after:via-zinc-700/10">
               <motion.div
                 className="relative mb-7 aspect-[240/135] w-full md:mb-12 md:w-[120%]"

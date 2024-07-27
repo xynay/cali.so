@@ -49,6 +49,7 @@
   font-size: 12px;
 }
 
+
 .dark {
   .🔒 , .cl-formField p, .cl-formField p[aria-live="polite"], .cl-formFieldInputShowPasswordButton {
     @apply text-zinc-400;
