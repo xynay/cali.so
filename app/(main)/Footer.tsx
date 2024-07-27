@@ -1,6 +1,6 @@
 import { count, isNotNull } from 'drizzle-orm'
 import Link from 'next/link'
-import React from 'react'
+import React, { Suspense, memo } from 'react'
 
 import { CursorClickIcon, UsersIcon } from '~/assets'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
@@ -15,36 +15,23 @@ import { redis } from '~/lib/redis'
 
 import { Newsletter } from './Newsletter'
 
-function NavLink({
-  href,
-  children,
-}: {
-  href: string
-  children: React.ReactNode
-}) {
-  return (
-    <Link
-      href={href}
-      className="transition hover:text-lime-500 dark:hover:text-lime-400"
-    >
-      {children}
-    </Link>
-  )
-}
+const NavLink = memo(({ href, children }: { href: string; children: React.ReactNode }) => (
+  <Link href={href} className="transition hover:text-lime-500 dark:hover:text-lime-400">
+    {children}
+  </Link>
+))
 
-function Links() {
-  return (
-    <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
-      {navigationItems.map(({ href, text }) => (
-        <NavLink key={href} href={href}>
-          {text}
-        </NavLink>
-      ))}
-    </nav>
-  )
-}
+const Links = memo(() => (
+  <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+    {navigationItems.map(({ href, text }) => (
+      <NavLink key={href} href={href}>
+        {text}
+      </NavLink>
+    ))}
+  </nav>
+))
 
-async function TotalPageViews() {
+const TotalPageViews = memo(async () => {
   let views: number
   if (env.VERCEL_ENV === 'production') {
     views = await redis.incr(kvKeys.totalPageViews)
@@ -61,14 +48,9 @@ async function TotalPageViews() {
       </span>
     </span>
   )
-}
+})
 
-type VisitorGeolocation = {
-  country: string
-  city?: string
-  flag: string
-}
-async function LastVisitorInfo() {
+const LastVisitorInfo = memo(async () => {
   let lastVisitor: VisitorGeolocation | undefined = undefined
   if (env.VERCEL_ENV === 'production') {
     const [lv, cv] = await redis.mget<VisitorGeolocation[]>(
@@ -96,7 +78,7 @@ async function LastVisitorInfo() {
       <span className="font-medium">{lastVisitor.flag}</span>
     </span>
   )
-}
+})
 
 export async function Footer() {
   const [subs] = await db
@@ -126,12 +108,12 @@ export async function Footer() {
           </Container.Inner>
           <Container.Inner className="mt-6">
             <div className="flex flex-col items-center justify-start gap-2 sm:flex-row">
-              <React.Suspense>
+              <Suspense fallback={<div>Loading...</div>}>
                 <TotalPageViews />
-              </React.Suspense>
-              <React.Suspense>
+              </Suspense>
+              <Suspense fallback={<div>Loading...</div>}>
                 <LastVisitorInfo />
-              </React.Suspense>
+              </Suspense>
             </div>
           </Container.Inner>
         </div>
