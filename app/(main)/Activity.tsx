@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
@@ -7,7 +7,7 @@ import { useQuery } from 'react-query';
 
 import { Tooltip } from '~/components/ui/Tooltip';
 
-const appLabels: { [app: string]: string } = {
+const appLabels = {
   slack: 'Slack',
   arc: 'Arc',
   craft: 'Craft',
@@ -41,7 +41,7 @@ const fetchActivity = async () => {
 export function Activity() {
   const { data } = useQuery<{ app: string }>('activity', fetchActivity, {
     refetchInterval: 5000,
-    enabled: typeof window !== 'undefined' && new URL(window.location.href).hostname === 'cali.so',
+    enabled: typeof window !== 'undefined' && new URL(window.location.href).hostname === 'xinrengui.eu.org',
   });
 
   const [open, setOpen] = React.useState(false);
