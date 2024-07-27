@@ -25,9 +25,9 @@ import { type PostDetail } from '~/sanity/schemas/post'
 
 import { BlogPostCard } from './BlogPostCard'
 
-const BlogPostTableOfContents = dynamic(() => import('./BlogPostTableOfContents'), { ssr: false })
-const BlogReactions = dynamic(() => import('~/app/(main)/blog/BlogReactions'), { ssr: false })
-const BlogPostStateLoader = dynamic(() => import('~/app/(main)/blog/BlogPostStateLoader'), { ssr: false })
+const BlogPostTableOfContents = dynamic<React.ComponentType<any>>(() => import('./BlogPostTableOfContents'), { ssr: false })
+const BlogReactions = dynamic<React.ComponentType<any>>(() => import('~/app/(main)/blog/BlogReactions'), { ssr: false })
+const BlogPostStateLoader = dynamic<React.ComponentType<any>>(() => import('~/app/(main)/blog/BlogPostStateLoader'), { ssr: false })
 
 export function BlogPostPage({
   post,
