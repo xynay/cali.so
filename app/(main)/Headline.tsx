@@ -1,46 +1,57 @@
 'use client'
 
-import React from 'react'
-import { motion } from 'framer-motion'
 import Balancer from 'react-wrap-balancer'
+import { motion } from 'framer-motion'
 
 import { SparkleIcon, UserSecurityIcon } from '~/assets'
 
-// 分离出角色组件，提高复用性和可读性
-const Developer = () => (
-  <span className="group">
-    <span className="font-mono">&lt;</span>探索者
-    <span className="font-mono">/&gt;</span>
-    <span className="invisible inline-flex text-zinc-300 before:content-['|'] group-hover:visible group-hover:animate-typing dark:text-zinc-500" />
-  </span>
-)
-
-const Designer = () => (
-  <span className="group relative bg-black/5 p-1 dark:bg-white/5">
-    <span className="pointer-events-none absolute inset-0 border border-lime-700/90 opacity-70 group-hover:border-dashed group-hover:opacity-100 dark:border-lime-400/90">
-      {['-left-[3.5px] -top-[3.5px]', '-bottom-[3.5px] -right-[3.5px]', '-bottom-[3.5px] -left-[3.5px]', '-right-[3.5px] -top-[3.5px]'].map((pos) => (
-        <span key={pos} className={`absolute ${pos} size-1.5 border border-lime-700 bg-zinc-50 dark:border-lime-400`} />
-      ))}
+function Developer() {
+  return (
+    <span className="group">
+      <span className="font-mono">&lt;</span>探索者
+      <span className="font-mono">/&gt;</span>
+      <span className="invisible inline-flex text-zinc-300 before:content-['|'] group-hover:visible group-hover:animate-typing dark:text-zinc-500" />
     </span>
-    生活家
-  </span>
-)
+  )
+}
 
-const OCD = () => (
-  <span className="group inline-flex items-center">
-    <SparkleIcon className="mr-1 inline-flex transform-gpu transition-transform duration-500 group-hover:rotate-180" />
-    <span>记录者</span>
-  </span>
-)
+function Designer() {
+  const borderPositions = [
+    '-left-[3.5px] -top-[3.5px]',
+    '-bottom-[3.5px] -right-[3.5px]',
+    '-bottom-[3.5px] -left-[3.5px]',
+    '-right-[3.5px] -top-[3.5px]'
+  ]
 
-const Founder = () => (
-  <span className="group inline-flex items-center">
-    <UserSecurityIcon className="mr-1 inline-flex group-hover:fill-zinc-600/20 dark:group-hover:fill-zinc-200/20" />
-    <span>思考者</span>
-  </span>
-)
+  return (
+    <span className="group relative bg-black/5 p-1 dark:bg-white/5">
+      <span className="pointer-events-none absolute inset-0 border border-lime-700/90 opacity-70 group-hover:border-dashed group-hover:opacity-100 dark:border-lime-400/90">
+        {borderPositions.map((pos) => (
+          <span key={pos} className={`absolute ${pos} size-1.5 border border-lime-700 bg-zinc-50 dark:border-lime-400`} />
+        ))}
+      </span>
+      生活家
+    </span>
+  )
+}
 
-const roles = [Developer, Designer, OCD, Founder]
+function OCD() {
+  return (
+    <span className="group inline-flex items-center">
+      <SparkleIcon className="mr-1 inline-flex transform-gpu transition-transform duration-500 group-hover:rotate-180" />
+      <span>记录者</span>
+    </span>
+  )
+}
+
+function Founder() {
+  return (
+    <span className="group inline-flex items-center">
+      <UserSecurityIcon className="mr-1 inline-flex group-hover:fill-zinc-600/20 dark:group-hover:fill-zinc-200/20" />
+      <span>思考者</span>
+    </span>
+  )
+}
 
 export function Headline() {
   return (
@@ -56,13 +67,9 @@ export function Headline() {
           duration: 0.3,
         }}
       >
-        {roles.map((Role, index) => (
-          <React.Fragment key={index}>
-            <Role />
-            {index < roles.length - 1 && '，'}
-          </React.Fragment>
-        ))}
+        <Developer />，<Designer />，
         <span className="block h-2" />
+        <OCD />，<Founder />
       </motion.h1>
       <motion.p
         className="mt-6 text-base text-zinc-600 dark:text-zinc-400"
