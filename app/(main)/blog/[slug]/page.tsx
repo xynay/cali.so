@@ -1,9 +1,11 @@
 import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
+
 import { BlogPostPage } from '~/app/(main)/blog/BlogPostPage'
-import { getBlogPost } from '~/sanity/queries'
+import { kvKeys } from '~/config/kv'
+import { env } from '~/env.mjs'
 import { url } from '~/lib'
-import { env } from '~/env.mjs'  // Make sure this path is correct
+import { getBlogPost } from '~/sanity/queries'
 
 export const generateMetadata = async ({
   params,
