@@ -21,11 +21,14 @@ export function BlogPostStateLoader({ post }: { post: Post }) {
   React.useEffect(() => {
     blogPostState.postId = post._id
   }, [post._id])
+
   React.useEffect(() => {
-    // only append new comments
+    const existingCommentIds = new Set(blogPostState.comments.map((c) => c.id))
     comments?.forEach((comment) => {
-      if (blogPostState.comments.find((c) => c.id === comment.id)) return
-      addComment(comment)
+      if (!existingCommentIds.has(comment.id)) {
+        addComment(comment)
+        existingCommentIds.add(comment.id)
+      }
     })
   }, [comments])
 
