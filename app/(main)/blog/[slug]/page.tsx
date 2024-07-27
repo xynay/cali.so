@@ -1,9 +1,9 @@
 import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
-
 import { BlogPostPage } from '~/app/(main)/blog/BlogPostPage'
 import { getBlogPost } from '~/sanity/queries'
 import { url } from '~/lib'
+import { env } from '~/env.mjs'  // Make sure this path is correct
 
 export const generateMetadata = async ({
   params,
@@ -55,7 +55,7 @@ export default async function BlogPage({
     notFound()
   }
 
-  // Mock views for development or fetch from API
+  // Fetch views from API or use mock data
   let views: number = 30578  // Default or mock value for development
   try {
     if (env.VERCEL_ENV === 'production') {
