@@ -1,6 +1,6 @@
 import { count, isNotNull } from 'drizzle-orm'
 import Link from 'next/link'
-import React, { useMemo, useState, useEffect } from 'react'
+import React from 'react'
 
 import { CursorClickIcon, UsersIcon } from '~/assets'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
@@ -34,37 +34,21 @@ const Links = React.memo(() => (
   </nav>
 ))
 
-const fetchTotalPageViews = async (): Promise<number> => {
-  if (env.VERCEL_ENV === 'production') {
-    return await redis.incr(kvKeys.totalPageViews)
-  }
-  return 345678
-}
-
-const fetchLastVisitorInfo = async (): Promise<VisitorGeolocation> => {
-  if (env.VERCEL_ENV === 'production') {
-    const [lv, cv] = await redis.mget<VisitorGeolocation[]>(kvKeys.lastVisitor, kvKeys.currentVisitor)
-    await redis.set(kvKeys.lastVisitor, cv)
-    return lv || { country: 'US', flag: '🇺🇸' }
-  }
-  return { country: 'US', flag: '🇺🇸' }
-}
-
-type VisitorGeolocation = {
-  country: string
-  city?: string
-  flag: string
-}
-
+// The Client Component that uses `useState` and `useEffect`
 function TotalPageViews() {
-  const [views, setViews] = useState<number>(0)
+  const [views, setViews] = React.useState<number>(0)
 
-  useEffect(() => {
-    const getViews = async () => {
-      const totalViews = await fetchTotalPageViews()
+  React.useEffect(() => {
+    const fetchTotalPageViews = async () => {
+      let totalViews: number
+      if (env.VERCEL_ENV === 'production') {
+        totalViews = await redis.incr(kvKeys.totalPageViews)
+      } else {
+        totalViews = 345678
+      }
       setViews(totalViews)
     }
-    getViews()
+    fetchTotalPageViews()
   }, [])
 
   return (
@@ -78,18 +62,32 @@ function TotalPageViews() {
   )
 }
 
+type VisitorGeolocation = {
+  country: string
+  city?: string
+  flag: string
+}
+
+// The Client Component that uses `useState` and `useEffect`
 function LastVisitorInfo() {
-  const [lastVisitor, setLastVisitor] = useState<VisitorGeolocation>({
+  const [lastVisitor, setLastVisitor] = React.useState<VisitorGeolocation>({
     country: 'US',
     flag: '🇺🇸'
   })
 
-  useEffect(() => {
-    const getVisitorInfo = async () => {
-      const visitorInfo = await fetchLastVisitorInfo()
-      setLastVisitor(visitorInfo)
+  React.useEffect(() => {
+    const fetchLastVisitorInfo = async () => {
+      let lastVisitor: VisitorGeolocation
+      if (env.VERCEL_ENV === 'production') {
+        const [lv, cv] = await redis.mget<VisitorGeolocation[]>(kvKeys.lastVisitor, kvKeys.currentVisitor)
+        lastVisitor = lv || { country: 'US', flag: '🇺🇸' }
+        await redis.set(kvKeys.lastVisitor, cv)
+      } else {
+        lastVisitor = { country: 'US', flag: '🇺🇸' }
+      }
+      setLastVisitor(lastVisitor)
     }
-    getVisitorInfo()
+    fetchLastVisitorInfo()
   }, [])
 
   return (
@@ -104,7 +102,7 @@ function LastVisitorInfo() {
   )
 }
 
-export async function Footer() {
+export default async function Footer() {
   const [subs] = await db
     .select({
       subCount: count(),
