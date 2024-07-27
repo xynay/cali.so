@@ -85,22 +85,42 @@ async function fetchPageStats() {
   let views: number
   let lastVisitor: VisitorGeolocation
 
-  if (env.VERCEL_ENV === 'production') {
-    // 获取多个键的值，并进行类型断言
-    const [viewCountRaw, currentVisitorRaw] = await redis.mget(
-      kvKeys.totalPageViews,
-      kvKeys.currentVisitor
-    ) as [string | null, string | null]
+  try {
+    if (env.VERCEL_ENV === 'production') {
+      // 获取多个键的值，并进行类型断言
+      const [viewCountRaw, currentVisitorRaw] = await redis.mget(
+        kvKeys.totalPageViews,
+        kvKeys.currentVisitor
+      ) as [string | null, string | null]
 
-    // 更新总浏览量
-    views = parseInt(viewCountRaw ?? '0', 10) + 1
-    await redis.set(kvKeys.totalPageViews, views.toString())
+      // 更新总浏览量
+      views = parseInt(viewCountRaw ?? '0', 10) + 1
+      await redis.set(kvKeys.totalPageViews, views.toString())
 
-    // 设置最近访客信息
-    lastVisitor = JSON.parse(currentVisitorRaw ?? '{}') || { country: 'US', flag: '🇺🇸' }
-    await redis.set(kvKeys.lastVisitor, JSON.stringify(lastVisitor))
-  } else {
-    views = 345678
+      // 处理最近访客信息
+      if (currentVisitorRaw) {
+        try {
+          lastVisitor = JSON.parse(currentVisitorRaw)
+          if (!lastVisitor.country || !lastVisitor.flag) {
+            throw new Error('Invalid visitor data')
+          }
+        } catch (e) {
+          console.error("Failed to parse JSON for lastVisitor:", e)
+          lastVisitor = { country: 'US', flag: '🇺🇸' }
+        }
+      } else {
+        lastVisitor = { country: 'US', flag: '🇺🇸' }
+      }
+
+      // 将更新后的最近访客信息存回 Redis
+      await redis.set(kvKeys.lastVisitor, JSON.stringify(lastVisitor))
+    } else {
+      views = 345678
+      lastVisitor = { country: 'US', flag: '🇺🇸' }
+    }
+  } catch (e) {
+    console.error("Error fetching page stats:", e)
+    views = 0
     lastVisitor = { country: 'US', flag: '🇺🇸' }
   }
 
