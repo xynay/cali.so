@@ -12,7 +12,6 @@ function getRateLimitKey(ip: string) {
 }
 
 function checkRateLimit(ip: string): boolean {
-  const key = getRateLimitKey(ip)
   const now = Date.now()
 
   // Cleanup expired entries
