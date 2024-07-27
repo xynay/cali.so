@@ -2,6 +2,7 @@ import React, { Suspense, memo } from 'react'
 import Link from 'next/link'
 
 import { count, isNotNull } from 'drizzle-orm'
+
 import { CursorClickIcon, UsersIcon } from '~/assets'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
 import { Container } from '~/components/ui/Container'
