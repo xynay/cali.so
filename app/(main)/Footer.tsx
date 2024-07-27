@@ -1,6 +1,6 @@
 import { count, isNotNull } from 'drizzle-orm'
 import Link from 'next/link'
-import React from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 
 import { CursorClickIcon, UsersIcon } from '~/assets'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
@@ -34,13 +34,38 @@ const Links = React.memo(() => (
   </nav>
 ))
 
-const TotalPageViews = React.lazy(async () => {
-  let views: number
+const fetchTotalPageViews = async (): Promise<number> => {
   if (env.VERCEL_ENV === 'production') {
-    views = await redis.incr(kvKeys.totalPageViews)
-  } else {
-    views = 345678
+    return await redis.incr(kvKeys.totalPageViews)
   }
+  return 345678
+}
+
+const fetchLastVisitorInfo = async (): Promise<VisitorGeolocation> => {
+  if (env.VERCEL_ENV === 'production') {
+    const [lv, cv] = await redis.mget<VisitorGeolocation[]>(kvKeys.lastVisitor, kvKeys.currentVisitor)
+    await redis.set(kvKeys.lastVisitor, cv)
+    return lv || { country: 'US', flag: '🇺🇸' }
+  }
+  return { country: 'US', flag: '🇺🇸' }
+}
+
+type VisitorGeolocation = {
+  country: string
+  city?: string
+  flag: string
+}
+
+function TotalPageViews() {
+  const [views, setViews] = useState<number>(0)
+
+  useEffect(() => {
+    const getViews = async () => {
+      const totalViews = await fetchTotalPageViews()
+      setViews(totalViews)
+    }
+    getViews()
+  }, [])
 
   return (
     <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
@@ -51,31 +76,21 @@ const TotalPageViews = React.lazy(async () => {
       </span>
     </span>
   )
-})
-
-type VisitorGeolocation = {
-  country: string
-  city?: string
-  flag: string
 }
 
-const LastVisitorInfo = React.lazy(async () => {
-  let lastVisitor: VisitorGeolocation | undefined = undefined
-  if (env.VERCEL_ENV === 'production') {
-    const [lv, cv] = await redis.mget<VisitorGeolocation[]>(
-      kvKeys.lastVisitor,
-      kvKeys.currentVisitor
-    )
-    lastVisitor = lv
-    await redis.set(kvKeys.lastVisitor, cv)
-  }
+function LastVisitorInfo() {
+  const [lastVisitor, setLastVisitor] = useState<VisitorGeolocation>({
+    country: 'US',
+    flag: '🇺🇸'
+  })
 
-  if (!lastVisitor) {
-    lastVisitor = {
-      country: 'US',
-      flag: '🇺🇸',
+  useEffect(() => {
+    const getVisitorInfo = async () => {
+      const visitorInfo = await fetchLastVisitorInfo()
+      setLastVisitor(visitorInfo)
     }
-  }
+    getVisitorInfo()
+  }, [])
 
   return (
     <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
@@ -87,7 +102,7 @@ const LastVisitorInfo = React.lazy(async () => {
       <span className="font-medium">{lastVisitor.flag}</span>
     </span>
   )
-})
+}
 
 export async function Footer() {
   const [subs] = await db
@@ -117,12 +132,8 @@ export async function Footer() {
           </Container.Inner>
           <Container.Inner className="mt-6">
             <div className="flex flex-col items-center justify-start gap-2 sm:flex-row">
-              <React.Suspense fallback={<div>Loading...</div>}>
-                <TotalPageViews />
-              </React.Suspense>
-              <React.Suspense fallback={<div>Loading...</div>}>
-                <LastVisitorInfo />
-              </React.Suspense>
+              <TotalPageViews />
+              <LastVisitorInfo />
             </div>
           </Container.Inner>
         </div>
