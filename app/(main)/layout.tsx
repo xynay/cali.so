@@ -1,16 +1,16 @@
-import './blog/[slug]/blog.css'
+import './blog/[slug]/blog.css';
 
-import { Analytics } from '@vercel/analytics/react'
-import { Suspense } from 'react'
+import { Analytics } from '@vercel/analytics/react';
+import { Suspense } from 'react';
 
-import { Footer } from '~/app/(main)/Footer'
-import { Header } from '~/app/(main)/Header'
-import { QueryProvider } from '~/app/QueryProvider'
+import { Footer } from '~/app/(main)/Footer';
+import { Header } from '~/app/(main)/Header';
+import { QueryProvider } from '~/app/QueryProvider';
 
 export default function BlogLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <>
@@ -27,7 +27,7 @@ export default function BlogLayout({
         <div className="relative text-zinc-800 dark:text-zinc-200">
           <Header />
           <main>{children}</main>
-          <Suspense>
+          <Suspense fallback={<div>Loading...</div>}>
             <Footer />
           </Suspense>
         </div>
@@ -35,5 +35,5 @@ export default function BlogLayout({
 
       <Analytics />
     </>
-  )
+  );
 }

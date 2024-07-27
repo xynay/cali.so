@@ -1,32 +1,33 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import Image from 'next/image'
-import React from 'react'
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import React from 'react';
 
 export function Photos({ photos }: { photos: string[] }) {
-  const [width, setWidth] = React.useState(0)
-  const [isCompact, setIsCompact] = React.useState(false)
-  const expandedWidth = React.useMemo(() => width * 1.38, [width])
+  const [width, setWidth] = React.useState(0);
+  const [isCompact, setIsCompact] = React.useState(false);
+  const expandedWidth = React.useMemo(() => width * 1.38, [width]);
 
   React.useEffect(() => {
     const handleResize = () => {
       // 640px is the breakpoint for md
       if (window.innerWidth < 640) {
-        setIsCompact(true)
-        return setWidth(window.innerWidth / 2 - 64)
+        setIsCompact(true);
+        setWidth(window.innerWidth / 2 - 64);
+      } else {
+        setIsCompact(false);
+        setWidth(window.innerWidth / photos.length - 4 * photos.length);
       }
+    };
 
-      setWidth(window.innerWidth / photos.length - 4 * photos.length)
-    }
-
-    window.addEventListener('resize', handleResize)
-    handleResize()
+    window.addEventListener('resize', handleResize);
+    handleResize();
 
     return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [photos.length])
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [photos.length]);
 
   return (
     <motion.div
@@ -73,5 +74,5 @@ export function Photos({ photos }: { photos: string[] }) {
         ))}
       </div>
     </motion.div>
-  )
+  );
 }
