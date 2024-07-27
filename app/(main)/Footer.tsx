@@ -1,6 +1,6 @@
 import { count, isNotNull } from 'drizzle-orm';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import { CursorClickIcon, UsersIcon } from '~/assets';
 import { PeekabooLink } from '~/components/links/PeekabooLink';
@@ -14,6 +14,8 @@ import { prettifyNumber } from '~/lib/math';
 import { redis } from '~/lib/redis';
 
 import { Newsletter } from './Newsletter';
+import TotalPageViews from './TotalPageViews';
+import LastVisitorInfo from './LastVisitorInfo';
 
 function NavLink({
   href,
@@ -41,82 +43,6 @@ function Links() {
         </NavLink>
       ))}
     </nav>
-  );
-}
-
-async function fetchTotalPageViews(): Promise<number> {
-  if (env.VERCEL_ENV === 'production') {
-    return await redis.incr(kvKeys.totalPageViews);
-  } else {
-    return 345678;
-  }
-}
-
-async function fetchLastVisitorInfo(): Promise<VisitorGeolocation> {
-  if (env.VERCEL_ENV === 'production') {
-    const [lv, cv] = await redis.mget<VisitorGeolocation[]>(
-      kvKeys.lastVisitor,
-      kvKeys.currentVisitor
-    );
-    await redis.set(kvKeys.lastVisitor, cv);
-    return lv ?? { country: 'US', flag: '🇺🇸' };
-  } else {
-    return { country: 'US', flag: '🇺🇸' };
-  }
-}
-
-function TotalPageViews() {
-  const [views, setViews] = useState<number | null>(null);
-
-  useEffect(() => {
-    async function loadViews() {
-      const result = await fetchTotalPageViews();
-      setViews(result);
-    }
-
-    loadViews();
-  }, []);
-
-  if (views === null) {
-    return <span>Loading...</span>; // 或者可以使用一个 Skeleton 组件
-  }
-
-  return (
-    <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
-      <UsersIcon className="h-4 w-4" />
-      <span title={`${Intl.NumberFormat('en-US').format(views)}次浏览`}>
-        总浏览量&nbsp;
-        <span className="font-medium">{prettifyNumber(views, true)}</span>
-      </span>
-    </span>
-  );
-}
-
-function LastVisitorInfo() {
-  const [lastVisitor, setLastVisitor] = useState<VisitorGeolocation | null>(null);
-
-  useEffect(() => {
-    async function loadLastVisitorInfo() {
-      const result = await fetchLastVisitorInfo();
-      setLastVisitor(result);
-    }
-
-    loadLastVisitorInfo();
-  }, []);
-
-  if (lastVisitor === null) {
-    return <span>Loading...</span>; // 或者可以使用一个 Skeleton 组件
-  }
-
-  return (
-    <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
-      <CursorClickIcon className="h-4 w-4" />
-      <span>
-        最近访客来自&nbsp;
-        {[lastVisitor.city, lastVisitor.country].filter(Boolean).join(', ')}
-      </span>
-      <span className="font-medium">{lastVisitor.flag}</span>
-    </span>
   );
 }
 
