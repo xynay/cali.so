@@ -1,3 +1,5 @@
+"use client"
+
 import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
 import { redis } from '~/lib/redis'
