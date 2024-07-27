@@ -13,7 +13,7 @@ import { env } from '~/env.mjs'
 import { prettifyNumber } from '~/lib/math'
 import { redis } from '~/lib/redis'
 
-
+// 定义 VisitorGeolocation 类型
 type VisitorGeolocation = {
   country: string
   city?: string
@@ -84,17 +84,18 @@ async function fetchPageStats() {
   let lastVisitor: VisitorGeolocation
 
   if (env.VERCEL_ENV === 'production') {
-    const [viewCount, currentVisitor] = await redis.mget<number, VisitorGeolocation>(
+    // 获取多个键的值
+    const [viewCount, currentVisitor] = await redis.mget(
       kvKeys.totalPageViews,
       kvKeys.currentVisitor
     )
-    
+
     // 更新总浏览量
-    views = viewCount || 0
-    await redis.set(kvKeys.totalPageViews, (views + 1).toString())
+    views = parseInt(viewCount || '0', 10) + 1
+    await redis.set(kvKeys.totalPageViews, views.toString())
 
     // 设置最近访客信息
-    lastVisitor = currentVisitor || { country: 'US', flag: '🇺🇸' }
+    lastVisitor = JSON.parse(currentVisitor || '{}') || { country: 'US', flag: '🇺🇸' }
     await redis.set(kvKeys.lastVisitor, JSON.stringify(lastVisitor))
   } else {
     views = 345678
