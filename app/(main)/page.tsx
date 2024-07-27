@@ -9,10 +9,16 @@ import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
 
-// Define the type for the settings object
+// Define the type for the settings object to match the actual data structure
 interface Settings {
-  heroPhotos?: { url: string }[];  // Adjust according to the actual shape of heroPhotos
-  resume?: { content: string };    // Adjust according to the actual shape of resume
+  heroPhotos?: string[];  // Change to string[] if that's the actual type
+  resume?: { 
+    company: string; 
+    title: string; 
+    logo: string; 
+    start: string; 
+    end?: string; 
+  }[];
 }
 
 const fetchSettings = async (): Promise<Settings> => {
