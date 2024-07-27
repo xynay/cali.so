@@ -26,20 +26,15 @@ import { type PostDetail } from '~/sanity/schemas/post'
 import { BlogPostCard } from './BlogPostCard'
 import { BlogPostTableOfContents } from './BlogPostTableOfContents'
 
-// 定义 BlogPostPage 组件属性的类型
-type BlogPostPageProps = {
-  post: PostDetail
-  views?: number
-  relatedViews: number[]
-  reactions?: number[] // 添加 reactions 属性
-}
-
 export function BlogPostPage({
   post,
   views,
   relatedViews,
-  reactions, // 确保在函数参数中解构出 reactions
-}: BlogPostPageProps) {
+}: {
+  post: PostDetail
+  views?: number
+  relatedViews: number[]
+}) {
   return (
     <Container className="mt-16 lg:mt-32">
       <div className="w-full md:flex md:justify-between xl:relative">
@@ -199,7 +194,7 @@ export function BlogPostPage({
       ) : null}
 
       <ClientOnly>
-        <BlogPostStateLoader post={post} reactions={reactions} />
+        <BlogPostStateLoader post={post} />
       </ClientOnly>
     </Container>
   )
