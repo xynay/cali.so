@@ -36,35 +36,34 @@ export function Newsletter({ subCount }: { subCount?: string }) {
     emoji: ['🤓', '😊', '🥳', '🤩', '🤪', '🤯', '🥰', '😎', '🤑', '🤗', '😇'],
     elementCount: 32,
   })
-  const onSubmit = React.useCallback(
-    async (data: NewsletterForm) => {
-      try {
-        if (isSubmitting) return
 
-        va.track('Newsletter:Subscribe')
+  const onSubmit = React.useCallback(async (data: NewsletterForm) => {
+    if (isSubmitting) return
 
-        const response = await fetch('/api/newsletter', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ data }),
-        })
-        if (response.ok) {
-          reset()
-          reward()
-          setIsSubscribed(true)
-        }
-      } catch (error) {
-        console.error(error)
+    va.track('Newsletter:Subscribe')
+
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data }),
+      })
+      if (response.ok) {
+        reset()
+        reward()
+        setIsSubscribed(true)
       }
-    },
-    [isSubmitting, reset, reward]
-  )
+    } catch (error) {
+      console.error(error)
+    }
+  }, [isSubmitting, reset, reward])
 
   React.useEffect(() => {
     if (isSubscribed) {
-      setTimeout(() => setIsSubscribed(false), 60000)
+      const timer = setTimeout(() => setIsSubscribed(false), 60000)
+      return () => clearTimeout(timer)
     }
   }, [isSubscribed])
 
@@ -97,7 +96,7 @@ export function Newsletter({ subCount }: { subCount?: string }) {
             className="mt-6 flex h-10"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit="initial"
+            exit={{ opacity: 0, y: 10 }}
           >
             <input
               type="email"
@@ -120,7 +119,7 @@ export function Newsletter({ subCount }: { subCount?: string }) {
             className="mt-6 h-10 text-center text-lg text-zinc-700 dark:text-zinc-300"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit="initial"
+            exit={{ opacity: 0, y: 10 }}
           >
             请查收订阅确认邮件 🥳
           </motion.p>

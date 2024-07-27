@@ -15,64 +15,96 @@ import { redis } from '~/lib/redis'
 
 import { Newsletter } from './Newsletter'
 
-const NavLink: React.FC<{ href: string }> = ({ href, children }) => (
-  <Link
-    href={href}
-    className="transition hover:text-lime-500 dark:hover:text-lime-400"
-  >
-    {children}
-  </Link>
-)
-
-const Links: React.FC = () => (
-  <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
-    {navigationItems.map(({ href, text }) => (
-      <NavLink key={href} href={href}>
-        {text}
-      </NavLink>
-    ))}
-  </nav>
-)
-
-const fetchPageStats = async () => {
-  if (env.VERCEL_ENV === 'production') {
-    const views = await redis.incr(kvKeys.totalPageViews)
-    const [lastVisitorRaw, currentVisitorRaw] = await redis.mget(kvKeys.lastVisitor, kvKeys.currentVisitor)
-    const lastVisitor = lastVisitorRaw ? JSON.parse(lastVisitorRaw) : { country: 'US', flag: '🇺🇸' }
-    await redis.set(kvKeys.lastVisitor, currentVisitorRaw || JSON.stringify(lastVisitor))
-    return { views, lastVisitor }
-  }
-  return { views: 345678, lastVisitor: { country: 'US', flag: '🇺🇸' } }
+function NavLink({
+  href,
+  children,
+}: {
+  href: string
+  children: React.ReactNode
+}) {
+  return (
+    <Link
+      href={href}
+      className="transition hover:text-lime-500 dark:hover:text-lime-400"
+    >
+      {children}
+    </Link>
+  )
 }
 
-const TotalPageViews: React.FC<{ views: number }> = ({ views }) => (
-  <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
-    <UsersIcon className="h-4 w-4" />
-    <span title={`${Intl.NumberFormat('en-US').format(views)}次浏览`}>
-      总浏览量&nbsp;
-      <span className="font-medium">{prettifyNumber(views, true)}</span>
-    </span>
-  </span>
-)
+function Links() {
+  return (
+    <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+      {navigationItems.map(({ href, text }) => (
+        <NavLink key={href} href={href}>
+          {text}
+        </NavLink>
+      ))}
+    </nav>
+  )
+}
 
-const LastVisitorInfo: React.FC<{ visitor: { country: string; city?: string; flag: string } }> = ({ visitor }) => (
-  <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
-    <CursorClickIcon className="h-4 w-4" />
-    <span>
-      最近访客来自&nbsp;
-      {[visitor.city, visitor.country].filter(Boolean).join(', ')}
+async function TotalPageViews() {
+  let views: number
+  if (env.VERCEL_ENV === 'production') {
+    views = await redis.incr(kvKeys.totalPageViews)
+  } else {
+    views = 345678
+  }
+
+  return (
+    <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
+      <UsersIcon className="h-4 w-4" />
+      <span title={`${Intl.NumberFormat('en-US').format(views)}次浏览`}>
+        总浏览量&nbsp;
+        <span className="font-medium">{prettifyNumber(views, true)}</span>
+      </span>
     </span>
-    <span className="font-medium">{visitor.flag}</span>
-  </span>
-)
+  )
+}
+
+type VisitorGeolocation = {
+  country: string
+  city?: string
+  flag: string
+}
+async function LastVisitorInfo() {
+  let lastVisitor: VisitorGeolocation | undefined = undefined
+  if (env.VERCEL_ENV === 'production') {
+    const [lv, cv] = await redis.mget<VisitorGeolocation[]>(
+      kvKeys.lastVisitor,
+      kvKeys.currentVisitor
+    )
+    lastVisitor = lv
+    await redis.set(kvKeys.lastVisitor, cv)
+  }
+
+  if (!lastVisitor) {
+    lastVisitor = {
+      country: 'US',
+      flag: '🇺🇸',
+    }
+  }
+
+  return (
+    <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
+      <CursorClickIcon className="h-4 w-4" />
+      <span>
+        最近访客来自&nbsp;
+        {[lastVisitor.city, lastVisitor.country].filter(Boolean).join(', ')}
+      </span>
+      <span className="font-medium">{lastVisitor.flag}</span>
+    </span>
+  )
+}
 
 export async function Footer() {
   const [subs] = await db
-    .select({ subCount: count() })
+    .select({
+      subCount: count(),
+    })
     .from(subscribers)
     .where(isNotNull(subscribers.subscribedAt))
-
-  const { views, lastVisitor } = await fetchPageStats()
 
   return (
     <footer className="mt-32">
@@ -94,8 +126,12 @@ export async function Footer() {
           </Container.Inner>
           <Container.Inner className="mt-6">
             <div className="flex flex-col items-center justify-start gap-2 sm:flex-row">
-              <TotalPageViews views={views} />
-              <LastVisitorInfo visitor={lastVisitor} />
+              <React.Suspense>
+                <TotalPageViews />
+              </React.Suspense>
+              <React.Suspense>
+                <LastVisitorInfo />
+              </React.Suspense>
             </div>
           </Container.Inner>
         </div>
