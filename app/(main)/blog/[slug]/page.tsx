@@ -2,7 +2,6 @@ import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { BlogPostPage } from '~/app/(main)/blog/BlogPostPage'
-import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
 import { getBlogPost } from '~/sanity/queries'
 

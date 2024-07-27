@@ -2,7 +2,6 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'edge'
 
-export async function GET(req: NextRequest) {
   // 由于删除了 Redis 模块，移除 Ratelimit 相关的 Redis 配置和使用
   // 如果需要其他的限流方法，你可以在这里实现它
   // const ratelimit = new Ratelimit({

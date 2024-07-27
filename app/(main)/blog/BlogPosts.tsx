@@ -8,8 +8,6 @@ export async function BlogPosts({ limit = 5 }) {
   // 获取博客文章
   const posts = await getLatestBlogPosts({ limit, forDisplay: true }) || []
 
-  // 提前获取视图数据
-  const postIdKeys = posts.map(({ _id }) => kvKeys.postViews(_id))
 
   // 使用缓存的视图数据或随机生成数据
   let views: number[] = []

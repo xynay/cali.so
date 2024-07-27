@@ -18,26 +18,30 @@ export async function GET(req: NextRequest) {
     return NextResponse.error()
   }
 
-  // Generate the image URL
-  const imageUrl = new URL(`${env.LINK_PREVIEW_API_BASE_URL}/jpeg`)
-  imageUrl.searchParams.set('url', url)
-  imageUrl.searchParams.set('width', width.toString())
-  imageUrl.searchParams.set('height', height.toString())
-  imageUrl.searchParams.set('ttl', '86400')
+  try {
+    // Generate the image URL
+    const imageUrl = new URL(`${env.LINK_PREVIEW_API_BASE_URL}/jpeg`)
+    imageUrl.searchParams.set('url', url)
+    imageUrl.searchParams.set('width', width.toString())
+    imageUrl.searchParams.set('height', height.toString())
+    imageUrl.searchParams.set('ttl', '86400')
 
-  return new ImageResponse(
-    (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={imageUrl.toString()}
-        alt={`Preview of ${url}`}
-        width={width}
-        height={height}
-      />
-    ),
-    {
-      width,
-      height,
-    }
-  )
+    return new ImageResponse(
+      (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={imageUrl.toString()}
+          alt={`Preview of ${url}`}
+          width={width}
+          height={height}
+        />
+      ),
+      {
+        width,
+        height,
+      }
+    )
+  } catch (error) {
+    return NextResponse.error()
+  }
 }

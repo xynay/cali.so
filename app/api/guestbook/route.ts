@@ -12,7 +12,7 @@ import { env } from '~/env.mjs'
 import { url } from '~/lib'
 import { resend } from '~/lib/mail'
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     // Directly respond with guestbook messages without rate limiting
     return NextResponse.json(await fetchGuestbookMessages())

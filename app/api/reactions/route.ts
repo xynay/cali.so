@@ -49,11 +49,9 @@ export async function GET(req: NextRequest) {
     reactionsStore[key] = [0, 0, 0, 0]
   }
 
-  const ip = req.ip ?? ''
+  const ip = req.headers.get('x-forwarded-for') ?? '' // Use 'x-forwarded-for' header for IP
   if (!checkRateLimit(ip)) {
-    return new Response('Too Many Requests', {
-      status: 429,
-    })
+    return new Response('Too Many Requests', { status: 429 })
   }
 
   return NextResponse.json(value ?? [0, 0, 0, 0])
@@ -69,11 +67,9 @@ export async function PATCH(req: NextRequest) {
 
   const key = getKey(id)
 
-  const ip = req.ip ?? ''
+  const ip = req.headers.get('x-forwarded-for') ?? '' // Use 'x-forwarded-for' header for IP
   if (!checkRateLimit(ip)) {
-    return new Response('Too Many Requests', {
-      status: 429,
-    })
+    return new Response('Too Many Requests', { status: 429 })
   }
 
   let current = reactionsStore[key]
@@ -87,7 +83,5 @@ export async function PATCH(req: NextRequest) {
 
   revalidateTag(key)
 
-  return NextResponse.json({
-    data: current,
-  })
+  return NextResponse.json({ data: current })
 }

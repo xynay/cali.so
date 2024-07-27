@@ -17,22 +17,11 @@ import { url } from '~/lib'
 import { resend } from '~/lib/mail'
 import { client } from '~/sanity/lib/client'
 
-function getKey(id: string) {
-  return `comments:${id}`
-}
-
 type Params = { params: { id: string } }
+
 export async function GET(req: NextRequest, { params }: Params) {
   try {
     const postId = params.id
-
-    // No rate limiting logic
-    // const { success } = await ratelimit.limit(getKey(postId) + `_${req.ip ?? ''}`)
-    // if (!success) {
-    //   return new Response('Too Many Requests', {
-    //     status: 429,
-    //   })
-    // }
 
     const data = await db
       .select({
@@ -77,14 +66,6 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   const postId = params.id
-
-  // No rate limiting logic
-  // const { success } = await ratelimit.limit(getKey(postId) + `_${req.ip ?? ''}`)
-  // if (!success) {
-  //   return new Response('Too Many Requests', {
-  //     status: 429,
-  //   })
-  // }
 
   const post = await client.fetch<
     { slug: string; title: string; imageUrl: string } | undefined
