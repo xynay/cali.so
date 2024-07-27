@@ -99,7 +99,7 @@ export default async function BlogPage({
       post={post}
       views={views}
       relatedViews={relatedViews}
-      reactions={reactions.length > 0 ? reactions : undefined}
+      reactions={reactions.length > 0 ? reactions : undefined} // 确保传递了可选的 reactions 属性
     />
   )
 }
