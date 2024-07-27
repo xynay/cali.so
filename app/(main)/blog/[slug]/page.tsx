@@ -55,29 +55,55 @@ export default async function BlogPage({
     notFound()
   }
 
-  // 直接从数据库或其他存储获取 views 数据
-  let views: number = 30578 // 示例数据，替换为实际获取逻辑
-
-  // 直接从数据库或其他存储获取 reactions 数据
-  let reactions: number[] = []
+  // Mock views for development or fetch from API
+  let views: number = 30578  // Default or mock value for development
   try {
-    const res = await fetch(url(`/api/reactions?id=${post._id}`), {
-      next: {
-        tags: [`reactions:${post._id}`],
-      },
-    })
-    const data = await res.json()
-    if (Array.isArray(data)) {
-      reactions = data
+    if (env.VERCEL_ENV === 'production') {
+      const res = await fetch(url(`/api/views?id=${post._id}`))
+      const data = await res.json()
+      views = data.views ?? views
     }
   } catch (error) {
     console.error(error)
   }
 
-  // 直接从数据库或其他存储获取 relatedViews 数据
+  // Fetch reactions from API or use mock data
+  let reactions: number[] = []
+  try {
+    if (env.VERCEL_ENV === 'production') {
+      const res = await fetch(url(`/api/reactions?id=${post._id}`), {
+        next: {
+          tags: [`reactions:${post._id}`],
+        },
+      })
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        reactions = data
+      }
+    } else {
+      reactions = Array.from({ length: 4 }, () =>
+        Math.floor(Math.random() * 50000)
+      )
+    }
+  } catch (error) {
+    console.error(error)
+  }
+
+  // Fetch related views from API or use mock data
   let relatedViews: number[] = []
   if (typeof post.related !== 'undefined' && post.related.length > 0) {
-    relatedViews = post.related.map(() => Math.floor(Math.random() * 1000)) // 示例数据，替换为实际获取逻辑
+    if (env.VERCEL_ENV === 'development') {
+      relatedViews = post.related.map(() => Math.floor(Math.random() * 1000))
+    } else {
+      try {
+        const postIdKeys = post.related.map(({ _id }) => url(`/api/views?id=${_id}`))
+        const responses = await Promise.all(postIdKeys.map((key) => fetch(key)))
+        const data = await Promise.all(responses.map((res) => res.json()))
+        relatedViews = data.map((d) => d.views)
+      } catch (error) {
+        console.error(error)
+      }
+    }
   }
 
   return (
