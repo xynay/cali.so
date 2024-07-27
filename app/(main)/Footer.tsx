@@ -1,3 +1,4 @@
+// src/components/Footer.tsx
 import { count, isNotNull } from 'drizzle-orm'
 import Link from 'next/link'
 import React from 'react'
@@ -12,6 +13,7 @@ import { env } from '~/env.mjs'
 
 const TotalPageViews = React.lazy(() => import('./TotalPageViews'))
 const LastVisitorInfo = React.lazy(() => import('./LastVisitorInfo'))
+import { Newsletter } from './Newsletter' // 确保导入路径正确
 
 function NavLink({
   href,

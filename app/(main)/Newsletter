@@ -1,0 +1,18 @@
+import React from 'react'
+
+type NewsletterProps = {
+  subCount: string
+}
+
+export const Newsletter: React.FC<NewsletterProps> = ({ subCount }) => {
+  return (
+    <div>
+      <h2>Newsletter</h2>
+      <p>Join our newsletter! Current subscribers: {subCount}</p>
+      <form>
+        <input type="email" placeholder="Your email" />
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+  )
+}
