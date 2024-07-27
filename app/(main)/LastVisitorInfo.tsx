@@ -3,12 +3,7 @@ import { CursorClickIcon } from '~/assets'
 import { kvKeys } from '~/config/kv'
 import { redis } from '~/lib/redis'
 import { env } from '~/env.mjs'
-
-type VisitorGeolocation = {
-  country: string
-  city?: string
-  flag: string
-}
+import { VisitorGeolocation } from '~/types'
 
 async function loadLastVisitorInfo() {
   let lastVisitor: VisitorGeolocation | undefined = undefined
