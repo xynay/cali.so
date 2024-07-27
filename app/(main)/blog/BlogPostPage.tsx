@@ -30,10 +30,12 @@ export function BlogPostPage({
   post,
   views,
   relatedViews,
+  reactions, // 添加 reactions 属性
 }: {
   post: PostDetail
   views?: number
   relatedViews: number[]
+  reactions?: number[] // 在 props 类型中定义 reactions
 }) {
   return (
     <Container className="mt-16 lg:mt-32">
