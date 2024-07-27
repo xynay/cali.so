@@ -10,12 +10,12 @@ const currentDate = getDate().toISOString()
 export const getAllLatestBlogPostSlugsQuery = () =>
   groq`
   *[_type == "post" && !(_id in path("drafts.**"))
-  && publishedAt <= "${currentDate}"
+  && publishedAt <= $currentDate
   && defined(slug.current)] | order(publishedAt desc).slug.current
   `
 
 export const getAllLatestBlogPostSlugs = () => {
-  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery())
+  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery(), { currentDate })
 }
 
 type GetBlogPostsOptions = {
@@ -29,7 +29,7 @@ export const getLatestBlogPostsQuery = ({
   forDisplay = true,
 }: GetBlogPostsOptions) =>
   groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${currentDate}"
+  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate
   && defined(slug.current)] | order(publishedAt desc)[0...${limit}] {
     _id,
     title,
@@ -48,7 +48,7 @@ export const getLatestBlogPostsQuery = ({
   }`
 
 export const getLatestBlogPosts = (options: GetBlogPostsOptions) =>
-  client.fetch<Post[]>(getLatestBlogPostsQuery(options))
+  client.fetch<Post[]>(getLatestBlogPostsQuery(options), { currentDate })
 
 export const getBlogPostQuery = groq`
   *[_type == "post" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
