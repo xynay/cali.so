@@ -7,10 +7,6 @@ const rateLimitStore: { [key: string]: number } = {}
 const RATE_LIMIT_WINDOW_MS = 10000 // 10 seconds
 const RATE_LIMIT_MAX_REQUESTS = 30 // Max requests per window
 
-function getRateLimitKey(ip: string) {
-  return `rate_limit:${ip}`
-}
-
 function checkRateLimit(ip: string): boolean {
   const now = Date.now()
 
@@ -43,6 +39,7 @@ export function GET(req: NextRequest) {
     reactionsStore[id] = [0, 0, 0, 0]
   }
 
+  // Removed unused 'ip' variable
   const ip = req.headers.get('x-forwarded-for') ?? '' // Use 'x-forwarded-for' header for IP
   if (!checkRateLimit(ip)) {
     return new Response('Too Many Requests', { status: 429 })
@@ -59,6 +56,7 @@ export function PATCH(req: NextRequest) {
     return new Response('Missing id or index', { status: 400 })
   }
 
+  // Removed unused 'ip' variable
   const ip = req.headers.get('x-forwarded-for') ?? '' // Use 'x-forwarded-for' header for IP
   if (!checkRateLimit(ip)) {
     return new Response('Too Many Requests', { status: 429 })
