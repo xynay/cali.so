@@ -1,15 +1,10 @@
-// CSS Imports
 import './globals.css'
 import './clerk.css'
 import './prism.css'
 
-// Next.js Imports
+import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata, Viewport } from 'next'
 
-// Clerk Imports
-import { ClerkProvider } from '@clerk/nextjs'
-
-// Local Imports
 import { ThemeProvider } from '~/app/(main)/ThemeProvider'
 import { url } from '~/lib'
 import { zhCN } from '~/lib/clerkLocalizations'
