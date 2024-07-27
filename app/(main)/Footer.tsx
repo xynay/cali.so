@@ -13,7 +13,9 @@ import { env } from '~/env.mjs'
 import { prettifyNumber } from '~/lib/math'
 import { redis } from '~/lib/redis'
 
-import { Newsletter } from './Newsletter'
+// 将异步组件提取到独立的模块中
+const TotalPageViews = React.lazy(() => import('./TotalPageViews'))
+const LastVisitorInfo = React.lazy(() => import('./LastVisitorInfo'))
 
 function NavLink({
   href,
@@ -44,13 +46,25 @@ function Links() {
   )
 }
 
-async function TotalPageViews() {
+// TotalPageViews 组件
+async function loadTotalPageViews() {
   let views: number
   if (env.VERCEL_ENV === 'production') {
     views = await redis.incr(kvKeys.totalPageViews)
   } else {
     views = 345678
   }
+  return views
+}
+
+function TotalPageViewsComponent() {
+  const [views, setViews] = React.useState<number | null>(null)
+
+  React.useEffect(() => {
+    loadTotalPageViews().then(setViews)
+  }, [])
+
+  if (views === null) return <div>Loading...</div>
 
   return (
     <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
@@ -63,12 +77,8 @@ async function TotalPageViews() {
   )
 }
 
-type VisitorGeolocation = {
-  country: string
-  city?: string
-  flag: string
-}
-async function LastVisitorInfo() {
+// LastVisitorInfo 组件
+async function loadLastVisitorInfo() {
   let lastVisitor: VisitorGeolocation | undefined = undefined
   if (env.VERCEL_ENV === 'production') {
     const [lv, cv] = await redis.mget<VisitorGeolocation[]>(
@@ -85,6 +95,18 @@ async function LastVisitorInfo() {
       flag: '🇺🇸',
     }
   }
+
+  return lastVisitor
+}
+
+function LastVisitorInfoComponent() {
+  const [lastVisitor, setLastVisitor] = React.useState<VisitorGeolocation | null>(null)
+
+  React.useEffect(() => {
+    loadLastVisitorInfo().then(setLastVisitor)
+  }, [])
+
+  if (lastVisitor === null) return <div>Loading...</div>
 
   return (
     <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
@@ -126,11 +148,11 @@ export async function Footer() {
           </Container.Inner>
           <Container.Inner className="mt-6">
             <div className="flex flex-col items-center justify-start gap-2 sm:flex-row">
-              <React.Suspense>
-                <TotalPageViews />
+              <React.Suspense fallback={<div>Loading...</div>}>
+                <TotalPageViewsComponent />
               </React.Suspense>
-              <React.Suspense>
-                <LastVisitorInfo />
+              <React.Suspense fallback={<div>Loading...</div>}>
+                <LastVisitorInfoComponent />
               </React.Suspense>
             </div>
           </Container.Inner>
