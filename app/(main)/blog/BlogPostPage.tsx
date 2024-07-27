@@ -4,10 +4,9 @@ import { parseDateTime } from '@zolplay/utils'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import React from 'react'
+import dynamic from 'next/dynamic'
 import Balancer from 'react-wrap-balancer'
 
-import { BlogPostStateLoader } from '~/app/(main)/blog/BlogPostStateLoader'
-import { BlogReactions } from '~/app/(main)/blog/BlogReactions'
 import {
   CalendarIcon,
   CursorClickIcon,
@@ -25,7 +24,10 @@ import { prettifyNumber } from '~/lib/math'
 import { type PostDetail } from '~/sanity/schemas/post'
 
 import { BlogPostCard } from './BlogPostCard'
-import { BlogPostTableOfContents } from './BlogPostTableOfContents'
+
+const BlogPostTableOfContents = dynamic(() => import('./BlogPostTableOfContents'), { ssr: false })
+const BlogReactions = dynamic(() => import('~/app/(main)/blog/BlogReactions'), { ssr: false })
+const BlogPostStateLoader = dynamic(() => import('~/app/(main)/blog/BlogPostStateLoader'), { ssr: false })
 
 export function BlogPostPage({
   post,
@@ -204,9 +206,8 @@ export function BlogPostPage({
           </div>
         </section>
       ) : null}
-
       <ClientOnly>
-        <BlogPostStateLoader post={post} />
+        <BlogPostStateLoader postId={post._id} />
       </ClientOnly>
     </Container>
   )
