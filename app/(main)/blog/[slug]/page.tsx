@@ -1,6 +1,8 @@
 import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
+
 import { BlogPostPage } from '~/app/(main)/blog/BlogPostPage'
+import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
 import { url } from '~/lib'
 import { getBlogPost } from '~/sanity/queries'
@@ -8,51 +10,37 @@ import { getBlogPost } from '~/sanity/queries'
 // 定义类型
 interface MainImage {
   asset: {
-    url: string;
-    lqip?: string;
-    dominant?: {
-      background?: string;
-      foreground?: string;
-    };
-  };
+    url: string
+  }
 }
 
 interface RelatedPost {
-  _id?: string;
-  title?: string;
-  slug?: string;
-  mainImage?: MainImage;
-  publishedAt?: string;
-  author?: string;
-  excerpt?: string;
-  mood?: "happy" | "sad" | "neutral";
+  _id: string
 }
 
 interface BlogPost {
-  _id: string;
-  title: string;
-  description: string;
-  mainImage: MainImage;
-  headings: any[]; // 添加缺失的字段
-  related?: RelatedPost[];
-  // 可能还需要其他字段，具体取决于PostDetail的定义
+  _id: string
+  title: string
+  description: string
+  mainImage: MainImage
+  related?: RelatedPost[]
 }
 
 interface ViewResponse {
-  views: number;
+  views: number
 }
 
 interface Reaction {
-  id: string;
-  count: number;
+  id: string
+  count: number
 }
 
 export const generateMetadata = async ({
   params,
 }: {
   params: { slug: string }
-}) => {
-  const post = await getBlogPost(params.slug) as BlogPost | null
+}): Promise<Metadata | undefined> => {
+  const post = await getBlogPost(params.slug)
   if (!post) {
     notFound()
   }
@@ -92,7 +80,7 @@ export default async function BlogPage({
 }: {
   params: { slug: string }
 }) {
-  const post = await getBlogPost(params.slug) as BlogPost | null
+  const post = await getBlogPost(params.slug)
   if (!post) {
     notFound()
   }
