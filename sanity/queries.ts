@@ -2,7 +2,7 @@ import { groq } from 'next-sanity';
 import { getDate } from '~/lib/date';
 import { client } from '~/sanity/lib/client';
 import { type Post, type PostDetail } from '~/sanity/schemas/post';
-import { type Project } from '~/sanity/schemas/project';
+import { type Project } from '~/sanity/schemas.project';
 
 // 预先计算当前日期
 const currentDate = getDate().toISOString();
