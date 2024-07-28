@@ -9,7 +9,23 @@ import { getBlogPost } from '~/sanity/queries'
 interface MainImage {
   asset: {
     url: string;
+    lqip?: string;
+    dominant?: {
+      background?: string;
+      foreground?: string;
+    };
   };
+}
+
+interface RelatedPost {
+  _id?: string;
+  title?: string;
+  slug?: string;
+  mainImage?: MainImage;
+  publishedAt?: string;
+  author?: string;
+  excerpt?: string;
+  mood?: "happy" | "sad" | "neutral";
 }
 
 interface BlogPost {
@@ -17,8 +33,9 @@ interface BlogPost {
   title: string;
   description: string;
   mainImage: MainImage;
-  related?: Array<{ _id: string }>;
-  // 添加其他可能的字段以匹配 PostDetail
+  headings: any[]; // 添加缺失的字段
+  related?: RelatedPost[];
+  // 可能还需要其他字段，具体取决于PostDetail的定义
 }
 
 interface ViewResponse {
