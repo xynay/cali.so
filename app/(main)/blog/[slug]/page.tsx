@@ -18,6 +18,7 @@ interface BlogPost {
   description: string;
   mainImage: MainImage;
   related?: Array<{ _id: string }>;
+  // 添加其他可能的字段以匹配 PostDetail
 }
 
 interface ViewResponse {
@@ -34,7 +35,7 @@ export const generateMetadata = async ({
 }: {
   params: { slug: string }
 }) => {
-  const post: BlogPost | null = await getBlogPost(params.slug)
+  const post = await getBlogPost(params.slug) as BlogPost | null
   if (!post) {
     notFound()
   }
@@ -74,7 +75,7 @@ export default async function BlogPage({
 }: {
   params: { slug: string }
 }) {
-  const post: BlogPost | null = await getBlogPost(params.slug)
+  const post = await getBlogPost(params.slug) as BlogPost | null
   if (!post) {
     notFound()
   }
