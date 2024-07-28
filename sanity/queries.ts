@@ -8,15 +8,14 @@ import { type Project } from '~/sanity/schemas/project';
 const currentDate = getDate().toISOString();
 
 // Query to fetch all latest blog post slugs
-export const getAllLatestBlogPostSlugsQuery = () =>
-  groq`
+export const getAllLatestBlogPostSlugsQuery = () => groq`
   *[_type == "post" && !(_id in path("drafts.**")) 
-  && publishedAt <= "${currentDate}" 
+  && publishedAt <= $currentDate 
   && defined(slug.current)] | order(publishedAt desc).slug.current
-  `;
+`;
 
 export const getAllLatestBlogPostSlugs = () => {
-  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery());
+  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery(), { currentDate });
 };
 
 // Options type for fetching blog posts
@@ -31,11 +30,10 @@ export const getLatestBlogPostsQuery = ({
   limit = 5,
   offset = 0,
   forDisplay = true,
-}: GetBlogPostsOptions) =>
-  groq`
+}: GetBlogPostsOptions) => groq`
   *[_type == "post" && !(_id in path("drafts.**")) 
-  && publishedAt <= "${currentDate}" 
-  && defined(slug.current)] | order(publishedAt desc)[${offset}...${offset + limit}] {
+  && publishedAt <= $currentDate 
+  && defined(slug.current)] | order(publishedAt desc)[$offset...${offset + limit}] {
     _id,
     title,
     "slug": slug.current,
@@ -53,7 +51,7 @@ export const getLatestBlogPostsQuery = ({
   }`;
 
 export const getLatestBlogPosts = (options: GetBlogPostsOptions) => 
-  client.fetch<Post[] | null>(getLatestBlogPostsQuery(options));
+  client.fetch<Post[] | null>(getLatestBlogPostsQuery(options), { currentDate, offset: options.offset });
 
 // Query to fetch a single blog post by slug
 export const getBlogPostQuery = groq`
@@ -107,8 +105,7 @@ export const getBlogPost = (slug: string) =>
   client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, { slug });
 
 // Query to fetch settings
-export const getSettingsQuery = () =>
-  groq`
+export const getSettingsQuery = () => groq`
   *[_type == "settings"][0] {
     "projects": projects[]->{
       _id,
