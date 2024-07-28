@@ -15,7 +15,7 @@ import {
   useMotionValue,
 } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import React from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
@@ -34,28 +34,28 @@ import { clamp } from '~/lib/math'
 export function Header() {
   const isHomePage = usePathname() === '/'
 
-  const headerRef = React.useRef<HTMLDivElement>(null)
-  const avatarRef = React.useRef<HTMLDivElement>(null)
-  const isInitial = React.useRef(true)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const avatarRef = useRef<HTMLDivElement>(null)
+  const isInitial = useRef(true)
 
   const avatarX = useMotionValue(0)
   const avatarScale = useMotionValue(1)
   const avatarBorderX = useMotionValue(0)
   const avatarBorderScale = useMotionValue(1)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const downDelay = avatarRef.current?.offsetTop ?? 0
     const upDelay = 64
 
-    function setProperty(property: string, value: string | null) {
+    const setProperty = (property: string, value: string | null) => {
       document.documentElement.style.setProperty(property, value)
     }
 
-    function removeProperty(property: string) {
+    const removeProperty = (property: string) => {
       document.documentElement.style.removeProperty(property)
     }
 
-    function updateHeaderStyles() {
+    const updateHeaderStyles = () => {
       if (!headerRef.current) {
         return
       }
@@ -96,7 +96,7 @@ export function Header() {
       }
     }
 
-    function updateAvatarStyles() {
+    const updateAvatarStyles = () => {
       if (!isHomePage) {
         return
       }
@@ -125,7 +125,7 @@ export function Header() {
       setProperty('--avatar-border-opacity', scale === toScale ? '1' : '0')
     }
 
-    function updateStyles() {
+    const updateStyles = () => {
       updateHeaderStyles()
       updateAvatarStyles()
       isInitial.current = false
@@ -145,8 +145,8 @@ export function Header() {
   const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
   const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
 
-  const [isShowingAltAvatar, setIsShowingAltAvatar] = React.useState(false)
-  const onAvatarContextMenu = React.useCallback(
+  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
+  const onAvatarContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault()
       setIsShowingAltAvatar((prev) => !prev)
@@ -218,7 +218,7 @@ export function Header() {
                       <Avatar.Image
                         large
                         alt={isShowingAltAvatar}
-                        className="rounded-full"
+                        className="block h-full w-full"
                       />
                     </motion.div>
                   </motion.div>
@@ -227,62 +227,70 @@ export function Header() {
             </>
           )}
         </AnimatePresence>
-
-        <Container
-          className={clsxm(
-            'relative flex h-16 w-full items-center gap-2',
-            'justify-between border-b border-primary-100/50 bg-primary-50/70 px-4',
-            'top-0 order-first -mb-3',
-            {
-              'bg-primary-900/70 backdrop-blur': isHomePage,
-            }
-          )}
+        <div
+          ref={headerRef}
+          className="top-0 z-10 h-16 pt-6"
+          style={{
+            position:
+              'var(--header-position)' as React.CSSProperties['position'],
+          }}
         >
-          <AnimatePresence>
-            <motion.div
-              className="flex items-center gap-2"
-              initial={{ opacity: 0, x: -15 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -15 }}
-              transition={{
-                type: 'spring',
-                damping: 30,
-                stiffness: 200,
-              }}
-            >
-              <NavigationBar.Mobile className="pointer-events-auto relative z-50 md:hidden" />
-              <NavigationBar.Desktop className="pointer-events-auto relative z-50 hidden md:block" />
-              <ThemeSwitcher />
-            </motion.div>
-          </AnimatePresence>
-
-          <div className="flex items-center gap-2">
-            <Tooltip content="User Menu">
-              <SignedIn>
-                <UserButton
-                  appearance={{
-                    elements: {
-                      userButtonAvatarBox: {
-                        width: '32px',
-                        height: '32px',
-                      },
-                    },
-                  }}
-                />
-              </SignedIn>
-              <SignedOut>
-                <SignInButton>
-                  <button
-                    type="button"
-                    className="flex items-center justify-center w-8 h-8 text-primary-900 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <UserArrowLeftIcon />
-                  </button>
-                </SignInButton>
-              </SignedOut>
-            </Tooltip>
-          </div>
-        </Container>
+          <Container
+            className="top-[var(--header-top,theme(spacing.6))] w-full"
+            style={{
+              position:
+                'var(--header-inner-position)' as React.CSSProperties['position'],
+            }}
+          >
+            <div className="relative flex gap-4">
+              <motion.div
+                className="flex flex-1"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  type: 'spring',
+                  damping: 30,
+                  stiffness: 200,
+                }}
+              >
+                <AnimatePresence>
+                  {!isHomePage && (
+                    <motion.div
+                      layoutId="avatar"
+                      layout
+                      onContextMenu={onAvatarContextMenu}
+                    >
+                      <Avatar>
+                        <Avatar.Image alt={isShowingAltAvatar} />
+                      </Avatar>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <NavigationBar />
+              </motion.div>
+              <div className="flex items-center justify-end gap-3">
+                <ThemeSwitcher />
+                <SignedOut>
+                  <Tooltip content="Sign in">
+                    <SignInButton mode="modal">
+                      <button
+                        className="focus-ring rounded-full p-2 text-primary-light dark:text-primary-dark"
+                        type="button"
+                      >
+                        <UserArrowLeftIcon className="h-6 w-6" />
+                      </button>
+                    </SignInButton>
+                  </Tooltip>
+                </SignedOut>
+                <SignedIn>
+                  <Tooltip content="Account">
+                    <UserButton afterSignOutUrl={url('/')} />
+                  </Tooltip>
+                </SignedIn>
+              </div>
+            </div>
+          </Container>
+        </div>
       </motion.header>
     </>
   )
