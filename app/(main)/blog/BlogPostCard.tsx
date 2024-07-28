@@ -1,7 +1,6 @@
 import { parseDateTime } from '@zolplay/utils'
 import Image from 'next/image'
 import Link from 'next/link'
-
 import {
   CalendarIcon,
   CursorClickIcon,
@@ -13,6 +12,11 @@ import { type Post } from '~/sanity/schemas/post'
 
 export function BlogPostCard({ post, views }: { post: Post; views: number }) {
   const { title, slug, mainImage, publishedAt, categories, readingTime } = post
+  const foreground = mainImage.asset.dominant?.foreground
+  const background = mainImage.asset.dominant?.background
+  const imageUrl = mainImage.asset.url
+  const lqip = mainImage.asset.lqip
+  const formattedDate = parseDateTime({ date: new Date(publishedAt) })?.format('YYYY/MM/DD')
 
   return (
     <Link
@@ -21,19 +25,19 @@ export function BlogPostCard({ post, views }: { post: Post; views: number }) {
       className="group relative flex w-full transform-gpu flex-col rounded-3xl bg-transparent ring-2 ring-[--post-image-bg] transition-transform hover:-translate-y-0.5"
       style={
         {
-          '--post-image-fg': mainImage.asset.dominant?.foreground,
-          '--post-image-bg': mainImage.asset.dominant?.background,
-          '--post-image': `url(${mainImage.asset.url}`,
+          '--post-image-fg': foreground,
+          '--post-image-bg': background,
+          '--post-image': `url(${imageUrl})`,
         } as React.CSSProperties
       }
     >
       <div className="relative aspect-[240/135] w-full">
         <Image
-          src={mainImage.asset.url}
+          src={imageUrl}
           alt=""
           className="rounded-t-3xl object-cover"
           placeholder="blur"
-          blurDataURL={mainImage.asset.lqip}
+          blurDataURL={lqip}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw"
         />
@@ -47,11 +51,7 @@ export function BlogPostCard({ post, views }: { post: Post; views: number }) {
           <span className="inline-flex items-center space-x-3">
             <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] md:text-sm">
               <CalendarIcon />
-              <span>
-                {parseDateTime({ date: new Date(publishedAt) })?.format(
-                  'YYYY/MM/DD'
-                )}
-              </span>
+              <span>{formattedDate}</span>
             </span>
 
             {Array.isArray(categories) && (
