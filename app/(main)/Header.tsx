@@ -15,15 +15,12 @@ import {
   useMotionValue,
 } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react'
+import React, { useCallback,  useEffect, useRef, useState } from 'react'
 
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
 import {
-  GitHubBrandIcon,
-  GoogleBrandIcon,
   MailIcon,
-  UserArrowLeftIcon,
 } from '~/assets'
 import { Avatar } from '~/components/Avatar'
 import { Container } from '~/components/ui/Container'
