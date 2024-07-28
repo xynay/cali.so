@@ -1,6 +1,5 @@
 import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
-
 import { BlogPostPage } from '~/app/(main)/blog/BlogPostPage'
 import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
@@ -58,43 +57,50 @@ export default async function BlogPage({
     notFound()
   }
 
-  let views: number
-  if (env.VERCEL_ENV === 'production') {
-    views = await redis.incr(kvKeys.postViews(post._id))
-  } else {
-    views = 30578
-  }
+  const viewsPromise = env.VERCEL_ENV === 'production'
+    ? redis.incr(kvKeys.postViews(post._id))
+    : Promise.resolve(30578)
 
-  let reactions: number[] = []
-  try {
-    if (env.VERCEL_ENV === 'production') {
-      const res = await fetch(url(/api/reactions?id=${post._id}), {
-        next: {
-          tags: [reactions:${post._id}],
-        },
-      })
-      const data = await res.json()
-      if (Array.isArray(data)) {
-        reactions = data
-      }
-    } else {
-      reactions = Array.from({ length: 4 }, () =>
+  const reactionsPromise = (async () => {
+    if (env.VERCEL_ENV !== 'production') {
+      return Array.from({ length: 4 }, () =>
         Math.floor(Math.random() * 50000)
       )
     }
-  } catch (error) {
-    console.error(error)
-  }
 
-  let relatedViews: number[] = []
-  if (typeof post.related !== 'undefined' && post.related.length > 0) {
-    if (env.VERCEL_ENV === 'development') {
-      relatedViews = post.related.map(() => Math.floor(Math.random() * 1000))
-    } else {
-      const postIdKeys = post.related.map(({ _id }) => kvKeys.postViews(_id))
-      relatedViews = await redis.mget<number[]>(...postIdKeys)
+    try {
+      const res = await fetch(url(`/api/reactions?id=${post._id}`), {
+        next: { tags: [`reactions:${post._id}`] },
+      })
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        return data
+      }
+    } catch (error) {
+      console.error(error)
     }
-  }
+
+    return []
+  })()
+
+  const relatedViewsPromise = (async () => {
+    if (typeof post.related === 'undefined' || post.related.length === 0) {
+      return []
+    }
+
+    if (env.VERCEL_ENV === 'development') {
+      return post.related.map(() => Math.floor(Math.random() * 1000))
+    }
+
+    const postIdKeys = post.related.map(({ _id }) => kvKeys.postViews(_id))
+    return redis.mget<number[]>(...postIdKeys)
+  })()
+
+  const [views, reactions, relatedViews] = await Promise.all([
+    viewsPromise,
+    reactionsPromise,
+    relatedViewsPromise,
+  ])
 
   return (
     <BlogPostPage
