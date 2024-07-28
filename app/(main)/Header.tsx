@@ -15,7 +15,7 @@ import {
   useMotionValue,
 } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import React from 'react'
+import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react'
 
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
@@ -34,23 +34,26 @@ import { clamp } from '~/lib/math'
 export function Header() {
   const isHomePage = usePathname() === '/'
 
-  const headerRef = React.useRef<HTMLDivElement>(null)
-  const avatarRef = React.useRef<HTMLDivElement>(null)
-  const isInitial = React.useRef(true)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const avatarRef = useRef<HTMLDivElement>(null)
+  const isInitial = useRef(true)
 
   const avatarX = useMotionValue(0)
   const avatarScale = useMotionValue(1)
   const avatarBorderX = useMotionValue(0)
   const avatarBorderScale = useMotionValue(1)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const downDelay = avatarRef.current?.offsetTop ?? 0
     const upDelay = 64
 
-    const setProperty = (property: string, value: string | null) =>
+    const setProperty = (property: string, value: string | null) => {
       document.documentElement.style.setProperty(property, value)
-    const removeProperty = (property: string) =>
+    }
+
+    const removeProperty = (property: string) => {
       document.documentElement.style.removeProperty(property)
+    }
 
     const updateHeaderStyles = () => {
       if (!headerRef.current) return
@@ -63,7 +66,6 @@ export function Header() {
       )
 
       if (isInitial.current) setProperty('--header-position', 'sticky')
-
       setProperty('--content-offset', `${downDelay}px`)
 
       if (isInitial.current || scrollY < downDelay) {
@@ -135,8 +137,8 @@ export function Header() {
   const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
   const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
 
-  const [isShowingAltAvatar, setIsShowingAltAvatar] = React.useState(false)
-  const onAvatarContextMenu = React.useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
+  const onAvatarContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
     setIsShowingAltAvatar((prev) => !prev)
   }, [])
@@ -146,7 +148,9 @@ export function Header() {
       <motion.header
         className={clsxm(
           'pointer-events-none relative z-50 mb-[var(--header-mb,0px)] flex flex-col',
-          isHomePage ? 'h-[var(--header-height,180px)]' : 'h-[var(--header-height,64px)]'
+          isHomePage
+            ? 'h-[var(--header-height,180px)]'
+            : 'h-[var(--header-height,64px)]'
         )}
         layout
         layoutRoot
@@ -154,7 +158,10 @@ export function Header() {
         <AnimatePresence>
           {isHomePage && (
             <>
-              <div ref={avatarRef} className="order-last mt-[calc(theme(spacing.16)-theme(spacing.3))]" />
+              <div
+                ref={avatarRef}
+                className="order-last mt-[calc(theme(spacing.16)-theme(spacing.3))]"
+              />
               <Container
                 className="top-0 order-last -mb-3 pt-3"
                 style={{ position: 'var(--header-position)' as React.CSSProperties['position'] }}
@@ -178,11 +185,16 @@ export function Header() {
                     >
                       <Avatar />
                     </motion.div>
+
                     <motion.div
                       className="block h-16 w-16 origin-left"
                       style={{ transform: avatarTransform }}
                     >
-                      <Avatar.Image large alt={isShowingAltAvatar} className="block h-full w-full" />
+                      <Avatar.Image
+                        large
+                        alt={isShowingAltAvatar}
+                        className="block h-full w-full"
+                      />
                     </motion.div>
                   </motion.div>
                 </motion.div>
@@ -206,47 +218,74 @@ export function Header() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: 'spring', damping: 30, stiffness: 200 }}
               >
-                <NavigationBar />
+                <AnimatePresence>
+                  {!isHomePage && (
+                    <motion.div
+                      layoutId="avatar"
+                      layout
+                      onContextMenu={onAvatarContextMenu}
+                    >
+                      <Avatar>
+                        <Avatar.Image alt={isShowingAltAvatar} />
+                      </Avatar>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
-              <div className="relative flex gap-4">
-                <Tooltip.Provider delayDuration={300}>
-                  <Tooltip.Root>
-                    <Tooltip.Trigger asChild>
-                      <motion.div
-                        className="flex items-center"
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-                      >
-                        <SignedIn>
-                          <UserButton />
-                        </SignedIn>
-                        <SignedOut>
-                          <SignInButton>
-                            <Avatar />
-                          </SignInButton>
-                        </SignedOut>
-                      </motion.div>
-                    </Tooltip.Trigger>
-                    <Tooltip.Content side="bottom">
-                      <div className="flex items-center gap-2">
-                        <SignedIn>
-                          <Avatar />
-                          <ThemeSwitcher />
-                        </SignedIn>
-                        <SignedOut>
-                          <Avatar />
-                          <ThemeSwitcher />
-                        </SignedOut>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Root>
-                </Tooltip.Provider>
+              <div className="flex flex-1 justify-end md:justify-center">
+                <NavigationBar.Mobile className="pointer-events-auto relative z-50 md:hidden" />
+                <NavigationBar.Desktop className="pointer-events-auto relative z-50 hidden md:block" />
               </div>
+              <motion.div
+                className="flex justify-end gap-3 md:flex-1"
+                initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+              >
+                <UserInfo />
+                <div className="pointer-events-auto">
+                  <ThemeSwitcher />
+                </div>
+              </motion.div>
             </div>
           </Container>
         </div>
       </motion.header>
+      {isHomePage && <div className="h-[--content-offset] w-full" />}
     </>
+  )
+}
+
+const UserInfo = () => {
+  const { user } = useUser()
+
+  return (
+    <Tooltip.Provider>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
+          <div className="pointer-events-auto">
+            <SignedIn>
+              <UserButton
+                userProfileMode="navigation"
+                afterSignOutUrl="/"
+              />
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal" redirectUrl={url('/')}>
+                <button className="flex items-center justify-center gap-2 rounded-lg bg-zinc-200/70 px-4 py-2.5 text-sm font-medium text-zinc-900 transition hover:bg-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-800/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 dark:focus-visible:ring-white/10">
+                  <MailIcon className="h-5 w-5" />
+                  Sign in
+                </button>
+              </SignInButton>
+            </SignedOut>
+          </div>
+        </Tooltip.Trigger>
+        <Tooltip.Content side="bottom" align="center" sideOffset={4}>
+          <Tooltip.Arrow className="fill-current text-zinc-800 dark:text-zinc-300" />
+          <div className="max-w-sm rounded-lg bg-zinc-800/90 p-2 text-center text-xs font-medium text-zinc-200 dark:bg-zinc-300 dark:text-zinc-900">
+            {user?.primaryEmailAddress?.emailAddress || 'User'}
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   )
 }
