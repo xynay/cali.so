@@ -1,36 +1,35 @@
-import { groq } from 'next-sanity'
+import { groq } from 'next-sanity';
+import { getDate } from '~/lib/date';
+import { client } from '~/sanity/lib/client';
+import { type Post, type PostDetail } from '~/sanity/schemas/post';
+import { type Project } from '~/sanity/schemas/project';
 
-import { getDate } from '~/lib/date'
-import { client } from '~/sanity/lib/client'
-import { type Post, type PostDetail } from '~/sanity/schemas/post'
-import { type Project } from '~/sanity/schemas/project'
-
-// 预先计算当前日期
-const currentDate = getDate().toISOString()
-
+// Query to fetch all latest blog post slugs
 export const getAllLatestBlogPostSlugsQuery = () =>
-  groq
+  groq`
   *[_type == "post" && !(_id in path("drafts.**"))
-  && publishedAt <= $currentDate
+  && publishedAt <= "${getDate().toISOString()}"
   && defined(slug.current)] | order(publishedAt desc).slug.current
-  
+  `;
 
 export const getAllLatestBlogPostSlugs = () => {
-  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery(), { currentDate })
-}
+  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery());
+};
 
+// Options type for fetching blog posts
 type GetBlogPostsOptions = {
-  limit?: number
-  offset?: number
-  forDisplay?: boolean
-}
+  limit?: number;
+  offset?: number;
+  forDisplay?: boolean;
+};
 
+// Query to fetch latest blog posts
 export const getLatestBlogPostsQuery = ({
   limit = 5,
   forDisplay = true,
 }: GetBlogPostsOptions) =>
-  groq
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate
+  groq`
+  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${getDate().toISOString()}"
   && defined(slug.current)] | order(publishedAt desc)[0...${limit}] {
     _id,
     title,
@@ -43,15 +42,20 @@ export const getLatestBlogPostsQuery = ({
       _ref,
       asset->{
         url,
-        ${forDisplay ? '"lqip": metadata.lqip, "dominant": metadata.palette.dominant,' : ''}
+        ${
+          forDisplay
+            ? '"lqip": metadata.lqip, "dominant": metadata.palette.dominant,'
+            : ''
+        }
       }
     }
-  }
+  }`;
 
 export const getLatestBlogPosts = (options: GetBlogPostsOptions) =>
-  client.fetch<Post[]>(getLatestBlogPostsQuery(options), { currentDate })
+  client.fetch<Post[] | null>(getLatestBlogPostsQuery(options));
 
-export const getBlogPostQuery = groq
+// Query to fetch a single blog post by slug
+export const getBlogPostQuery = groq`
   *[_type == "post" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
     _id,
     title,
@@ -92,17 +96,16 @@ export const getBlogPostQuery = groq
           "lqip": metadata.lqip,
           "dominant": metadata.palette.dominant
         }
-      },
+      }
     }
-  }
+  }`;
 
 export const getBlogPost = (slug: string) =>
-  client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, {
-    slug,
-  })
+  client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, { slug });
 
+// Query to fetch settings
 export const getSettingsQuery = () =>
-  groq
+  groq`
   *[_type == "settings"][0] {
     "projects": projects[]->{
       _id,
@@ -119,17 +122,17 @@ export const getSettingsQuery = () =>
       end,
       "logo": logo.asset->url
     }
-  }
+}`;
 
 export const getSettings = () =>
   client.fetch<{
-    projects: Project[] | null
-    heroPhotos?: string[] | null
+    projects: Project[] | null;
+    heroPhotos?: string[] | null;
     resume?: {
-      company: string
-      title: string
-      logo: string
-      start: string
-      end?: string
-    }[] | null
-  }>(getSettingsQuery())
+      company: string;
+      title: string;
+      logo: string;
+      start: string;
+      end?: string;
+    }[] | null;
+  }>(getSettingsQuery());
