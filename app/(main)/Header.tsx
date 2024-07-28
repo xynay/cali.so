@@ -31,30 +31,27 @@ import { Tooltip } from '~/components/ui/Tooltip'
 import { url } from '~/lib'
 import { clamp } from '~/lib/math'
 
-export function Header() {
+function Header() {
   const isHomePage = usePathname() === '/'
-
   const headerRef = useRef<HTMLDivElement>(null)
   const avatarRef = useRef<HTMLDivElement>(null)
   const isInitial = useRef(true)
-
   const avatarX = useMotionValue(0)
   const avatarScale = useMotionValue(1)
   const avatarBorderX = useMotionValue(0)
   const avatarBorderScale = useMotionValue(1)
 
+  const setProperty = (property: string, value: string | null) =>
+    document.documentElement.style.setProperty(property, value)
+  const removeProperty = (property: string) =>
+    document.documentElement.style.removeProperty(property)
+
   useEffect(() => {
     const downDelay = avatarRef.current?.offsetTop ?? 0
     const upDelay = 64
 
-    const setProperty = (property: string, value: string | null) =>
-      document.documentElement.style.setProperty(property, value)
-    const removeProperty = (property: string) =>
-      document.documentElement.style.removeProperty(property)
-
     const updateHeaderStyles = () => {
       if (!headerRef.current) return
-
       const { top, height } = headerRef.current.getBoundingClientRect()
       const scrollY = clamp(
         window.scrollY,
@@ -90,27 +87,20 @@ export function Header() {
 
     const updateAvatarStyles = () => {
       if (!isHomePage) return
-
       const fromScale = 1
       const toScale = 36 / 64
       const fromX = 0
       const toX = 2 / 16
       const scrollY = downDelay - window.scrollY
-
       let scale = (scrollY * (fromScale - toScale)) / downDelay + toScale
       scale = clamp(scale, fromScale, toScale)
-
       let x = (scrollY * (fromX - toX)) / downDelay + toX
       x = clamp(x, fromX, toX)
-
       avatarX.set(x)
       avatarScale.set(scale)
-
       const borderScale = 1 / (toScale / scale)
-
       avatarBorderX.set((-toX + x) * borderScale)
       avatarBorderScale.set(borderScale)
-
       setProperty('--avatar-border-opacity', scale === toScale ? '1' : '0')
     }
 
@@ -123,7 +113,6 @@ export function Header() {
     updateStyles()
     window.addEventListener('scroll', updateStyles, { passive: true })
     window.addEventListener('resize', updateStyles)
-
     return () => {
       window.removeEventListener('scroll', updateStyles)
       window.removeEventListener('resize', updateStyles)
@@ -132,7 +121,6 @@ export function Header() {
 
   const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
   const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
-
   const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
   const onAvatarContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -196,7 +184,6 @@ export function Header() {
                     >
                       <Avatar />
                     </motion.div>
-
                     <motion.div
                       className="block h-16 w-16 origin-left"
                       style={{
