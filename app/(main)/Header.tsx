@@ -1,241 +1,252 @@
 'use client'
 
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { AnimatePresence, motion, useMotionValue } from 'framer-motion'
-import * as React from 'react'
-import { SignedIn, SignedOut, useUser } from '@clerk/nextjs'
-import { Avatar } from '@components/ui/Avatar'
-import { Container } from '@components/ui/Container'
-import { ThemeSwitcher } from '@components/ui/ThemeSwitcher'
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+  useUser,
+} from '@clerk/nextjs'
 import { clsxm } from '@zolplay/utils'
-import { GitHubBrandIcon } from '@icons/brands/GitHubBrandIcon'
-import { GoogleBrandIcon } from '@icons/brands/GoogleBrandIcon'
-import { MailIcon } from '@icons/brands/MailIcon'
+import {
+  AnimatePresence,
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+} from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import { NavigationBar } from './NavigationBar'
+import React from 'react'
 
-const downDelay = 80
-const upDelay = 64
-
-function clamp(number: number, a: number, b: number) {
-  return Math.max(a, Math.min(number, b))
-}
-
-function setCSSProperty(property: string, value: string | null) {
-  document.documentElement.style.setProperty(property, value)
-}
-
-function removeCSSProperty(property: string) {
-  document.documentElement.style.removeProperty(property)
-}
-
-function updateHeaderStyles(isInitial: boolean, headerRef: React.RefObject<HTMLDivElement>) {
-  if (!headerRef.current) {
-    return
-  }
-
-  const { top, height } = headerRef.current.getBoundingClientRect()
-  const scrollY = clamp(
-    window.scrollY,
-    0,
-    document.body.scrollHeight - window.innerHeight
-  )
-
-  if (isInitial) {
-    setCSSProperty('--header-position', 'sticky')
-  }
-
-  setCSSProperty('--content-offset', `${downDelay}px`)
-
-  if (isInitial || scrollY < downDelay) {
-    setCSSProperty('--header-height', `${downDelay + height}px`)
-    setCSSProperty('--header-mb', `${-downDelay}px`)
-  } else if (top + height < -upDelay) {
-    const offset = Math.max(height, scrollY - upDelay)
-    setCSSProperty('--header-height', `${offset}px`)
-    setCSSProperty('--header-mb', `${height - offset}px`)
-  } else if (top === 0) {
-    setCSSProperty('--header-height', `${scrollY + height}px`)
-    setCSSProperty('--header-mb', `${-scrollY}px`)
-  }
-
-  if (top === 0 && scrollY > 0 && scrollY >= downDelay) {
-    setCSSProperty('--header-inner-position', 'fixed')
-    removeCSSProperty('--header-top')
-    removeCSSProperty('--avatar-top')
-  } else {
-    removeCSSProperty('--header-inner-position')
-    setCSSProperty('--header-top', '0px')
-    setCSSProperty('--avatar-top', '0px')
-  }
-}
-
-function updateAvatarStyles(isHomePage: boolean, avatarX: any, avatarScale: any, avatarBorderX: any, avatarBorderScale: any) {
-  if (!isHomePage) {
-    return
-  }
-
-  const fromScale = 1
-  const toScale = 36 / 64
-  const fromX = 0
-  const toX = 2 / 16
-
-  const scrollY = downDelay - window.scrollY
-
-  let scale = (scrollY * (fromScale - toScale)) / downDelay + toScale
-  scale = clamp(scale, fromScale, toScale)
-
-  let x = (scrollY * (fromX - toX)) / downDelay + toX
-  x = clamp(x, fromX, toX)
-
-  avatarX.set(x)
-  avatarScale.set(scale)
-
-  const borderScale = 1 / (toScale / scale)
-
-  avatarBorderX.set((-toX + x) * borderScale)
-  avatarBorderScale.set(borderScale)
-
-  setCSSProperty('--avatar-border-opacity', scale === toScale ? '1' : '0')
-}
-
-function addWindowEventListener(event: string, handler: () => void) {
-  window.addEventListener(event, handler, { passive: true })
-}
-
-function removeWindowEventListener(event: string, handler: () => void) {
-  window.removeEventListener(event, handler)
-}
-
-function UserInfo() {
-  const [tooltipOpen, setTooltipOpen] = React.useState(false)
-  const { user } = useUser()
-  const StrategyIcon = React.useMemo(() => {
-    const strategy = user?.primaryEmailAddress?.verification.strategy
-    if (!strategy) {
-      return null
-    }
-
-    switch (strategy) {
-      case 'from_oauth_github':
-        return GitHubBrandIcon as (
-          props: React.ComponentProps<'svg'>
-        ) => JSX.Element
-      case 'from_oauth_google':
-        return GoogleBrandIcon
-      default:
-        return MailIcon
-    }
-  }, [user?.primaryEmailAddress?.verification.strategy])
-
-  return (
-    <AnimatePresence>
-      <SignedIn key="user-info">
-        <motion.div
-          className="pointer-events-auto relative"
-          initial={{ opacity: 0, y: -20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-        >
-          <Tooltip.Provider delayDuration={200}>
-            <Tooltip.Root open={tooltipOpen} onOpenChange={setTooltipOpen}>
-              <Tooltip.Trigger asChild>
-                <button
-                  className={clsxm(
-                    'relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-200/75 transition dark:bg-gray-700/50'
-                  )}
-                >
-                  <Avatar alt="User avatar" className="h-8 w-8" />
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Content side="bottom" align="center">
-                <div className="rounded bg-gray-700 px-3 py-2 text-sm text-white shadow-lg">
-                  {user?.firstName} {user?.lastName}
-                </div>
-                <Tooltip.Arrow className="fill-gray-700" />
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        </motion.div>
-      </SignedIn>
-      <SignedOut key="sign-in">
-        <motion.div
-          className="pointer-events-auto relative"
-          initial={{ opacity: 0, y: -20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-        >
-          <Tooltip.Provider delayDuration={200}>
-            <Tooltip.Root open={tooltipOpen} onOpenChange={setTooltipOpen}>
-              <Tooltip.Trigger asChild>
-                <Link href="/sign-in">
-                  <a
-                    className={clsxm(
-                      'relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-200/75 transition dark:bg-gray-700/50'
-                    )}
-                  >
-                    <SignInIcon className="h-8 w-8" />
-                  </a>
-                </Link>
-              </Tooltip.Trigger>
-              <Tooltip.Content side="bottom" align="center">
-                <div className="rounded bg-gray-700 px-3 py-2 text-sm text-white shadow-lg">
-                  Sign in
-                </div>
-                <Tooltip.Arrow className="fill-gray-700" />
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        </motion.div>
-      </SignedOut>
-    </AnimatePresence>
-  )
-}
+import { NavigationBar } from '~/app/(main)/NavigationBar'
+import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
+import {
+  GitHubBrandIcon,
+  GoogleBrandIcon,
+  MailIcon,
+  UserArrowLeftIcon,
+} from '~/assets'
+import { Avatar } from '~/components/Avatar'
+import { Container } from '~/components/ui/Container'
+import { Tooltip } from '~/components/ui/Tooltip'
+import { url } from '~/lib'
+import { clamp } from '~/lib/math'
 
 export function Header() {
+  const isHomePage = usePathname() === '/'
+
   const headerRef = React.useRef<HTMLDivElement>(null)
   const avatarRef = React.useRef<HTMLDivElement>(null)
   const isInitial = React.useRef(true)
-  const isHomePage = usePathname() === '/'
+
   const avatarX = useMotionValue(0)
   const avatarScale = useMotionValue(1)
   const avatarBorderX = useMotionValue(0)
   const avatarBorderScale = useMotionValue(1)
 
   React.useEffect(() => {
-    function update() {
-      updateHeaderStyles(isInitial.current, headerRef)
-      updateAvatarStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale)
+    const downDelay = avatarRef.current?.offsetTop ?? 0
+    const upDelay = 64
+
+    const setProperty = (property: string, value: string | null) =>
+      document.documentElement.style.setProperty(property, value)
+    const removeProperty = (property: string) =>
+      document.documentElement.style.removeProperty(property)
+
+    const updateHeaderStyles = () => {
+      if (!headerRef.current) return
+
+      const { top, height } = headerRef.current.getBoundingClientRect()
+      const scrollY = clamp(
+        window.scrollY,
+        0,
+        document.body.scrollHeight - window.innerHeight
+      )
+
+      if (isInitial.current) setProperty('--header-position', 'sticky')
+
+      setProperty('--content-offset', `${downDelay}px`)
+
+      if (isInitial.current || scrollY < downDelay) {
+        setProperty('--header-height', `${downDelay + height}px`)
+        setProperty('--header-mb', `${-downDelay}px`)
+      } else if (top + height < -upDelay) {
+        const offset = Math.max(height, scrollY - upDelay)
+        setProperty('--header-height', `${offset}px`)
+        setProperty('--header-mb', `${height - offset}px`)
+      } else if (top === 0) {
+        setProperty('--header-height', `${scrollY + height}px`)
+        setProperty('--header-mb', `${-scrollY}px`)
+      }
+
+      if (top === 0 && scrollY > 0 && scrollY >= downDelay) {
+        setProperty('--header-inner-position', 'fixed')
+        removeProperty('--header-top')
+        removeProperty('--avatar-top')
+      } else {
+        removeProperty('--header-inner-position')
+        setProperty('--header-top', '0px')
+        setProperty('--avatar-top', '0px')
+      }
+    }
+
+    const updateAvatarStyles = () => {
+      if (!isHomePage) return
+
+      const fromScale = 1
+      const toScale = 36 / 64
+      const fromX = 0
+      const toX = 2 / 16
+
+      const scrollY = downDelay - window.scrollY
+
+      let scale = (scrollY * (fromScale - toScale)) / downDelay + toScale
+      scale = clamp(scale, fromScale, toScale)
+
+      let x = (scrollY * (fromX - toX)) / downDelay + toX
+      x = clamp(x, fromX, toX)
+
+      avatarX.set(x)
+      avatarScale.set(scale)
+
+      const borderScale = 1 / (toScale / scale)
+
+      avatarBorderX.set((-toX + x) * borderScale)
+      avatarBorderScale.set(borderScale)
+
+      setProperty('--avatar-border-opacity', scale === toScale ? '1' : '0')
+    }
+
+    const updateStyles = () => {
+      updateHeaderStyles()
+      updateAvatarStyles()
       isInitial.current = false
     }
 
-    addWindowEventListener('scroll', update)
-    addWindowEventListener('resize', update)
-    update()
+    updateStyles()
+    window.addEventListener('scroll', updateStyles, { passive: true })
+    window.addEventListener('resize', updateStyles)
 
     return () => {
-      removeWindowEventListener('scroll', update)
-      removeWindowEventListener('resize', update)
+      window.removeEventListener('scroll', updateStyles)
+      window.removeEventListener('resize', updateStyles)
     }
   }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale])
 
+  const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
+  const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
+
+  const [isShowingAltAvatar, setIsShowingAltAvatar] = React.useState(false)
+  const onAvatarContextMenu = React.useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setIsShowingAltAvatar((prev) => !prev)
+  }, [])
+
   return (
-    <header ref={headerRef}>
-      <Container className="flex justify-between items-center py-4">
-        <div className="flex items-center">
-          <Avatar
-            ref={avatarRef}
-            className="h-16 w-16 rounded-full"
-            style={{
-              x: avatarX,
-              scale: avatarScale,
-              '--avatar-border-x': avatarBorderX,
-              '--avatar-border-scale': avatarBorderScale,
-            }}
-          />
+    <>
+      <motion.header
+        className={clsxm(
+          'pointer-events-none relative z-50 mb-[var(--header-mb,0px)] flex flex-col',
+          isHomePage ? 'h-[var(--header-height,180px)]' : 'h-[var(--header-height,64px)]'
+        )}
+        layout
+        layoutRoot
+      >
+        <AnimatePresence>
+          {isHomePage && (
+            <>
+              <div ref={avatarRef} className="order-last mt-[calc(theme(spacing.16)-theme(spacing.3))]" />
+              <Container
+                className="top-0 order-last -mb-3 pt-3"
+                style={{ position: 'var(--header-position)' as React.CSSProperties['position'] }}
+              >
+                <motion.div
+                  className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none"
+                  style={{ position: 'var(--header-inner-position)' as React.CSSProperties['position'] }}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', damping: 30, stiffness: 200 }}
+                >
+                  <motion.div
+                    className="relative inline-flex"
+                    layoutId="avatar"
+                    layout
+                    onContextMenu={onAvatarContextMenu}
+                  >
+                    <motion.div
+                      className="absolute left-0 top-3 origin-left opacity-[var(--avatar-border-opacity,0)] transition-opacity"
+                      style={{ transform: avatarBorderTransform }}
+                    >
+                      <Avatar />
+                    </motion.div>
+                    <motion.div
+                      className="block h-16 w-16 origin-left"
+                      style={{ transform: avatarTransform }}
+                    >
+                      <Avatar.Image large alt={isShowingAltAvatar} className="block h-full w-full" />
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              </Container>
+            </>
+          )}
+        </AnimatePresence>
+        <div
+          ref={headerRef}
+          className="top-0 z-10 h-16 pt-6"
+          style={{ position: 'var(--header-position)' as React.CSSProperties['position'] }}
+        >
+          <Container
+            className="top-[var(--header-top,theme(spacing.6))] w-full"
+            style={{ position: 'var(--header-inner-position)' as React.CSSProperties['position'] }}
+          >
+            <div className="relative flex gap-4">
+              <motion.div
+                className="flex flex-1"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', damping: 30, stiffness: 200 }}
+              >
+                <NavigationBar />
+              </motion.div>
+              <div className="relative flex gap-4">
+                <Tooltip.Provider delayDuration={300}>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <motion.div
+                        className="flex items-center"
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ type: 'spring', damping: 30, stiffness: 200 }}
+                      >
+                        <SignedIn>
+                          <UserButton />
+                        </SignedIn>
+                        <SignedOut>
+                          <SignInButton>
+                            <Avatar />
+                          </SignInButton>
+                        </SignedOut>
+                      </motion.div>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content side="bottom">
+                      <div className="flex items-center gap-2">
+                        <SignedIn>
+                          <Avatar />
+                          <ThemeSwitcher />
+                        </SignedIn>
+                        <SignedOut>
+                          <Avatar />
+                          <ThemeSwitcher />
+                        </SignedOut>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              </div>
+            </div>
+          </Container>
         </div>
-        <UserInfo />
-        <ThemeSwitcher />
-      </Container>
-      <NavigationBar />
-    </header>
+      </motion.header>
+    </>
   )
 }
