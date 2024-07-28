@@ -1,13 +1,16 @@
 import { env } from '~/env.mjs';
 import { getLatestBlogPosts } from '~/sanity/queries';
-
 import { BlogPostCard } from './BlogPostCard';
+import { useMemo } from 'react';
 
 export async function BlogPosts({ limit = 5 }) {
   const posts = await getLatestBlogPosts({ limit, forDisplay: true }) || [];
 
-  const views = posts.map(() =>
-    env.VERCEL_ENV === 'development' ? Math.floor(Math.random() * 1000) : 0
+  const views = useMemo(() => 
+    posts.map(() =>
+      env.VERCEL_ENV === 'development' ? Math.floor(Math.random() * 1000) : 0
+    ),
+    [posts, env.VERCEL_ENV]
   );
 
   return (
