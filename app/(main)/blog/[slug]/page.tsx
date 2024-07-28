@@ -1,5 +1,6 @@
 import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
+
 import { BlogPostPage } from '~/app/(main)/blog/BlogPostPage'
 import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
@@ -61,7 +62,7 @@ export default async function BlogPage({
     ? redis.incr(kvKeys.postViews(post._id))
     : Promise.resolve(30578)
 
-  const reactionsPromise = (async () => {
+  const reactionsPromise = (async (): Promise<number[]> => {
     if (env.VERCEL_ENV !== 'production') {
       return Array.from({ length: 4 }, () =>
         Math.floor(Math.random() * 50000)
@@ -83,7 +84,7 @@ export default async function BlogPage({
     return []
   })()
 
-  const relatedViewsPromise = (async () => {
+  const relatedViewsPromise = (async (): Promise<number[]> => {
     if (typeof post.related === 'undefined' || post.related.length === 0) {
       return []
     }
@@ -93,7 +94,8 @@ export default async function BlogPage({
     }
 
     const postIdKeys = post.related.map(({ _id }) => kvKeys.postViews(_id))
-    return redis.mget<number[]>(...postIdKeys)
+    const relatedViews = await redis.mget<number[]>(...postIdKeys)
+    return relatedViews as number[] // Cast to number[] since redis.mget will return an array of numbers
   })()
 
   const [views, reactions, relatedViews] = await Promise.all([
