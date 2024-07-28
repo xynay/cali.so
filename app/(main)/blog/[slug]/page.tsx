@@ -8,8 +8,26 @@ import { url } from '~/lib'
 import { redis } from '~/lib/redis'
 import { getBlogPost } from '~/sanity/queries'
 
-export const generateMetadata = async ({ params }: { params: { slug: string } }) => {
-  const post = await getBlogPost(params.slug)
+type Post = {
+  _id: string
+  title: string
+  description: string
+  mainImage: {
+    asset: {
+      url: string
+    }
+  }
+  related?: {
+    _id: string
+  }[]
+}
+
+export const generateMetadata = async ({
+  params,
+}: {
+  params: { slug: string }
+}): Promise<Metadata> => {
+  const post = await getBlogPost(params.slug) as Post | null
   if (!post) {
     notFound()
   }
@@ -44,40 +62,43 @@ export const generateMetadata = async ({ params }: { params: { slug: string } })
   } satisfies Metadata
 }
 
-export default async function BlogPage({ params }: { params: { slug: string } }) {
-  const post = await getBlogPost(params.slug)
+export default async function BlogPage({
+  params,
+}: {
+  params: { slug: string }
+}) {
+  const post = await getBlogPost(params.slug) as Post | null
   if (!post) {
     notFound()
   }
 
-  const postId = post._id
+  let views: number
+  if (env.VERCEL_ENV === 'production') {
+    views = await redis.incr(kvKeys.postViews(post._id))
+  } else {
+    views = 30578
+  }
 
-  const viewsPromise = (async () => {
+  let reactions: number[] = []
+  try {
     if (env.VERCEL_ENV === 'production') {
-      return await redis.incr(kvKeys.postViews(postId))
-    } else {
-      return 30578
-    }
-  })()
-
-  const reactionsPromise = (async () => {
-    if (env.VERCEL_ENV === 'production') {
-      try {
-        const res = await fetch(url(`/api/reactions?id=${postId}`), {
-          next: {
-            tags: [`reactions:${postId}`],
-          },
-        })
-        const data = await res.json()
-        return Array.isArray(data) ? data : []
-      } catch (error) {
-        console.error(error)
-        return []
+      const res = await fetch(url(`/api/reactions?id=${post._id}`), {
+        next: {
+          tags: [`reactions:${post._id}`],
+        },
+      })
+      const data = await res.json() as number[]
+      if (Array.isArray(data)) {
+        reactions = data
       }
     } else {
-      return Array.from({ length: 4 }, () => Math.floor(Math.random() * 50000))
+      reactions = Array.from({ length: 4 }, () =>
+        Math.floor(Math.random() * 50000)
+      )
     }
-  })()
+  } catch (error) {
+    console.error(error)
+  }
 
   let relatedViews: number[] = []
   if (post.related && post.related.length > 0) {
@@ -85,12 +106,9 @@ export default async function BlogPage({ params }: { params: { slug: string } })
       relatedViews = post.related.map(() => Math.floor(Math.random() * 1000))
     } else {
       const postIdKeys = post.related.map(({ _id }) => kvKeys.postViews(_id))
-      const relatedViewsResult = await redis.mget(...postIdKeys)
-      relatedViews = relatedViewsResult.map((viewCount) => Number(viewCount) || 0)
+      relatedViews = await redis.mget(...postIdKeys) as number[]
     }
   }
-
-  const [views, reactions] = await Promise.all([viewsPromise, reactionsPromise])
 
   return (
     <BlogPostPage
