@@ -1,17 +1,40 @@
 import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
-
 import { BlogPostPage } from '~/app/(main)/blog/BlogPostPage'
 import { env } from '~/env.mjs'
 import { url } from '~/lib'
 import { getBlogPost } from '~/sanity/queries'
+
+// 定义类型
+interface MainImage {
+  asset: {
+    url: string;
+  };
+}
+
+interface BlogPost {
+  _id: string;
+  title: string;
+  description: string;
+  mainImage: MainImage;
+  related?: Array<{ _id: string }>;
+}
+
+interface ViewResponse {
+  views: number;
+}
+
+interface Reaction {
+  id: string;
+  count: number;
+}
 
 export const generateMetadata = async ({
   params,
 }: {
   params: { slug: string }
 }) => {
-  const post = await getBlogPost(params.slug)
+  const post: BlogPost | null = await getBlogPost(params.slug)
   if (!post) {
     notFound()
   }
@@ -51,7 +74,7 @@ export default async function BlogPage({
 }: {
   params: { slug: string }
 }) {
-  const post = await getBlogPost(params.slug)
+  const post: BlogPost | null = await getBlogPost(params.slug)
   if (!post) {
     notFound()
   }
@@ -61,7 +84,7 @@ export default async function BlogPage({
   try {
     if (env.VERCEL_ENV === 'production') {
       const res = await fetch(url(`/api/views?id=${post._id}`))
-      const data = await res.json()
+      const data: ViewResponse = await res.json()
       views = typeof data.views === 'number' ? data.views : views
     }
   } catch (error) {
@@ -77,9 +100,9 @@ export default async function BlogPage({
           tags: [`reactions:${post._id}`],
         },
       })
-      const data = await res.json()
+      const data: Reaction[] = await res.json()
       if (Array.isArray(data)) {
-        reactions = data.map((item: any) => typeof item === 'number' ? item : 0) // 类型检查
+        reactions = data.map((item) => typeof item.count === 'number' ? item.count : 0) // 类型检查
       }
     } else {
       reactions = Array.from({ length: 4 }, () =>
@@ -100,7 +123,7 @@ export default async function BlogPage({
         const postIdKeys = post.related.map(({ _id }) => url(`/api/views?id=${_id}`))
         const responses = await Promise.all(postIdKeys.map((key) => fetch(key)))
         const data = await Promise.all(responses.map((res) => res.json()))
-        relatedViews = data.map((d: any) => typeof d.views === 'number' ? d.views : 0) // 类型检查
+        relatedViews = data.map((d: ViewResponse) => typeof d.views === 'number' ? d.views : 0) // 类型检查
       } catch (error) {
         console.error(error)
       }
