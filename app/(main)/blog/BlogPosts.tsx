@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { env } from '~/env.mjs';
 import { getLatestBlogPosts } from '~/sanity/queries';
+
 import { BlogPostCard } from './BlogPostCard';
 
 export async function BlogPosts({ limit = 5 }) {
