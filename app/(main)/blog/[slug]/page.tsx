@@ -85,7 +85,8 @@ export default async function BlogPage({ params }: { params: { slug: string } })
       relatedViews = post.related.map(() => Math.floor(Math.random() * 1000))
     } else {
       const postIdKeys = post.related.map(({ _id }) => kvKeys.postViews(_id))
-      relatedViews = await redis.mget<number[]>(...postIdKeys)
+      const relatedViewsResult = await redis.mget(...postIdKeys)
+      relatedViews = relatedViewsResult.map((viewCount) => Number(viewCount) || 0)
     }
   }
 
