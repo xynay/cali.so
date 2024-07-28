@@ -1,4 +1,5 @@
 import { groq } from 'next-sanity';
+
 import { getDate } from '~/lib/date';
 import { client } from '~/sanity/lib/client';
 import { type Post, type PostDetail } from '~/sanity/schemas/post';
