@@ -5,6 +5,7 @@ import {
   SignedOut,
   SignInButton,
   UserButton,
+  useUser,
 } from '@clerk/nextjs'
 import { clsxm } from '@zolplay/utils'
 import {
@@ -18,10 +19,16 @@ import React from 'react'
 
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
-import { UserArrowLeftIcon } from '~/assets'
+import {
+  GitHubBrandIcon,
+  GoogleBrandIcon,
+  MailIcon,
+  UserArrowLeftIcon,
+} from '~/assets'
 import { Avatar } from '~/components/Avatar'
 import { Container } from '~/components/ui/Container'
 import { Tooltip } from '~/components/ui/Tooltip'
+import { url } from '~/lib'
 import { clamp } from '~/lib/math'
 
 export function Header() {
@@ -243,7 +250,8 @@ export function Header() {
                 stiffness: 200,
               }}
             >
-              <NavigationBar />
+              <NavigationBar.Mobile className="pointer-events-auto relative z-50 md:hidden" />
+              <NavigationBar.Desktop className="pointer-events-auto relative z-50 hidden md:block" />
               <ThemeSwitcher />
             </motion.div>
           </AnimatePresence>
