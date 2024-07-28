@@ -15,7 +15,7 @@ import {
   useMotionValue,
 } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import React from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
@@ -34,16 +34,16 @@ import { clamp } from '~/lib/math'
 export function Header() {
   const isHomePage = usePathname() === '/'
 
-  const headerRef = React.useRef<HTMLDivElement>(null)
-  const avatarRef = React.useRef<HTMLDivElement>(null)
-  const isInitial = React.useRef(true)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const avatarRef = useRef<HTMLDivElement>(null)
+  const isInitial = useRef(true)
 
   const avatarX = useMotionValue(0)
   const avatarScale = useMotionValue(1)
   const avatarBorderX = useMotionValue(0)
   const avatarBorderScale = useMotionValue(1)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const downDelay = avatarRef.current?.offsetTop ?? 0
     const upDelay = 64
 
@@ -128,13 +128,13 @@ export function Header() {
       window.removeEventListener('scroll', updateStyles)
       window.removeEventListener('resize', updateStyles)
     }
-  }, [isHomePage])
+  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale])
 
   const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
   const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
 
-  const [isShowingAltAvatar, setIsShowingAltAvatar] = React.useState(false)
-  const onAvatarContextMenu = React.useCallback(
+  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
+  const onAvatarContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault()
       setIsShowingAltAvatar((prev) => !prev)
@@ -279,18 +279,16 @@ export function Header() {
 }
 
 function UserInfo() {
-  const [tooltipOpen, setTooltipOpen] = React.useState(false)
+  const [tooltipOpen, setTooltipOpen] = useState(false)
   const pathname = usePathname()
   const { user } = useUser()
-  const StrategyIcon = React.useMemo(() => {
+  const StrategyIcon = useMemo(() => {
     const strategy = user?.primaryEmailAddress?.verification.strategy
     if (!strategy) return null
 
     switch (strategy) {
       case 'from_oauth_github':
-        return GitHubBrandIcon as (
-          props: React.ComponentProps<'svg'>
-        ) => JSX.Element
+        return GitHubBrandIcon
       case 'from_oauth_google':
         return GoogleBrandIcon
       default:
