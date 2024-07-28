@@ -1,4 +1,4 @@
-const TerserPlugin = require('terser-webpack-plugin');
+import TerserPlugin from 'terser-webpack-plugin';
 
 // 只在开发或构建时加载环境变量，避免生产环境下的额外开销
 if (!process.env.SKIP_ENV_VALIDATION) {
