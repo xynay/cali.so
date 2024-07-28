@@ -1,13 +1,22 @@
+<<<<<<< HEAD
 import { groq } from 'next-sanity';
 
 import { getDate } from '~/lib/date';
 import { client } from '~/sanity/lib/client';
 import { type Post, type PostDetail } from '~/sanity/schemas/post';
 import { type Project } from '~/sanity/schemas/project';
+=======
+import { groq } from 'next-sanity'
+import { getDate } from '~/lib/date'
+import { client } from '~/sanity/lib/client'
+import { type Post, type PostDetail } from '~/sanity/schemas/post'
+import { type Project } from '~/sanity/schemas/project'
+>>>>>>> parent of 7a16155 (Update queries.ts)
 
 // 预先计算当前日期
-const currentDate = getDate().toISOString();
+const currentDate = getDate().toISOString()
 
+<<<<<<< HEAD
 export const getAllLatestBlogPostSlugsQuery = groq`
   *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current)] | order(publishedAt desc).slug.current
 `;
@@ -15,15 +24,37 @@ export const getAllLatestBlogPostSlugsQuery = groq`
 export const getAllLatestBlogPostSlugs = () => {
   return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery, { currentDate });
 };
+=======
+export const getAllLatestBlogPostSlugsQuery = () =>
+  groq`
+  *[_type == "post" && !(_id in path("drafts.**"))
+  && publishedAt <= $currentDate
+  && defined(slug.current)] | order(publishedAt desc).slug.current
+  `
+
+export const getAllLatestBlogPostSlugs = () => {
+  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery(), { currentDate })
+}
+>>>>>>> parent of 7a16155 (Update queries.ts)
 
 type GetBlogPostsOptions = {
-  limit?: number;
-  offset?: number;
-  forDisplay?: boolean;
-};
+  limit?: number
+  offset?: number
+  forDisplay?: boolean
+}
 
+<<<<<<< HEAD
 export const getLatestBlogPostsQuery = ({ limit = 5, forDisplay = true }: GetBlogPostsOptions) => groq`
   *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current)] | order(publishedAt desc)[0...${limit}] {
+=======
+export const getLatestBlogPostsQuery = ({
+  limit = 5,
+  forDisplay = true,
+}: GetBlogPostsOptions) =>
+  groq`
+  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate
+  && defined(slug.current)] | order(publishedAt desc)[0...${limit}] {
+>>>>>>> parent of 7a16155 (Update queries.ts)
     _id,
     title,
     "slug": slug.current,
@@ -38,12 +69,10 @@ export const getLatestBlogPostsQuery = ({ limit = 5, forDisplay = true }: GetBlo
         ${forDisplay ? '"lqip": metadata.lqip, "dominant": metadata.palette.dominant,' : ''}
       }
     }
-  }
-`;
+  }`
 
-export const getLatestBlogPosts = (options: GetBlogPostsOptions) => {
-  return client.fetch<Post[]>(getLatestBlogPostsQuery(options), { currentDate });
-};
+export const getLatestBlogPosts = (options: GetBlogPostsOptions) =>
+  client.fetch<Post[]>(getLatestBlogPostsQuery(options), { currentDate })
 
 export const getBlogPostQuery = groq`
   *[_type == "post" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
@@ -86,16 +115,21 @@ export const getBlogPostQuery = groq`
           "lqip": metadata.lqip,
           "dominant": metadata.palette.dominant
         }
-      }
+      },
     }
-  }
-`;
+  }`
 
-export const getBlogPost = (slug: string) => {
-  return client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, { slug });
-};
+export const getBlogPost = (slug: string) =>
+  client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, {
+    slug,
+  })
 
+<<<<<<< HEAD
 export const getSettingsQuery = groq`
+=======
+export const getSettingsQuery = () =>
+  groq`
+>>>>>>> parent of 7a16155 (Update queries.ts)
   *[_type == "settings"][0] {
     "projects": projects[]->{
       _id,
@@ -112,19 +146,17 @@ export const getSettingsQuery = groq`
       end,
       "logo": logo.asset->url
     }
-  }
-`;
+  }`
 
-export const getSettings = () => {
-  return client.fetch<{
-    projects: Project[] | null;
-    heroPhotos?: string[] | null;
+export const getSettings = () =>
+  client.fetch<{
+    projects: Project[] | null
+    heroPhotos?: string[] | null
     resume?: {
-      company: string;
-      title: string;
-      logo: string;
-      start: string;
-      end?: string;
-    }[] | null;
-  }>(getSettingsQuery());
-};
+      company: string
+      title: string
+      logo: string
+      start: string
+      end?: string
+    }[] | null
+  }>(getSettingsQuery())
