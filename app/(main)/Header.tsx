@@ -349,3 +349,4 @@ function UserInfo() {
     </AnimatePresence>
   )
 }
+export { Header };
