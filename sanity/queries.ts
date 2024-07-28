@@ -1,41 +1,23 @@
-<<<<<<< HEAD
-import { groq } from 'next-sanity';
-
-import { getDate } from '~/lib/date';
-import { client } from '~/sanity/lib/client';
-import { type Post, type PostDetail } from '~/sanity/schemas/post';
-import { type Project } from '~/sanity/schemas/project';
-=======
 import { groq } from 'next-sanity'
+
 import { getDate } from '~/lib/date'
 import { client } from '~/sanity/lib/client'
 import { type Post, type PostDetail } from '~/sanity/schemas/post'
 import { type Project } from '~/sanity/schemas/project'
->>>>>>> parent of 7a16155 (Update queries.ts)
 
 // 预先计算当前日期
 const currentDate = getDate().toISOString()
 
-<<<<<<< HEAD
-export const getAllLatestBlogPostSlugsQuery = groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current)] | order(publishedAt desc).slug.current
-`;
-
-export const getAllLatestBlogPostSlugs = () => {
-  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery, { currentDate });
-};
-=======
 export const getAllLatestBlogPostSlugsQuery = () =>
-  groq`
+  groq
   *[_type == "post" && !(_id in path("drafts.**"))
   && publishedAt <= $currentDate
   && defined(slug.current)] | order(publishedAt desc).slug.current
-  `
+  
 
 export const getAllLatestBlogPostSlugs = () => {
   return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery(), { currentDate })
 }
->>>>>>> parent of 7a16155 (Update queries.ts)
 
 type GetBlogPostsOptions = {
   limit?: number
@@ -43,18 +25,13 @@ type GetBlogPostsOptions = {
   forDisplay?: boolean
 }
 
-<<<<<<< HEAD
-export const getLatestBlogPostsQuery = ({ limit = 5, forDisplay = true }: GetBlogPostsOptions) => groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current)] | order(publishedAt desc)[0...${limit}] {
-=======
 export const getLatestBlogPostsQuery = ({
   limit = 5,
   forDisplay = true,
 }: GetBlogPostsOptions) =>
-  groq`
+  groq
   *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate
   && defined(slug.current)] | order(publishedAt desc)[0...${limit}] {
->>>>>>> parent of 7a16155 (Update queries.ts)
     _id,
     title,
     "slug": slug.current,
@@ -69,12 +46,12 @@ export const getLatestBlogPostsQuery = ({
         ${forDisplay ? '"lqip": metadata.lqip, "dominant": metadata.palette.dominant,' : ''}
       }
     }
-  }`
+  }
 
 export const getLatestBlogPosts = (options: GetBlogPostsOptions) =>
   client.fetch<Post[]>(getLatestBlogPostsQuery(options), { currentDate })
 
-export const getBlogPostQuery = groq`
+export const getBlogPostQuery = groq
   *[_type == "post" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
     _id,
     title,
@@ -117,19 +94,15 @@ export const getBlogPostQuery = groq`
         }
       },
     }
-  }`
+  }
 
 export const getBlogPost = (slug: string) =>
   client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, {
     slug,
   })
 
-<<<<<<< HEAD
-export const getSettingsQuery = groq`
-=======
 export const getSettingsQuery = () =>
-  groq`
->>>>>>> parent of 7a16155 (Update queries.ts)
+  groq
   *[_type == "settings"][0] {
     "projects": projects[]->{
       _id,
@@ -146,7 +119,7 @@ export const getSettingsQuery = () =>
       end,
       "logo": logo.asset->url
     }
-  }`
+  }
 
 export const getSettings = () =>
   client.fetch<{
