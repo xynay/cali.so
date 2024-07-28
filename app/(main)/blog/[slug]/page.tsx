@@ -68,9 +68,9 @@ export default async function BlogPage({
   let reactions: number[] = []
   try {
     if (env.VERCEL_ENV === 'production') {
-      const res = await fetch(url(`/api/reactions?id=${post._id}`), {
+      const res = await fetch(url(/api/reactions?id=${post._id}), {
         next: {
-          tags: [`reactions:${post._id}`],
+          tags: [reactions:${post._id}],
         },
       })
       const data = await res.json()
