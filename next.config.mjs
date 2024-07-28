@@ -1,3 +1,5 @@
+const TerserPlugin = require('terser-webpack-plugin');
+
 // 只在开发或构建时加载环境变量，避免生产环境下的额外开销
 if (!process.env.SKIP_ENV_VALIDATION) {
   (async () => {
@@ -17,11 +19,9 @@ const nextConfig = {
       }
     ],
   },
-
   experimental: {
     taint: true, // 仅在需要时启用实验功能
   },
-
   redirects() {
     return [
       { source: '/twitter', destination: 'https://x.com/thecalicastle', permanent: false },
@@ -33,13 +33,26 @@ const nextConfig = {
       { source: '/bilibili', destination: 'https://space.bilibili.com/8350251', permanent: false },
     ];
   },
-
   rewrites() {
     return [
       { source: '/feed', destination: '/feed.xml' },
       { source: '/rss', destination: '/feed.xml' },
       { source: '/rss.xml', destination: '/feed.xml' },
     ];
+  },
+  webpack(config, { dev, isServer }) {
+    if (!dev && !isServer) {
+      config.optimization.minimizer.push(
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              drop_console: true,
+            },
+          },
+        })
+      );
+    }
+    return config;
   },
 }
 
