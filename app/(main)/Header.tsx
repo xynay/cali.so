@@ -267,7 +267,7 @@ const UserInfo = () => {
               />
             </SignedIn>
             <SignedOut>
-              <SignInButton mode="modal" redirectUrl={url('/')}>
+              <SignInButton mode="modal" redirectUrl={url('/').toString()}>
                 <button className="flex items-center justify-center gap-2 rounded-lg bg-zinc-200/70 px-4 py-2.5 text-sm font-medium text-zinc-900 transition hover:bg-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-800/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 dark:focus-visible:ring-white/10">
                   <MailIcon className="h-5 w-5" />
                   Sign in
