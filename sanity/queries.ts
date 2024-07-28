@@ -4,11 +4,14 @@ import { client } from '~/sanity/lib/client';
 import { type Post, type PostDetail } from '~/sanity/schemas/post';
 import { type Project } from '~/sanity/schemas/project';
 
+// Cache the current date to avoid recalculating it multiple times
+const currentDate = getDate().toISOString();
+
 // Query to fetch all latest blog post slugs
 export const getAllLatestBlogPostSlugsQuery = () =>
   groq`
   *[_type == "post" && !(_id in path("drafts.**"))
-  && publishedAt <= "${getDate().toISOString()}"
+  && publishedAt <= "${currentDate}"
   && defined(slug.current)] | order(publishedAt desc).slug.current
   `;
 
@@ -29,7 +32,7 @@ export const getLatestBlogPostsQuery = ({
   forDisplay = true,
 }: GetBlogPostsOptions) =>
   groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${getDate().toISOString()}"
+  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${currentDate}"
   && defined(slug.current)] | order(publishedAt desc)[0...${limit}] {
     _id,
     title,
@@ -42,11 +45,7 @@ export const getLatestBlogPostsQuery = ({
       _ref,
       asset->{
         url,
-        ${
-          forDisplay
-            ? '"lqip": metadata.lqip, "dominant": metadata.palette.dominant,'
-            : ''
-        }
+        ${forDisplay ? '"lqip": metadata.lqip, "dominant": metadata.palette.dominant,' : ''}
       }
     }
   }`;
@@ -122,7 +121,7 @@ export const getSettingsQuery = () =>
       end,
       "logo": logo.asset->url
     }
-}`;
+  }`;
 
 export const getSettings = () =>
   client.fetch<{
