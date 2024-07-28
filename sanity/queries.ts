@@ -2,18 +2,17 @@ import { groq } from 'next-sanity';
 import { getDate } from '~/lib/date';
 import { client } from '~/sanity/lib/client';
 import { type Post, type PostDetail } from '~/sanity/schemas/post';
-import { type Project } from '~/sanity/schemas.project';
+import { type Project } from '~/sanity/schemas/project';
 
 // 预先计算当前日期
 const currentDate = getDate().toISOString();
 
-export const getAllLatestBlogPostSlugsQuery = () => groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current)]
-  | order(publishedAt desc) { "slug": slug.current }
+export const getAllLatestBlogPostSlugsQuery = groq`
+  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current)] | order(publishedAt desc).slug.current
 `;
 
 export const getAllLatestBlogPostSlugs = () => {
-  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery(), { currentDate });
+  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery, { currentDate });
 };
 
 type GetBlogPostsOptions = {
@@ -23,8 +22,7 @@ type GetBlogPostsOptions = {
 };
 
 export const getLatestBlogPostsQuery = ({ limit = 5, forDisplay = true }: GetBlogPostsOptions) => groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current)]
-  | order(publishedAt desc) [0...${limit}] {
+  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current)] | order(publishedAt desc)[0...${limit}] {
     _id,
     title,
     "slug": slug.current,
@@ -33,6 +31,7 @@ export const getLatestBlogPostsQuery = ({ limit = 5, forDisplay = true }: GetBlo
     publishedAt,
     readingTime,
     mainImage {
+      _ref,
       asset->{
         url,
         ${forDisplay ? '"lqip": metadata.lqip, "dominant": metadata.palette.dominant,' : ''}
@@ -60,17 +59,19 @@ export const getBlogPostQuery = groq`
       _type == "image" => {
         "url": asset->url,
         "lqip": asset->metadata.lqip,
-        "dimensions": asset->metadata.dimensions
+        "dimensions": asset->metadata.dimensions,
+        ...
       }
     },
+    "headings": body[length(style) == 2 && string::startsWith(style, "h")],
     mainImage {
+      _ref,
       asset->{
         url,
         "lqip": metadata.lqip
       }
     },
-    "related": *[_type == "post" && slug.current != $slug && count(categories[@._ref in ^.^.categories[]._ref]) > 0]
-    | order(publishedAt desc, _createdAt desc) [0...2] {
+    "related": *[_type == "post" && slug.current != $slug && count(categories[@._ref in ^.^.categories[]._ref]) > 0] | order(publishedAt desc, _createdAt desc) [0..2] {
       _id,
       title,
       "slug": slug.current,
@@ -78,6 +79,7 @@ export const getBlogPostQuery = groq`
       publishedAt,
       readingTime,
       mainImage {
+        _ref,
         asset->{
           url,
           "lqip": metadata.lqip,
@@ -92,7 +94,7 @@ export const getBlogPost = (slug: string) => {
   return client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, { slug });
 };
 
-export const getSettingsQuery = () => groq`
+export const getSettingsQuery = groq`
   *[_type == "settings"][0] {
     "projects": projects[]->{
       _id,
