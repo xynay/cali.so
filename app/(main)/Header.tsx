@@ -150,11 +150,11 @@ export function Header() {
               <div ref={avatarRef} className="order-last mt-[calc(theme(spacing.16)-theme(spacing.3))]" />
               <Container
                 className="top-0 order-last -mb-3 pt-3"
-                style={{ position: 'var(--header-position)' }}
+                style={{ position: 'sticky' }} // 使用硬编码的CSS属性
               >
                 <motion.div
                   className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none"
-                  style={{ position: 'var(--header-inner-position)' }}
+                  style={{ position: 'sticky' }} // 使用硬编码的CSS属性
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ type: 'spring', damping: 30, stiffness: 200 }}
@@ -184,8 +184,8 @@ export function Header() {
             </>
           )}
         </AnimatePresence>
-        <div ref={headerRef} className="top-0 z-10 h-16 pt-6" style={{ position: 'var(--header-position)' }}>
-          <Container className="top-[var(--header-top,theme(spacing.6))] w-full" style={{ position: 'var(--header-inner-position)' }}>
+        <div ref={headerRef} className="top-0 z-10 h-16 pt-6" style={{ position: 'sticky' }}> // 使用硬编码的CSS属性
+          <Container className="top-[var(--header-top,theme(spacing.6))] w-full" style={{ position: 'sticky' }}> // 使用硬编码的CSS属性
             <div className="relative flex gap-4">
               <motion.div
                 className="flex flex-1"
@@ -230,13 +230,10 @@ function UserInfo() {
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const pathname = usePathname()
   const { user } = useUser()
-  const StrategyIcon = useMemo(() => {
-    const strategy = user?.primaryEmailAddress?.verification.strategy
-    if (!strategy) return null
-    switch (strategy) {
-      case 'from_oauth_github':
-        return GitHubBrandIcon
-      case 'from_oauth_google':
+
+  const UserIcon = useMemo(() => {
+    switch (user?.primaryEmailAddress?.provider) {
+      case 'google':
         return GoogleBrandIcon
       case 'from_link':
         return MailIcon
