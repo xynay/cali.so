@@ -4,21 +4,18 @@ import Link from 'next/link'
 
 import {
   CalendarIcon,
-  CursorClickIcon,
   HourglassIcon,
   ScriptIcon,
 } from '~/assets'
-import { prettifyNumber } from '~/lib/math'
 import { type Post } from '~/sanity/schemas/post'
 
-export function BlogPostCard({ post, views }: { post: Post; views: number }) {
+function BlogPostCard({ post }: { post: Post }) {
   const { title, slug, mainImage, publishedAt, categories, readingTime } = post
   const foreground = mainImage.asset.dominant?.foreground
   const background = mainImage.asset.dominant?.background
   const imageUrl = mainImage.asset.url
   const lqip = mainImage.asset.lqip
   const formattedDate = parseDateTime({ date: new Date(publishedAt) })?.format('YYYY/MM/DD')
-
   return (
     <Link
       href={`/blog/${slug}`}
@@ -47,14 +44,12 @@ export function BlogPostCard({ post, views }: { post: Post; views: number }) {
         <h2 className="z-20 text-base font-bold tracking-tight text-[--post-image-fg] opacity-70 transition-opacity group-hover:opacity-100 md:text-xl">
           {title}
         </h2>
-
         <span className="relative z-20 flex items-center justify-between opacity-50 transition-opacity group-hover:opacity-80">
           <span className="inline-flex items-center space-x-3">
             <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] md:text-sm">
               <CalendarIcon />
               <span>{formattedDate}</span>
             </span>
-
             {Array.isArray(categories) && (
               <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] md:text-sm">
                 <ScriptIcon />
@@ -63,11 +58,6 @@ export function BlogPostCard({ post, views }: { post: Post; views: number }) {
             )}
           </span>
           <span className="inline-flex items-center space-x-3 text-[12px] font-medium text-[--post-image-fg] md:text-xs">
-            <span className="inline-flex items-center space-x-1">
-              <CursorClickIcon />
-              <span>{prettifyNumber(views, true)}</span>
-            </span>
-
             <span className="inline-flex items-center space-x-1">
               <HourglassIcon />
               <span>{readingTime.toFixed(0)}分钟阅读</span>
@@ -78,3 +68,5 @@ export function BlogPostCard({ post, views }: { post: Post; views: number }) {
     </Link>
   )
 }
+
+export { BlogPostCard }
