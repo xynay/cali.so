@@ -45,13 +45,13 @@ const BlogHomePageContent: React.FC = React.memo(async () => {
       )}
 
       <Container className="mt-24 md:mt-28">
-        <div className="mx-auto grid max-w-lg grid-cols-1 gap-y-20 lg:max-w-none">
-          <div className="flex flex-col gap-6 pt-4 w-full">
-            <h2 className="flex items-center justify-start text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <div className="mx-auto grid max-w-md grid-cols-1 gap-y-20 lg:max-w-none">
+          <div className="flex flex-col gap-6 pt-4 w-full items-center">
+            <h2 className="flex items-center justify-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               <PencilSwooshIcon className="h-5 w-5 flex-none" />
               <span className="ml-2">近期文章</span>
             </h2>
-            <div>
+            <div className="w-full">
               <BlogPosts />
             </div>
           </div>
