@@ -46,7 +46,7 @@ const Founder = () => (
 )
 
 export const Headline = () => (
-  <div className="max-w-2xl">
+  <div className="max-w-2xl mx-auto text-center">
     <motion.h1
       className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl"
       initial={{ opacity: 0, y: 30 }}
