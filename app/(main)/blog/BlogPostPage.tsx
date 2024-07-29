@@ -199,3 +199,4 @@ function BlogPostPage({
     </Container>
   )
 }
+export { BlogPostPage };
