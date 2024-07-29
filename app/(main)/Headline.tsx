@@ -13,7 +13,7 @@ const borderPositions = [
 ]
 
 const Developer = () => (
-  <span className="group">
+  <span className="group text-2xl">
     <span className="font-mono">&lt;</span>探索者
     <span className="font-mono">/&gt;</span>
     <span className="invisible inline-flex text-zinc-300 before:content-['|'] group-hover:visible group-hover:animate-typing dark:text-zinc-500" />
@@ -21,7 +21,7 @@ const Developer = () => (
 )
 
 const Designer = () => (
-  <span className="group relative bg-black/5 p-1 dark:bg-white/5">
+  <span className="group relative bg-black/5 p-1 dark:bg-white/5 text-2xl">
     <span className="pointer-events-none absolute inset-0 border border-lime-700/90 opacity-70 group-hover:border-dashed group-hover:opacity-100 dark:border-lime-400/90">
       {borderPositions.map((pos) => (
         <span key={pos} className={`absolute ${pos} size-1.5 border border-lime-700 bg-zinc-50 dark:border-lime-400`} />
@@ -32,14 +32,14 @@ const Designer = () => (
 )
 
 const OCD = () => (
-  <span className="group inline-flex items-center">
+  <span className="group inline-flex items-center text-2xl">
     <SparkleIcon className="mr-1 inline-flex transform-gpu transition-transform duration-500 group-hover:rotate-180" />
     <span>记录者</span>
   </span>
 )
 
 const Founder = () => (
-  <span className="group inline-flex items-center">
+  <span className="group inline-flex items-center text-2xl">
     <UserSecurityIcon className="mr-1 inline-flex group-hover:fill-zinc-600/20 dark:group-hover:fill-zinc-200/20" />
     <span>思考者</span>
   </span>
@@ -48,7 +48,7 @@ const Founder = () => (
 export const Headline = () => (
   <div className="max-w-2xl mx-auto text-center">
     <motion.h1
-      className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl"
+      className="text-5xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-6xl"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
@@ -66,7 +66,7 @@ export const Headline = () => (
       </div>
     </motion.h1>
     <motion.p
-      className="mt-6 text-base text-zinc-600 dark:text-zinc-400"
+      className="mt-6 text-lg text-zinc-600 dark:text-zinc-400"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
