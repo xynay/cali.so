@@ -1,9 +1,9 @@
 'use client'
 
-import React from 'react'
-import Link from 'next/link'
 import Spline from '@splinetool/react-spline'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
+import React from 'react'
 
 import { url } from '~/lib'
 

@@ -1,13 +1,13 @@
 'use client'
 
-import React from 'react'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useReward } from 'react-rewards'
 import va from '@vercel/analytics'
 import { clsxm } from '@zolplay/utils'
+import { AnimatePresence, motion } from 'framer-motion'
+import React from 'react'
+import { useForm } from 'react-hook-form'
+import { useReward } from 'react-rewards'
+import { z } from 'zod'
 
 import { TiltedSendIcon } from '~/assets'
 import { Button } from '~/components/ui/Button'
