@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import Spline from '@splinetool/react-spline'
 import { motion } from 'framer-motion'
+
 import { url } from '~/lib'
 
 const NotFoundPage = React.memo(() => {

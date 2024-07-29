@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useReward } from 'react-rewards'
 import va from '@vercel/analytics'
 import { clsxm } from '@zolplay/utils'
+
 import { TiltedSendIcon } from '~/assets'
 import { Button } from '~/components/ui/Button'
 
