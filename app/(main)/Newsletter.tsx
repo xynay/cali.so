@@ -1,14 +1,13 @@
 'use client'
 
+import React from 'react'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import va from '@vercel/analytics'
 import { clsxm } from '@zolplay/utils'
 import { AnimatePresence, motion } from 'framer-motion'
-import React from 'react'
-import { useForm } from 'react-hook-form'
 import { useReward } from 'react-rewards'
 import { z } from 'zod'
-
 import { TiltedSendIcon } from '~/assets'
 import { Button } from '~/components/ui/Button'
 
@@ -20,7 +19,7 @@ export const newsletterFormSchema = z.object({
 })
 export type NewsletterForm = z.infer<typeof newsletterFormSchema>
 
-export function Newsletter({ subCount }: { subCount?: string }) {
+const Newsletter = React.memo(({ subCount }: { subCount?: string }) => {
   const {
     register,
     handleSubmit,
@@ -39,9 +38,7 @@ export function Newsletter({ subCount }: { subCount?: string }) {
 
   const onSubmit = React.useCallback(async (data: NewsletterForm) => {
     if (isSubmitting) return
-
     va.track('Newsletter:Subscribe')
-
     try {
       const response = await fetch('/api/newsletter', {
         method: 'POST',
@@ -133,4 +130,6 @@ export function Newsletter({ subCount }: { subCount?: string }) {
       )}
     </form>
   )
-}
+})
+
+export default Newsletter

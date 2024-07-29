@@ -1,12 +1,12 @@
 'use client'
 
-import Spline from '@splinetool/react-spline';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
+import React from 'react'
+import Spline from '@splinetool/react-spline'
+import { motion } from 'framer-motion'
+import Link from 'next/link'
+import { url } from '~/lib'
 
-import { url } from '~/lib';
-
-export default function NotFoundPage() {
+const NotFoundPage = React.memo(() => {
   return (
     <main className="h-screen">
       <div className="absolute inset-0 h-full w-full">
@@ -30,5 +30,7 @@ export default function NotFoundPage() {
         </Link>
       </div>
     </main>
-  );
-}
+  )
+})
+
+export default NotFoundPage
