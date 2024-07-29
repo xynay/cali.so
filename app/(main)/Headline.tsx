@@ -58,9 +58,14 @@ export const Headline = () => (
         duration: 0.3,
       }}
     >
-      <Developer />，<Designer />，
-      <span className="block h-2" />
-      <OCD />，<Founder />
+      <div className="flex flex-col items-center">
+        <div className="text-left w-full">
+          <Developer />，<Designer />，
+        </div>
+        <div className="text-left w-full">
+          <OCD />，<Founder />
+        </div>
+      </div>
     </motion.h1>
     <motion.p
       className="mt-6 text-base text-zinc-600 dark:text-zinc-400"
