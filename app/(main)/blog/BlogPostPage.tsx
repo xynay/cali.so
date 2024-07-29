@@ -10,7 +10,6 @@ import { BlogPostStateLoader } from '~/app/(main)/blog/BlogPostStateLoader'
 import { BlogReactions } from '~/app/(main)/blog/BlogReactions'
 import {
   CalendarIcon,
-  CursorClickIcon,
   HourglassIcon,
   PencilSwooshIcon,
   ScriptIcon,
@@ -21,17 +20,16 @@ import { PostPortableText } from '~/components/PostPortableText'
 import { Prose } from '~/components/Prose'
 import { Button } from '~/components/ui/Button'
 import { Container } from '~/components/ui/Container'
-import { prettifyNumber } from '~/lib/math'
 import { type PostDetail } from '~/sanity/schemas/post'
 
 import { BlogPostCard } from './BlogPostCard'
 import { BlogPostTableOfContents } from './BlogPostTableOfContents'
 
+// Remove the duplicate export statement
+
 function BlogPostPage({
   post,
-  views,
   reactions,
-  relatedViews,
 }: {
   post: PostDetail
   views?: number
@@ -184,7 +182,7 @@ function BlogPostPage({
             <span className="ml-2">相关文章</span>
           </h2>
           <div className="mt-6 grid grid-cols-1 justify-center gap-6 md:grid-cols-[repeat(auto-fit,75%)] lg:grid-cols-[repeat(auto-fit,45%)] lg:gap-8">
-            {post.related.map((post, idx) => (
+            {post.related.map((post, _idx) => (
               <BlogPostCard
                 post={post}
                 key={post._id}
