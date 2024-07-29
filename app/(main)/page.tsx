@@ -35,12 +35,12 @@ const BlogHomePageContent: React.FC = React.memo(async () => {
 
   return (
     <>
-      <Container className="mt-10 text-center">
+      <Container className="mt-10">
         <Headline />
       </Container>
 
       {heroPhotos && (
-        <Container className="text-center">
+        <Container>
           <Photos photos={heroPhotos} />
         </Container>
       )}
@@ -48,11 +48,11 @@ const BlogHomePageContent: React.FC = React.memo(async () => {
       <Container className="mt-24 md:mt-28">
         <div className="mx-auto grid max-w-xl grid-cols-1 gap-y-20 lg:max-w-none lg:grid-cols-2">
           <div className="flex flex-col gap-6 pt-6">
-            <h2 className="flex items-center justify-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            <h2 className="flex items-center justify-start text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               <PencilSwooshIcon className="h-5 w-5 flex-none" />
               <span className="ml-2">近期文章</span>
             </h2>
-            <div className="text-center">
+            <div>
               <BlogPosts />
             </div>
           </div>
