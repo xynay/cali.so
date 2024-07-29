@@ -1,4 +1,5 @@
 import { getLatestBlogPosts } from '~/sanity/queries';
+
 import { BlogPostCard } from './BlogPostCard';
 
 export async function BlogPosts({ limit = 5 }) {
