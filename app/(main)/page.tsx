@@ -3,7 +3,6 @@ import React, { Suspense } from 'react';
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
 import { Photos } from '~/app/(main)/Photos';
-import { Resume } from '~/app/(main)/Resume';
 import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
@@ -31,7 +30,7 @@ const fetchSettings = async (): Promise<Settings> => {
 
 const BlogHomePageContent: React.FC = React.memo(async () => {
   const settings = await fetchSettings();
-  const { heroPhotos, resume } = settings;
+  const { heroPhotos } = settings;
 
   return (
     <>
