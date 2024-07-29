@@ -59,10 +59,8 @@ export const Headline = () => (
       }}
     >
       <div className="flex flex-col items-center">
-        <div className="text-left w-full">
+        <div className="flex flex-wrap justify-center">
           <Developer />，<Designer />，
-        </div>
-        <div className="text-left w-full">
           <OCD />，<Founder />
         </div>
       </div>
