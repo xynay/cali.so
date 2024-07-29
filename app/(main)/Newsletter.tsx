@@ -51,9 +51,11 @@ const Newsletter = React.memo(({ subCount }: { subCount?: string }) => {
         reset()
         reward()
         setIsSubscribed(true)
+      } else {
+        console.error('订阅失败')
       }
     } catch (error) {
-      console.error(error)
+      console.error('订阅请求出错', error)
     }
   }, [isSubmitting, reset, reward])
 
