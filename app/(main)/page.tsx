@@ -35,20 +35,26 @@ const BlogHomePageContent: React.FC = React.memo(async () => {
 
   return (
     <>
-      <Container className="mt-10">
+      <Container className="mt-10 text-center">
         <Headline />
       </Container>
 
-      {heroPhotos && <Photos photos={heroPhotos} />}
+      {heroPhotos && (
+        <Container className="text-center">
+          <Photos photos={heroPhotos} />
+        </Container>
+      )}
 
       <Container className="mt-24 md:mt-28">
         <div className="mx-auto grid max-w-xl grid-cols-1 gap-y-20 lg:max-w-none lg:grid-cols-2">
           <div className="flex flex-col gap-6 pt-6">
-            <h2 className="flex items-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            <h2 className="flex items-center justify-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               <PencilSwooshIcon className="h-5 w-5 flex-none" />
               <span className="ml-2">近期文章</span>
             </h2>
-            <BlogPosts />
+            <div className="text-center">
+              <BlogPosts />
+            </div>
           </div>
           <aside className="space-y-10 lg:sticky lg:top-8 lg:h-fit lg:pl-16 xl:pl-20">
             {resume && <Resume resume={resume} />}
@@ -62,12 +68,14 @@ const BlogHomePageContent: React.FC = React.memo(async () => {
 // Add a display name to the component
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
-export default function BlogHomePage() {
+const BlogHomePage: React.FC = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <BlogHomePageContent />
     </Suspense>
   );
-}
+};
+
+export default BlogHomePage;
 
 export const revalidate = 60;
