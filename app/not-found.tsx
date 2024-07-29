@@ -1,9 +1,9 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import Spline from '@splinetool/react-spline'
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 import { url } from '~/lib'
 
 const NotFoundPage = React.memo(() => {
@@ -32,5 +32,7 @@ const NotFoundPage = React.memo(() => {
     </main>
   )
 })
+
+NotFoundPage.displayName = 'NotFoundPage'
 
 export default NotFoundPage
