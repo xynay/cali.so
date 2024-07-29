@@ -51,7 +51,7 @@ const BlogHomePageContent: React.FC = React.memo(async () => {
               <PencilSwooshIcon className="h-5 w-5 flex-none" />
               <span className="ml-2">近期文章</span>
             </h2>
-            <div className="w-full">
+            <div className="w-full mx-auto mb-8 max-w-md">
               <BlogPosts />
             </div>
           </div>
