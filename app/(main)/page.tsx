@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
@@ -28,8 +28,24 @@ const fetchSettings = async (): Promise<Settings> => {
   }
 };
 
-const BlogHomePageContent: React.FC = React.memo(async () => {
-  const settings = await fetchSettings();
+
+const BlogHomePageContent: React.FC = () => {
+  const [settings, setSettings] = useState<Settings>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const settings = await fetchSettings();
+      setSettings(settings);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   const { heroPhotos } = settings;
 
   return (
@@ -59,10 +75,7 @@ const BlogHomePageContent: React.FC = React.memo(async () => {
       </Container>
     </>
   );
-});
-
-// Add a display name to the component
-BlogHomePageContent.displayName = 'BlogHomePageContent';
+};
 
 const BlogHomePage: React.FC = () => {
   return (
