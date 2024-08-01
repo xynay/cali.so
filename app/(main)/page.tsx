@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useState  } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
@@ -39,7 +39,7 @@ const BlogHomePageContent: React.FC = React.memo(() => {
       setSettings(settings);
     };
 
-    fetchData();
+    void fetchData(); // 使用 void 操作符显式忽略返回的 Promise
   }, []);
 
   const { heroPhotos } = settings;
