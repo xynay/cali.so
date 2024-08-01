@@ -39,7 +39,7 @@ const BlogHomePageContent: React.FC = React.memo(() => {
       setSettings(settings);
     };
 
-    void fetchData(); // 使用 void 操作符显式忽略返回的 Promise
+    fetchData(); // 使用 void 操作符显式忽略返回的 Promise
   }, []);
 
   const { heroPhotos } = settings;
