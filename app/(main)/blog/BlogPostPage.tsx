@@ -1,8 +1,10 @@
 'use client'
 
+import { parseDateTime } from '@zolplay/utils'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import React from 'react'
+import Balancer from 'react-wrap-balancer'
 
 import { BlogPostStateLoader } from '~/app/(main)/blog/BlogPostStateLoader'
 import {
@@ -100,7 +102,9 @@ function BlogPostPage({
                 >
                   <CalendarIcon />
                   <span>
-                    {new Date(post.publishedAt).toLocaleDateString('zh-CN')}
+                    {parseDateTime({
+                      date: new Date(post.publishedAt),
+                    })?.format('YYYY/MM/DD')}
                   </span>
                 </time>
                 <span className="inline-flex items-center space-x-1.5">
@@ -120,7 +124,7 @@ function BlogPostPage({
                   delay: 0.2,
                 }}
               >
-                {post.title}
+                <Balancer>{post.title}</Balancer>
               </motion.h1>
               <motion.p
                 className="my-5 w-full text-sm font-medium text-zinc-500"
