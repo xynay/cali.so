@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React, { Suspense, useState, useEffect } from 'react';
+import React, { Suspense, useEffect,useState } from 'react';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
@@ -30,7 +30,6 @@ const fetchSettings = async (): Promise<Settings> => {
   }
 };
 
-
 const BlogHomePageContent: React.FC = () => {
   const [settings, setSettings] = useState<Settings>({});
   const [loading, setLoading] = useState(true);
@@ -41,7 +40,7 @@ const BlogHomePageContent: React.FC = () => {
       setSettings(settings);
       setLoading(false);
     };
-    fetchData();
+    void fetchData(); // 使用 void 操作符显式忽略 Promise
   }, []);
 
   if (loading) {
