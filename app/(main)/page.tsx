@@ -95,4 +95,4 @@ const BlogHomePage: React.FC = () => {
 
 export default BlogHomePage;
 
-export const revalidate = 60;
+export const revalidate = 70;
