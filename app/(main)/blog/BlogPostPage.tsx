@@ -28,7 +28,6 @@ import { BlogPostTableOfContents } from './BlogPostTableOfContents'
 
 function BlogPostPage({
   post,
-  reactions,
 }: {
   post: PostDetail
   views?: number
