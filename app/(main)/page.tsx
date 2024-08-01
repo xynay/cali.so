@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
@@ -28,8 +28,18 @@ const fetchSettings = async (): Promise<Settings> => {
   }
 };
 
-const BlogHomePageContent: React.FC = React.memo(async () => {
-  const settings = await fetchSettings();
+const BlogHomePageContent: React.FC = React.memo(() => {
+  const [settings, setSettings] = useState<Settings>({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const settings = await fetchSettings();
+      setSettings(settings);
+    };
+
+    fetchData();
+  }, []);
+
   const { heroPhotos } = settings;
 
   return (
