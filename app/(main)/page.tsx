@@ -1,6 +1,4 @@
-"use client";
-
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense } from 'react';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
@@ -30,18 +28,8 @@ const fetchSettings = async (): Promise<Settings> => {
   }
 };
 
-const BlogHomePageContent: React.FC = React.memo(() => {
-  const [settings, setSettings] = useState<Settings>({});
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const settings = await fetchSettings();
-      setSettings(settings);
-    };
-
-    fetchData(); // 使用 void 操作符显式忽略返回的 Promise
-  }, []);
-
+const BlogHomePageContent: React.FC = React.memo(async () => {
+  const settings = await fetchSettings();
   const { heroPhotos } = settings;
 
   return (
