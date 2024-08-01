@@ -1,3 +1,5 @@
+"use client"
+
 import React, { Suspense, useState, useEffect } from 'react';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
