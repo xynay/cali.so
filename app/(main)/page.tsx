@@ -57,22 +57,16 @@ const BlogHomePageContent: React.FC = () => {
         <Headline />
       </Container>
 
-      {heroPhotos && (
-        <Container>
-          <Photos photos={heroPhotos} />
-        </Container>
-      )}
+      {heroPhotos && <Photos photos={heroPhotos} />}
 
       <Container className="mt-24 md:mt-28">
-        <div className="mx-auto grid max-w-md grid-cols-1 gap-y-20 lg:max-w-none">
-          <div className="flex flex-col gap-6 pt-4 w-full items-center">
-            <h2 className="flex items-center justify-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <div className="mx-auto grid max-w-xl grid-cols-1 gap-y-20 lg:max-w-none lg:grid-cols-2">
+          <div className="flex flex-col gap-6 pt-6">
+            <h2 className="flex items-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               <PencilSwooshIcon className="h-5 w-5 flex-none" />
               <span className="ml-2">近期文章</span>
             </h2>
-            <div className="w-full mx-auto mb-8 max-w-md">
-              <BlogPosts />
-            </div>
+            <BlogPosts />
           </div>
         </div>
       </Container>
@@ -80,7 +74,7 @@ const BlogHomePageContent: React.FC = () => {
   );
 };
 
-const BlogHomePage: React.FC = () => {
+export default function BlogHomePage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-screen">
@@ -93,8 +87,6 @@ const BlogHomePage: React.FC = () => {
       <BlogHomePageContent />
     </Suspense>
   );
-};
-
-export default BlogHomePage;
+}
 
 export const revalidate = false;
