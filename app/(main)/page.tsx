@@ -22,7 +22,9 @@ interface Settings {
 
 const fetchSettings = async (): Promise<Settings> => {
   try {
+    console.log('Fetching settings...');
     const settings = await getSettings();
+    console.log('Settings fetched:', settings);
     return settings || {};
   } catch (error) {
     console.error('Failed to fetch settings', error);
