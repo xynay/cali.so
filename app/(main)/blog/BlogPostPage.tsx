@@ -7,7 +7,6 @@ import React from 'react'
 import Balancer from 'react-wrap-balancer'
 
 import { BlogPostStateLoader } from '~/app/(main)/blog/BlogPostStateLoader'
-import { BlogReactions } from '~/app/(main)/blog/BlogReactions'
 import {
   CalendarIcon,
   HourglassIcon,
@@ -167,11 +166,7 @@ function BlogPostPage({
         </div>
         <aside className="hidden w-[90px] shrink-0 lg:block">
           <div className="sticky top-2 flex justify-end pt-20">
-            <BlogReactions
-              _id={post._id}
-              mood={post.mood}
-              reactions={reactions}
-            />
+
           </div>
         </aside>
       </div>
