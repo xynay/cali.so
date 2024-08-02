@@ -30,11 +30,11 @@ const fetchSettings = async (): Promise<Settings> => {
 };
 
 const SettingsServerComponent: React.FC = async () => {
-  const settings = await fetchSettings();
-  return <BlogHomePageContent settings={settings} />;
+  await fetchSettings(); // Fetch settings but don't use them directly
+  return <BlogHomePageContent />;
 };
 
-const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => {
+const BlogHomePageContent: React.FC = () => {
   return (
     <>
       <Container className="mt-10">
