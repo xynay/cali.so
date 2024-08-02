@@ -4,7 +4,7 @@ import React, { Suspense } from 'react';
 import { Headline } from '~/app/(main)/Headline';
 import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
-//import { getSettings } from '~/sanity/queries';
+import { getSettings } from '~/sanity/queries';
 
 interface Settings {
   heroPhotos?: string[];
@@ -32,7 +32,7 @@ const fetchSettings = async (): Promise<Settings> => {
 };
 
 const SettingsServerComponent: React.FC = async () => {
-  const settings = await fetchSettings();
+  const _settings = await fetchSettings();
   return <BlogHomePageContent settings={settings} />;
 };
 
