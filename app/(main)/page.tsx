@@ -1,8 +1,7 @@
 import React, { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 
-import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
-import { Photos } from '~/app/(main)/Photos';
 import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
@@ -17,6 +16,10 @@ interface Settings {
     end?: string; 
   }[];
 }
+
+// 动态导入 BlogPosts 和 Photos 组件
+const BlogPosts = dynamic(() => import('~/app/(main)/blog/BlogPosts'));
+const Photos = dynamic(() => import('~/app/(main)/Photos'));
 
 const fetchSettings = async (): Promise<Settings> => {
   try {
