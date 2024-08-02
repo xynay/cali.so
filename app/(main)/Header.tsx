@@ -39,7 +39,7 @@ function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatar
   const setProperty = useCallback((properties) => {
     for (const [property, value] of Object.entries(properties)) {
       if (value !== null) {
-        document.documentElement.style.setProperty(property, value)
+        document.documentElement.style.setProperty(property, value as string)
       } else {
         document.documentElement.style.removeProperty(property)
       }
@@ -101,12 +101,6 @@ function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatar
         x = clamp(x, fromX, toX)
         avatarX.set(x)
         avatarScale.set(scale)
-        const borderScale = 1 / (toScale / scale)
-        avatarBorderX.set((-toX + x) * borderScale)
-        avatarBorderScale.set(borderScale)
-        setProperty({
-          '--avatar-border-opacity': scale === toScale ? '1' : '0',
-        })
       }
 
       isInitial.current = false
