@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
@@ -18,17 +18,11 @@ interface Settings {
   }[];
 }
 
-const fetchSettings = async (): Promise<Settings> => {
-  try {
-    const settings = await getSettings();
-    return settings || {};
-  } catch (error) {
-    console.error('Failed to fetch settings', error);
-    return {};
-  }
-};
+interface BlogHomePageProps {
+  settings: Settings;
+}
 
-const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => {
+const BlogHomePageContent: React.FC<BlogHomePageProps> = ({ settings }) => {
   const { heroPhotos } = settings;
 
   return (
@@ -63,26 +57,9 @@ const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => 
 // Add a display name to the component
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
-const BlogHomePage: React.FC = () => {
-  const [settings, setSettings] = React.useState<Settings | null>(null);
-
-  React.useEffect(() => {
-    fetchSettings().then((data) => setSettings(data));
-  }, []);
-
-  if (!settings) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="loader" />
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
+const BlogHomePage: React.FC<BlogHomePageProps> = ({ settings }) => {
   return (
-    <Suspense fallback={
+    <React.Suspense fallback={
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="loader" />
@@ -91,10 +68,23 @@ const BlogHomePage: React.FC = () => {
       </div>
     }>
       <BlogHomePageContent settings={settings} />
-    </Suspense>
+    </React.Suspense>
   );
 };
 
 export default BlogHomePage;
 
-export const revalidate = 60;
+export const getServerSideProps = async () => {
+  const settings = await fetchSettings();
+  return { props: { settings } };
+};
+
+const fetchSettings = async (): Promise<Settings> => {
+  try {
+    const settings = await getSettings();
+    return settings || {};
+  } catch (error) {
+    console.error('Failed to fetch settings', error);
+    return {};
+  }
+};
