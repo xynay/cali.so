@@ -1,8 +1,8 @@
 'use client'
 
+import React from 'react'
 import { motion } from 'framer-motion'
 import Balancer from 'react-wrap-balancer'
-import React from 'react'
 
 import { SparkleIcon, UserSecurityIcon } from '~/assets'
 
