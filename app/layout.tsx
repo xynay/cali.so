@@ -1,5 +1,5 @@
-import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata, Viewport } from 'next';
+import { ClerkProvider } from '@clerk/nextjs';
 
 import fs from 'fs';
 import path from 'path';
