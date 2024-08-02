@@ -76,3 +76,5 @@ export function Photos({ photos }: { photos: string[] }) {
     </motion.div>
   );
 }
+
+export default Photos;

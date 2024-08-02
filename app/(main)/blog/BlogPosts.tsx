@@ -13,3 +13,5 @@ export async function BlogPosts({ limit = 5 }) {
     </>
   );
 }
+
+export default BlogPosts;
