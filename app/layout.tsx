@@ -81,7 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             href="/1.woff2"
             as="font"
             type="font/woff2"
-            crossorigin="anonymous"
+            crossOrigin="anonymous"
           />
           {/* Add additional preload links for other font formats if needed */}
         </head>
