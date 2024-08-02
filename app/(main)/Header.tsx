@@ -277,22 +277,20 @@ function Header() {
 }
 
 function UserInfo() {
-  const [tooltipOpen, setTooltipOpen] = useState(false)
-  const pathname = usePathname()
-  const { user } = useUser()
+  const [tooltipOpen, setTooltipOpen] = useState<boolean>(false); // 显式指定类型为 boolean
+  const pathname = usePathname();
+  const { user } = useUser();
   const StrategyIcon = useMemo(() => {
-    const strategy = user?.primaryEmailAddress?.verification.strategy
-    if (!strategy) return null
+    const strategy = user?.primaryEmailAddress?.verification.strategy;
+    if (!strategy) return null;
 
     switch (strategy) {
       case 'from_oauth_github':
-        return GitHubBrandIcon
       case 'from_oauth_google':
-        return GoogleBrandIcon
       default:
-        return MailIcon
+        return MailIcon;
     }
-  }, [user?.primaryEmailAddress?.verification.strategy])
+  }, [user?.primaryEmailAddress?.verification.strategy]);
 
   return (
     <AnimatePresence>
@@ -358,7 +356,7 @@ function UserInfo() {
         </motion.div>
       </SignedOut>
     </AnimatePresence>
-  )
+  );
 }
 
 export { Header };
