@@ -1,8 +1,7 @@
-import TerserPlugin from 'terser-webpack-plugin';
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+const TerserPlugin = require('terser-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
-// 只在开发或构建时加载环境变量，避免生产环境下的额外开销
 if (!process.env.SKIP_ENV_VALIDATION) {
   (async () => {
     await import('./env.mjs');
@@ -52,11 +51,11 @@ const nextConfig = {
             },
           },
         }),
-        new CssMinimizerPlugin() // 添加 CSS 最小化插件
+        new CssMinimizerPlugin()
       );
     }
     config.cache = {
-      type: 'filesystem', // 启用持久化缓存
+      type: 'filesystem',
     };
     config.optimization.splitChunks = {
       chunks: 'all',
@@ -64,23 +63,23 @@ const nextConfig = {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
           priority: -10,
-          filename: 'vendors.js',
+          filename: 'vendors-[contenthash].js', // 添加 [contenthash] 确保唯一性
         },
         default: {
           minChunks: 2,
           priority: -20,
           reuseExistingChunk: true,
-          filename: 'common.js',
+          filename: 'common-[contenthash].js', // 添加 [contenthash] 确保唯一性
         },
       },
     };
     if (!dev) {
       config.plugins.push(
-        new BundleAnalyzerPlugin() // 添加分析插件
+        new BundleAnalyzerPlugin()
       );
     }
     return config;
   },
 }
 
-export default nextConfig;
+module.exports = nextConfig;
