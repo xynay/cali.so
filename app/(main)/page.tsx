@@ -36,7 +36,7 @@ const SettingsServerComponent: React.FC = async () => {
   return <BlogHomePageContent settings={_settings} />;
 };
 
-const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => {
+const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ _settings }) => {
   // const { heroPhotos } = settings;
 
   return (
