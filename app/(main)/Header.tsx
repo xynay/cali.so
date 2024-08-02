@@ -31,17 +31,12 @@ import { Tooltip } from '~/components/ui/Tooltip'
 import { url } from '~/lib'
 import { clamp } from '~/lib/math'
 
-function Header() {
-  const isHomePage = usePathname() === '/'
+function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale) {
   const headerRef = useRef<HTMLDivElement>(null)
   const avatarRef = useRef<HTMLDivElement>(null)
   const isInitial = useRef(true)
-  const avatarX = useMotionValue(0)
-  const avatarScale = useMotionValue(1)
-  const avatarBorderX = useMotionValue(0)
-  const avatarBorderScale = useMotionValue(1)
 
-  const setProperty = (properties: { [key: string]: string | null }) => {
+  const setProperty = useCallback((properties) => {
     for (const [property, value] of Object.entries(properties)) {
       if (value !== null) {
         document.documentElement.style.setProperty(property, value)
@@ -49,12 +44,9 @@ function Header() {
         document.documentElement.style.removeProperty(property)
       }
     }
-  }
+  }, [])
 
   useEffect(() => {
-    const downDelay = avatarRef.current?.offsetTop ?? 0
-    const upDelay = 64
-
     const updateStyles = () => {
       if (!headerRef.current) return
       const { top, height } = headerRef.current.getBoundingClientRect()
@@ -63,7 +55,8 @@ function Header() {
         0,
         document.body.scrollHeight - window.innerHeight
       )
-
+      const downDelay = avatarRef.current?.offsetTop ?? 0
+      const upDelay = 64
       const commonProperties = {
         '--header-position': 'sticky',
         '--content-offset': `${downDelay}px`,
@@ -126,11 +119,24 @@ function Header() {
       window.removeEventListener('scroll', updateStyles)
       window.removeEventListener('resize', updateStyles)
     }
-  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale])
+  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty])
+
+  return { headerRef, avatarRef }
+}
+
+function Header() {
+  const isHomePage = usePathname() === '/'
+  const avatarX = useMotionValue(0)
+  const avatarScale = useMotionValue(1)
+  const avatarBorderX = useMotionValue(0)
+  const avatarBorderScale = useMotionValue(1)
+  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
+
+  const { headerRef, avatarRef } = useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale)
 
   const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
   const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
-  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
+
   const onAvatarContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault()
