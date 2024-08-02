@@ -31,22 +31,30 @@ import { Tooltip } from '~/components/ui/Tooltip'
 import { url } from '~/lib'
 import { clamp } from '~/lib/math'
 
-function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale) {
+function Header() {
+  const isHomePage = usePathname() === '/'
   const headerRef = useRef<HTMLDivElement>(null)
   const avatarRef = useRef<HTMLDivElement>(null)
   const isInitial = useRef(true)
+  const avatarX = useMotionValue(0)
+  const avatarScale = useMotionValue(1)
+  const avatarBorderX = useMotionValue(0)
+  const avatarBorderScale = useMotionValue(1)
 
-  const setProperty = useCallback((properties) => {
+  const setProperty = (properties: { [key: string]: string | null }) => {
     for (const [property, value] of Object.entries(properties)) {
       if (value !== null) {
-        document.documentElement.style.setProperty(property, value as string)
+        document.documentElement.style.setProperty(property, value)
       } else {
         document.documentElement.style.removeProperty(property)
       }
     }
-  }, [])
+  }
 
   useEffect(() => {
+    const downDelay = avatarRef.current?.offsetTop ?? 0
+    const upDelay = 64
+
     const updateStyles = () => {
       if (!headerRef.current) return
       const { top, height } = headerRef.current.getBoundingClientRect()
@@ -55,8 +63,7 @@ function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatar
         0,
         document.body.scrollHeight - window.innerHeight
       )
-      const downDelay = avatarRef.current?.offsetTop ?? 0
-      const upDelay = 64
+
       const commonProperties = {
         '--header-position': 'sticky',
         '--content-offset': `${downDelay}px`,
@@ -101,6 +108,12 @@ function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatar
         x = clamp(x, fromX, toX)
         avatarX.set(x)
         avatarScale.set(scale)
+        const borderScale = 1 / (toScale / scale)
+        avatarBorderX.set((-toX + x) * borderScale)
+        avatarBorderScale.set(borderScale)
+        setProperty({
+          '--avatar-border-opacity': scale === toScale ? '1' : '0',
+        })
       }
 
       isInitial.current = false
@@ -113,24 +126,11 @@ function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatar
       window.removeEventListener('scroll', updateStyles)
       window.removeEventListener('resize', updateStyles)
     }
-  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty])
-
-  return { headerRef, avatarRef }
-}
-
-function Header() {
-  const isHomePage = usePathname() === '/'
-  const avatarX = useMotionValue(0)
-  const avatarScale = useMotionValue(1)
-  const avatarBorderX = useMotionValue(0)
-  const avatarBorderScale = useMotionValue(1)
-  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
-
-  const { headerRef, avatarRef } = useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale)
+  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale])
 
   const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
   const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
-
+  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
   const onAvatarContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault()
@@ -271,20 +271,22 @@ function Header() {
 }
 
 function UserInfo() {
-  const [tooltipOpen, setTooltipOpen] = useState<boolean>(false); // 显式指定类型为 boolean
-  const pathname = usePathname();
-  const { user } = useUser();
+  const [tooltipOpen, setTooltipOpen] = useState(false)
+  const pathname = usePathname()
+  const { user } = useUser()
   const StrategyIcon = useMemo(() => {
-    const strategy = user?.primaryEmailAddress?.verification.strategy;
-    if (!strategy) return null;
+    const strategy = user?.primaryEmailAddress?.verification.strategy
+    if (!strategy) return null
 
     switch (strategy) {
       case 'from_oauth_github':
+        return GitHubBrandIcon
       case 'from_oauth_google':
+        return GoogleBrandIcon
       default:
-        return MailIcon;
+        return MailIcon
     }
-  }, [user?.primaryEmailAddress?.verification.strategy]);
+  }, [user?.primaryEmailAddress?.verification.strategy])
 
   return (
     <AnimatePresence>
@@ -350,7 +352,7 @@ function UserInfo() {
         </motion.div>
       </SignedOut>
     </AnimatePresence>
-  );
+  )
 }
 
 export { Header };

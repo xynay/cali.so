@@ -1,21 +1,21 @@
-import { parseDateTime } from '@zolplay/utils'
-import Image from 'next/image'
-import Link from 'next/link'
+import { parseDateTime } from '@zolplay/utils';
+import Image from 'next/image';
+import Link from 'next/link';
 
 import {
   CalendarIcon,
   HourglassIcon,
   ScriptIcon,
-} from '~/assets'
-import { type Post } from '~/sanity/schemas/post'
+} from '~/assets';
+import { type Post } from '~/sanity/schemas/post';
 
 function BlogPostCard({ post }: { post: Post }) {
-  const { title, slug, mainImage, publishedAt, categories, readingTime } = post
-  const foreground = mainImage.asset.dominant?.foreground
-  const background = mainImage.asset.dominant?.background
-  const imageUrl = mainImage.asset.url
-  const lqip = mainImage.asset.lqip
-  const formattedDate = parseDateTime({ date: new Date(publishedAt) })?.format('YYYY/MM/DD')
+  const { title, slug, mainImage, publishedAt, categories, readingTime } = post;
+  const foreground = mainImage.asset.dominant?.foreground;
+  const background = mainImage.asset.dominant?.background;
+  const imageUrl = mainImage.asset.url;
+  const lqip = mainImage.asset.lqip;
+  const formattedDate = parseDateTime({ date: new Date(publishedAt) })?.format('YYYY/MM/DD');
 
   return (
     <Link
@@ -33,7 +33,7 @@ function BlogPostCard({ post }: { post: Post }) {
       <div className="relative aspect-[240/135] w-full">
         <Image
           src={imageUrl}
-          alt=""
+          alt={title}
           className="rounded-t-3xl object-cover"
           placeholder="blur"
           blurDataURL={lqip}
@@ -68,7 +68,7 @@ function BlogPostCard({ post }: { post: Post }) {
         </span>
       </span>
     </Link>
-  )
+  );
 }
 
-export { BlogPostCard }
+export { BlogPostCard };
