@@ -37,7 +37,7 @@ const SettingsServerComponent: React.FC = async () => {
 };
 
 const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => {
-  const { heroPhotos } = settings;
+  // const { heroPhotos } = settings;
 
   return (
     <>
@@ -45,11 +45,11 @@ const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => 
         <Headline />
       </Container>
 
-      {heroPhotos && (
+      {/* {heroPhotos && (
         <Container>
           <Photos photos={heroPhotos} />
         </Container>
-      )}
+      )} */}
 
       <Container className="mt-24 md:mt-28">
         <div className="mx-auto grid max-w-md grid-cols-1 gap-y-20 lg:max-w-none">
