@@ -49,26 +49,41 @@ const nextConfig = {
           terserOptions: {
             compress: {
               drop_console: true,
+              drop_debugger: true,
+              pure_funcs: ['console.info', 'console.debug'],
+            },
+            format: {
+              comments: false,
             },
           },
+          extractComments: false,
         }),
         new CssMinimizerPlugin()
       );
     }
     config.cache = {
-      type: 'filesystem', // 启用持久化缓存
+      type: 'filesystem',
+      buildDependencies: {
+        config: [__filename],
+      },
+      name: 'my-cache',
     };
     config.optimization.splitChunks = {
       chunks: 'all',
+      minSize: 20000,
+      maxSize: 0,
       cacheGroups: {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
           priority: -10,
+          reuseExistingChunk: true,
+          filename: 'vendors.[contenthash].js',
         },
         default: {
           minChunks: 2,
           priority: -20,
           reuseExistingChunk: true,
+          filename: 'common.[contenthash].js',
         },
       },
     };
@@ -77,7 +92,7 @@ const nextConfig = {
     //   config.plugins.push(
     //     new BundleAnalyzerPlugin({
     //       analyzerMode: 'server',
-    //       openAnalyzer: false,
+    //       openAnalyzer: true,
     //     })
     //   );
     // }
