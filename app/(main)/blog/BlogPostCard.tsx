@@ -9,26 +9,22 @@ import {
 } from '~/assets';
 import { type Post } from '~/sanity/schemas/post';
 
-function BlogPostCard({ post }: { post: Post }) {
-  const { title, slug, mainImage, publishedAt, categories, readingTime } = post;
+function BlogPostCard({ post: { title, slug, mainImage, publishedAt, categories, readingTime } }: { post: Post }) {
   const foreground = mainImage.asset.dominant?.foreground;
   const background = mainImage.asset.dominant?.background;
   const imageUrl = mainImage.asset.url;
   const lqip = mainImage.asset.lqip;
-  const formattedDate = parseDateTime({ date: new Date(publishedAt) })?.format('YYYY/MM/DD');
 
   return (
     <Link
       href={`/blog/${slug}`}
       prefetch={false}
       className="group relative flex w-full transform-gpu flex-col rounded-3xl bg-transparent ring-2 ring-[--post-image-bg] transition-transform hover:-translate-y-0.5"
-      style={
-        {
-          '--post-image-fg': foreground,
-          '--post-image-bg': background,
-          '--post-image': `url(${imageUrl})`,
-        } as React.CSSProperties
-      }
+      style={{
+        '--post-image-fg': foreground,
+        '--post-image-bg': background,
+        '--post-image': `url(${imageUrl})`,
+      } as React.CSSProperties}
     >
       <div className="relative aspect-[240/135] w-full">
         <Image
@@ -50,7 +46,7 @@ function BlogPostCard({ post }: { post: Post }) {
           <span className="inline-flex items-center space-x-3">
             <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] md:text-sm">
               <CalendarIcon />
-              <span>{formattedDate}</span>
+              <span>{parseDateTime({ date: new Date(publishedAt) })?.format('YYYY/MM/DD')}</span>
             </span>
             {Array.isArray(categories) && (
               <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] md:text-sm">
