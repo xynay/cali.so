@@ -1,7 +1,8 @@
-"use client";
+// pages/index.tsx
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
+import { GetStaticProps } from 'next';
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
 import { Photos } from '~/app/(main)/Photos';
@@ -20,41 +21,12 @@ interface Settings {
   }[];
 }
 
-const fetchSettings = async (): Promise<Settings> => {
-  try {
-    const settings = await getSettings();
-    return settings || {};
-  } catch (error) {
-    console.error('Failed to fetch settings', error);
-    return {};
-  }
-};
+interface BlogHomePageProps {
+  settings: Settings;
+}
 
-const BlogHomePageContent: React.FC = () => {
-  const [settings, setSettings] = useState<Settings>({});
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadSettings = async () => {
-      const fetchedSettings = await fetchSettings();
-      setSettings(fetchedSettings);
-      setIsLoading(false);
-    };
-    loadSettings();
-  }, []);
-
+const BlogHomePage: React.FC<BlogHomePageProps> = ({ settings }) => {
   const { heroPhotos } = settings;
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="loader" />
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -85,12 +57,23 @@ const BlogHomePageContent: React.FC = () => {
   );
 };
 
-BlogHomePageContent.displayName = 'BlogHomePageContent';
-
-const BlogHomePage: React.FC = () => {
-  return <BlogHomePageContent />;
+export const getStaticProps: GetStaticProps = async () => {
+  try {
+    const settings = await getSettings();
+    return {
+      props: {
+        settings: settings || {},
+      },
+      revalidate: 60, // Revalidate at most once every minute
+    };
+  } catch (error) {
+    console.error('Failed to fetch settings', error);
+    return {
+      props: {
+        settings: {},
+      },
+    };
+  }
 };
 
 export default BlogHomePage;
-
-export const revalidate = 60;
