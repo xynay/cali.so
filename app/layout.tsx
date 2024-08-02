@@ -11,10 +11,8 @@ import { zhCN } from '~/lib/clerkLocalizations'
 import { sansFont } from '~/lib/font'
 import { seo } from '~/lib/seo'
 
-// CSS Imports
-
 // Metadata Configuration
-const metadata: Metadata = {
+export const metadata: Metadata = {
   metadataBase: seo.url,
   title: {
     template: '%s | 辛壬癸的命理笔记',
@@ -60,44 +58,42 @@ const metadata: Metadata = {
   },
 }
 
-// Viewport Configuration
-const viewport: Viewport = {
+export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#000212' },
     { media: '(prefers-color-scheme: light)', color: '#fafafa' },
   ],
 }
 
-// Root Layout Component
-const RootLayout = ({ children }: { children: React.ReactNode }) => (
-  <ClerkProvider localization={zhCN}>
-    <html
-      lang="zh-CN"
-      className={`${sansFont.variable} m-0 h-full p-0 font-sans antialiased`}
-      suppressHydrationWarning
-    >
-      <head>
-        <link
-          rel="preload"
-          href="/1.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-        {/* Add additional preload links for other font formats if needed */}
-      </head>
-      <body className="flex h-full flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
-  </ClerkProvider>
-)
-
-export default RootLayout
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ClerkProvider localization={zhCN}>
+      <html
+        lang="zh-CN"
+        className={`${sansFont.variable} m-0 h-full p-0 font-sans antialiased`}
+        suppressHydrationWarning
+      >
+        <head>
+          <link
+            rel="preload"
+            href="/1.woff2"
+            as="font"
+            type="font/woff2"
+            crossOrigin="anonymous"
+          />
+          {/* Add additional preload links for other font formats if needed */}
+        </head>
+        <body className="flex h-full flex-col">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
+  )
+}
