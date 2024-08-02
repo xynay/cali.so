@@ -110,4 +110,4 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = React.memo(({ childr
   );
 });
 
-export default RootLayout;
+RootLayout.displayName = 'RootLayout';
