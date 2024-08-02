@@ -1,7 +1,8 @@
-import { ClerkProvider } from '@clerk/nextjs';
-import type { Metadata, Viewport } from 'next';
 import fs from 'fs';
 import path from 'path';
+
+import { ClerkProvider } from '@clerk/nextjs';
+import type { Metadata, Viewport } from 'next';
 
 import { ThemeProvider } from '~/app/(main)/ThemeProvider';
 import { url } from '~/lib';
