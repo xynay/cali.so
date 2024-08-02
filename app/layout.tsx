@@ -75,6 +75,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`${sansFont.variable} m-0 h-full p-0 font-sans antialiased`}
         suppressHydrationWarning
       >
+        <head>
+          <link
+            rel="preload"
+            href="/1.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+          />
+          {/* Add additional preload links for other font formats if needed */}
+        </head>
         <body className="flex h-full flex-col">
           <ThemeProvider
             attribute="class"

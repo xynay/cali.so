@@ -8,6 +8,7 @@ body {
   background-color: var(--bg-color);
   scroll-behavior: smooth;
   scroll-padding-top: 3rem;
+  font-family: 'CustomFont', sans-serif; /* Ensure the font you want is applied */
 }
 
 html.light {
