@@ -4,15 +4,16 @@ import './prism.css'
 
 import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata, Viewport } from 'next'
-
 import { ThemeProvider } from '~/app/(main)/ThemeProvider'
 import { url } from '~/lib'
 import { zhCN } from '~/lib/clerkLocalizations'
 import { sansFont } from '~/lib/font'
 import { seo } from '~/lib/seo'
 
+// CSS Imports
+
 // Metadata Configuration
-export const metadata: Metadata = {
+const metadata: Metadata = {
   metadataBase: seo.url,
   title: {
     template: '%s | 辛壬癸的命理笔记',
@@ -59,7 +60,7 @@ export const metadata: Metadata = {
 }
 
 // Viewport Configuration
-export const viewport: Viewport = {
+const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#000212' },
     { media: '(prefers-color-scheme: light)', color: '#fafafa' },
@@ -67,47 +68,35 @@ export const viewport: Viewport = {
 }
 
 // Root Layout Component
-const RootLayout: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
-  const handleCssLoad = (event: React.SyntheticEvent<HTMLLinkElement>) => {
-    event.currentTarget.media = 'all';
-  };
+const RootLayout = ({ children }: { children: React.ReactNode }) => (
+  <ClerkProvider localization={zhCN}>
+    <html
+      lang="zh-CN"
+      className={`${sansFont.variable} m-0 h-full p-0 font-sans antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        <link
+          rel="preload"
+          href="/1.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        {/* Add additional preload links for other font formats if needed */}
+      </head>
+      <body className="flex h-full flex-col">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  </ClerkProvider>
+)
 
-  return (
-    <ClerkProvider localization={zhCN}>
-      <html
-        lang="zh-CN"
-        className={`${sansFont.variable} m-0 h-full p-0 font-sans antialiased`}
-        suppressHydrationWarning
-      >
-        <head>
-          <link
-            rel="preload"
-            href="/1.woff2"
-            as="font"
-            type="font/woff2"
-            crossOrigin="anonymous"
-          />
-          <link
-            rel="stylesheet"
-            href="/clerk.css"
-            media="print"
-            onLoad={handleCssLoad}
-          />
-          <noscript><link rel="stylesheet" href="/clerk.css" /></noscript>
-        </head>
-        <body className="flex h-full flex-col">
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
-  );
-});
-
-RootLayout.displayName = 'RootLayout';
+export default RootLayout
