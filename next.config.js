@@ -1,7 +1,8 @@
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
+// 只在开发或构建时加载环境变量，避免生产环境下的额外开销
 if (!process.env.SKIP_ENV_VALIDATION) {
   (async () => {
     await import('./env.mjs');
@@ -21,7 +22,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    taint: true,
+    taint: true, // 仅在需要时启用实验功能
   },
   redirects() {
     return [
@@ -55,7 +56,7 @@ const nextConfig = {
       );
     }
     config.cache = {
-      type: 'filesystem',
+      type: 'filesystem', // 启用持久化缓存
     };
     config.optimization.splitChunks = {
       chunks: 'all',
@@ -63,26 +64,25 @@ const nextConfig = {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
           priority: -10,
-          filename: 'vendors-[contenthash].js',
         },
         default: {
           minChunks: 2,
           priority: -20,
           reuseExistingChunk: true,
-          filename: 'common-[contenthash].js',
         },
       },
     };
-    if (dev) {
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'server', // 或 'static'，用于生成报告文件
-          openAnalyzer: false, // 禁用自动打开浏览器
-        })
-      );
-    }
+    // 移除 BundleAnalyzerPlugin
+    // if (dev) {
+    //   config.plugins.push(
+    //     new BundleAnalyzerPlugin({
+    //       analyzerMode: 'server',
+    //       openAnalyzer: false,
+    //     })
+    //   );
+    // }
     return config;
   },
-}
+};
 
 module.exports = nextConfig;
