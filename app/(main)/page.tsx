@@ -18,6 +18,11 @@ interface Settings {
   }[];
 }
 
+export const getStaticProps = async () => {
+  const settings = await fetchSettings();
+  return { props: { settings } };
+};
+
 const fetchSettings = async (): Promise<Settings> => {
   try {
     const settings = await getSettings();
@@ -79,18 +84,3 @@ const BlogHomePage: React.FC<{ settings: Settings }> = ({ settings }) => {
 };
 
 export default BlogHomePage;
-
-export const getServerSideProps = async () => {
-  const settings = await fetchSettings();
-  return { props: { settings } };
-};
-
-const fetchSettings = async (): Promise<Settings> => {
-  try {
-    const settings = await getSettings();
-    return settings || {};
-  } catch (error) {
-    console.error('Failed to fetch settings', error);
-    return {};
-  }
-};
