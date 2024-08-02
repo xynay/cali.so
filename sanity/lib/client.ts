@@ -1,11 +1,18 @@
-import { createClient } from 'next-sanity'
+import { createClient } from 'next-sanity';
 
-import { apiVersion, dataset, projectId, useCdn } from '../env'
+import { apiVersion, dataset, projectId, useCdn } from '../env';
 
-export const client = createClient({
-  apiVersion,
-  dataset,
-  projectId,
-  useCdn,
-  // perspective: 'published',
-})
+let clientInstance: ReturnType<typeof createClient> | null = null;
+
+export const getClient = () => {
+  if (!clientInstance) {
+    clientInstance = createClient({
+      apiVersion,
+      dataset,
+      projectId,
+      useCdn,
+      // perspective: 'published',
+    });
+  }
+  return clientInstance;
+};
