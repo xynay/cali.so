@@ -1,5 +1,6 @@
-import React, { Suspense, useEffect, useState } from 'react';
+"use client";
 
+import React, { Suspense, useEffect, useState } from 'react';
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
 import { Photos } from '~/app/(main)/Photos';
