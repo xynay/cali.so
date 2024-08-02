@@ -9,25 +9,25 @@ export function Photos({ photos }: { photos: string[] }) {
   const [isCompact, setIsCompact] = React.useState(false);
   const expandedWidth = React.useMemo(() => width * 1.38, [width]);
 
-  React.useEffect(() => {
-    const handleResize = () => {
-      // 640px is the breakpoint for md
-      if (window.innerWidth < 640) {
-        setIsCompact(true);
-        setWidth(window.innerWidth / 2 - 64);
-      } else {
-        setIsCompact(false);
-        setWidth(window.innerWidth / photos.length - 4 * photos.length);
-      }
-    };
+  const handleResize = React.useCallback(() => {
+    // 640px is the breakpoint for md
+    if (window.innerWidth < 640) {
+      setIsCompact(true);
+      setWidth(window.innerWidth / 2 - 64);
+    } else {
+      setIsCompact(false);
+      setWidth(window.innerWidth / photos.length - 4 * photos.length);
+    }
+  }, [photos.length]);
 
+  React.useEffect(() => {
     window.addEventListener('resize', handleResize);
     handleResize();
 
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [photos.length]);
+  }, [handleResize]);
 
   return (
     <motion.div
