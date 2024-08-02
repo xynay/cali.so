@@ -112,12 +112,15 @@ function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatar
       isInitial.current = false
     }
 
+    const onScroll = () => requestAnimationFrame(updateStyles)
+    const onResize = () => requestAnimationFrame(updateStyles)
+
     updateStyles()
-    window.addEventListener('scroll', updateStyles, { passive: true })
-    window.addEventListener('resize', updateStyles)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onResize)
     return () => {
-      window.removeEventListener('scroll', updateStyles)
-      window.removeEventListener('resize', updateStyles)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
     }
   }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty])
 
