@@ -74,14 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
       >
         <head>
-          <link
-            rel="preload"
-            href="/1.woff2"
-            as="font"
-            type="font/woff2"
-            crossOrigin="anonymous"
-          />
-          {/* Add additional preload links for other font formats if needed */}
+          {/* Removed the preload link for 1.woff2 */}
         </head>
         <body className="flex h-full flex-col">
           <ThemeProvider
