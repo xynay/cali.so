@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { Suspense } from 'react';
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
 import { Photos } from '~/app/(main)/Photos';
@@ -9,12 +8,12 @@ import { getSettings } from '~/sanity/queries';
 
 interface Settings {
   heroPhotos?: string[];
-  resume?: { 
-    company: string; 
-    title: string; 
-    logo: string; 
-    start: string; 
-    end?: string; 
+  resume?: {
+    company: string;
+    title: string;
+    logo: string;
+    start: string;
+    end?: string;
   }[];
 }
 
@@ -28,35 +27,7 @@ const fetchSettings = async (): Promise<Settings> => {
   }
 };
 
-const BlogHomePageContent: React.FC = () => {
-  const [settings, setSettings] = useState<Settings | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    const loadSettings = async () => {
-      const fetchedSettings = await fetchSettings();
-      setSettings(fetchedSettings);
-      setLoading(false);
-    };
-
-    loadSettings();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="loader" />
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!settings) {
-    return <p>Failed to load settings.</p>;
-  }
-
+const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => {
   const { heroPhotos } = settings;
 
   return (
@@ -92,7 +63,37 @@ const BlogHomePageContent: React.FC = () => {
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
 const BlogHomePage: React.FC = () => {
-  return <BlogHomePageContent />;
+  const [settings, setSettings] = React.useState<Settings | null>(null);
+
+  React.useEffect(() => {
+    fetchSettings().then((data) => setSettings(data));
+  }, []);
+
+  if (!settings) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="loader" />
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="loader" />
+          <p>Loading...</p>
+        </div>
+      </div>
+    }>
+      <BlogHomePageContent settings={settings} />
+    </Suspense>
+  );
 };
 
 export default BlogHomePage;
+
+export const revalidate = 60;
