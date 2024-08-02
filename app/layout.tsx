@@ -68,6 +68,10 @@ export const viewport: Viewport = {
 
 // Root Layout Component
 const RootLayout: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
+  const handleCssLoad = (event: React.SyntheticEvent<HTMLLinkElement>) => {
+    event.currentTarget.media = 'all';
+  };
+
   return (
     <ClerkProvider localization={zhCN}>
       <html
@@ -83,12 +87,11 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = React.memo(({ childr
             type="font/woff2"
             crossOrigin="anonymous"
           />
-          {/* Add additional preload links for other font formats if needed */}
           <link
             rel="stylesheet"
             href="/clerk.css"
             media="print"
-            onLoad="this.media='all'"
+            onLoad={handleCssLoad}
           />
           <noscript><link rel="stylesheet" href="/clerk.css" /></noscript>
         </head>
@@ -104,7 +107,7 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = React.memo(({ childr
         </body>
       </html>
     </ClerkProvider>
-  )
+  );
 });
 
 export default RootLayout;
