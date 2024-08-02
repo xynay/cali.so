@@ -1,5 +1,4 @@
-import React from 'react';
-import { GetStaticProps } from 'next';
+import React, { useState, useEffect } from 'react';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
@@ -19,11 +18,45 @@ interface Settings {
   }[];
 }
 
-interface BlogHomePageProps {
-  settings: Settings;
-}
+const fetchSettings = async (): Promise<Settings> => {
+  try {
+    const settings = await getSettings();
+    return settings || {};
+  } catch (error) {
+    console.error('Failed to fetch settings', error);
+    return {};
+  }
+};
 
-const BlogHomePageContent: React.FC<BlogHomePageProps> = ({ settings }) => {
+const BlogHomePageContent: React.FC = () => {
+  const [settings, setSettings] = useState<Settings | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const fetchedSettings = await fetchSettings();
+      setSettings(fetchedSettings);
+      setLoading(false);
+    };
+
+    loadSettings();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="loader" />
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!settings) {
+    return <p>Failed to load settings.</p>;
+  }
+
   const { heroPhotos } = settings;
 
   return (
@@ -58,40 +91,8 @@ const BlogHomePageContent: React.FC<BlogHomePageProps> = ({ settings }) => {
 // Add a display name to the component
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
-const BlogHomePage: React.FC<BlogHomePageProps> = (props) => {
-  return (
-    <React.Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="loader" />
-          <p>Loading...</p>
-        </div>
-      </div>
-    }>
-      <BlogHomePageContent {...props} />
-    </React.Suspense>
-  );
-};
-
-export const getStaticProps: GetStaticProps = async () => {
-  const settings = await fetchSettings();
-  return {
-    props: {
-      settings,
-    },
-    revalidate: 60, // Revalidate every 60 seconds
-  };
+const BlogHomePage: React.FC = () => {
+  return <BlogHomePageContent />;
 };
 
 export default BlogHomePage;
-
-// Helper function to fetch settings
-const fetchSettings = async (): Promise<Settings> => {
-  try {
-    const settings = await getSettings();
-    return settings || {};
-  } catch (error) {
-    console.error('Failed to fetch settings', error);
-    return {};
-  }
-};
