@@ -41,16 +41,21 @@ function Header() {
   const avatarBorderX = useMotionValue(0)
   const avatarBorderScale = useMotionValue(1)
 
-  const setProperty = (property: string, value: string | null) =>
-    document.documentElement.style.setProperty(property, value)
-  const removeProperty = (property: string) =>
-    document.documentElement.style.removeProperty(property)
+  const setProperty = (properties: { [key: string]: string | null }) => {
+    for (const [property, value] of Object.entries(properties)) {
+      if (value !== null) {
+        document.documentElement.style.setProperty(property, value)
+      } else {
+        document.documentElement.style.removeProperty(property)
+      }
+    }
+  }
 
   useEffect(() => {
     const downDelay = avatarRef.current?.offsetTop ?? 0
     const upDelay = 64
 
-    const updateHeaderStyles = () => {
+    const updateStyles = () => {
       if (!headerRef.current) return
       const { top, height } = headerRef.current.getBoundingClientRect()
       const scrollY = clamp(
@@ -59,54 +64,58 @@ function Header() {
         document.body.scrollHeight - window.innerHeight
       )
 
-      if (isInitial.current) setProperty('--header-position', 'sticky')
-      setProperty('--content-offset', `${downDelay}px`)
+      const commonProperties = {
+        '--header-position': 'sticky',
+        '--content-offset': `${downDelay}px`,
+      }
 
-      if (isInitial.current || scrollY < downDelay) {
-        setProperty('--header-height', `${downDelay + height}px`)
-        setProperty('--header-mb', `${-downDelay}px`)
+      if (isInitial.current) setProperty(commonProperties)
+      const isScrolledPastDownDelay = scrollY >= downDelay
+
+      if (isInitial.current || !isScrolledPastDownDelay) {
+        setProperty({
+          '--header-height': `${downDelay + height}px`,
+          '--header-mb': `${-downDelay}px`,
+        })
       } else if (top + height < -upDelay) {
         const offset = Math.max(height, scrollY - upDelay)
-        setProperty('--header-height', `${offset}px`)
-        setProperty('--header-mb', `${height - offset}px`)
+        setProperty({
+          '--header-height': `${offset}px`,
+          '--header-mb': `${height - offset}px`,
+        })
       } else if (top === 0) {
-        setProperty('--header-height', `${scrollY + height}px`)
-        setProperty('--header-mb', `${-scrollY}px`)
+        setProperty({
+          '--header-height': `${scrollY + height}px`,
+          '--header-mb': `${-scrollY}px`,
+        })
       }
 
-      if (top === 0 && scrollY > 0 && scrollY >= downDelay) {
-        setProperty('--header-inner-position', 'fixed')
-        removeProperty('--header-top')
-        removeProperty('--avatar-top')
-      } else {
-        removeProperty('--header-inner-position')
-        setProperty('--header-top', '0px')
-        setProperty('--avatar-top', '0px')
+      setProperty({
+        '--header-inner-position': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? 'fixed' : null,
+        '--header-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
+        '--avatar-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
+      })
+
+      if (isHomePage) {
+        const fromScale = 1
+        const toScale = 36 / 64
+        const fromX = 0
+        const toX = 2 / 16
+        const remainingScroll = downDelay - window.scrollY
+        let scale = (remainingScroll * (fromScale - toScale)) / downDelay + toScale
+        scale = clamp(scale, fromScale, toScale)
+        let x = (remainingScroll * (fromX - toX)) / downDelay + toX
+        x = clamp(x, fromX, toX)
+        avatarX.set(x)
+        avatarScale.set(scale)
+        const borderScale = 1 / (toScale / scale)
+        avatarBorderX.set((-toX + x) * borderScale)
+        avatarBorderScale.set(borderScale)
+        setProperty({
+          '--avatar-border-opacity': scale === toScale ? '1' : '0',
+        })
       }
-    }
 
-    const updateAvatarStyles = () => {
-      if (!isHomePage) return
-      const fromScale = 1
-      const toScale = 36 / 64
-      const fromX = 0
-      const toX = 2 / 16
-      const scrollY = downDelay - window.scrollY
-      let scale = (scrollY * (fromScale - toScale)) / downDelay + toScale
-      scale = clamp(scale, fromScale, toScale)
-      let x = (scrollY * (fromX - toX)) / downDelay + toX
-      x = clamp(x, fromX, toX)
-      avatarX.set(x)
-      avatarScale.set(scale)
-      const borderScale = 1 / (toScale / scale)
-      avatarBorderX.set((-toX + x) * borderScale)
-      avatarBorderScale.set(borderScale)
-      setProperty('--avatar-border-opacity', scale === toScale ? '1' : '0')
-    }
-
-    const updateStyles = () => {
-      updateHeaderStyles()
-      updateAvatarStyles()
       isInitial.current = false
     }
 
@@ -152,15 +161,13 @@ function Header() {
               <Container
                 className="top-0 order-last -mb-3 pt-3"
                 style={{
-                  position:
-                    'var(--header-position)' as React.CSSProperties['position'],
+                  position: 'var(--header-position)' as React.CSSProperties['position'],
                 }}
               >
                 <motion.div
                   className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none"
                   style={{
-                    position:
-                      'var(--header-inner-position)' as React.CSSProperties['position'],
+                    position: 'var(--header-inner-position)' as React.CSSProperties['position'],
                   }}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -206,15 +213,13 @@ function Header() {
           ref={headerRef}
           className="top-0 z-10 h-16 pt-6"
           style={{
-            position:
-              'var(--header-position)' as React.CSSProperties['position'],
+            position: 'var(--header-position)' as React.CSSProperties['position'],
           }}
         >
           <Container
             className="top-[var(--header-top,theme(spacing.6))] w-full"
             style={{
-              position:
-                'var(--header-inner-position)' as React.CSSProperties['position'],
+              position: 'var(--header-inner-position)' as React.CSSProperties['position'],
             }}
           >
             <div className="relative flex gap-4">
@@ -349,4 +354,5 @@ function UserInfo() {
     </AnimatePresence>
   )
 }
+
 export { Header };
