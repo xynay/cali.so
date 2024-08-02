@@ -33,7 +33,7 @@ const fetchSettings = async (): Promise<Settings> => {
 
 const SettingsServerComponent: React.FC = async () => {
   const _settings = await fetchSettings();
-  return <BlogHomePageContent settings={settings} />;
+  return <BlogHomePageContent settings={_settings} />;
 };
 
 const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => {
