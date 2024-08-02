@@ -1,5 +1,5 @@
 import React from 'react';
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
@@ -73,18 +73,17 @@ const BlogHomePage: React.FC<BlogHomePageProps> = (props) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const settings = await fetchSettings();
   return {
     props: {
-      settings
+      settings,
     },
+    revalidate: 60, // Revalidate every 60 seconds
   };
 };
 
 export default BlogHomePage;
-
-export const revalidate = 60;
 
 // Helper function to fetch settings
 const fetchSettings = async (): Promise<Settings> => {
