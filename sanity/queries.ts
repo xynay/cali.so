@@ -139,4 +139,4 @@ export const getSettings = () =>
       start: string;
       end?: string;
     }[] | null;
-  }>(getSettingsQuery());
+  }>(getSettingsQuery);
