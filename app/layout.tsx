@@ -1,15 +1,19 @@
-import './globals.css'
-import './clerk.css'
-import './prism.css'
+import fs from 'fs';
+import path from 'path';
 
-import { ClerkProvider } from '@clerk/nextjs'
-import type { Metadata, Viewport } from 'next'
+import { ClerkProvider } from '@clerk/nextjs';
+import type { Metadata, Viewport } from 'next';
 
-import { ThemeProvider } from '~/app/(main)/ThemeProvider'
-import { url } from '~/lib'
-import { zhCN } from '~/lib/clerkLocalizations'
-import { sansFont } from '~/lib/font'
-import { seo } from '~/lib/seo'
+import { ThemeProvider } from '~/app/(main)/ThemeProvider';
+import { url } from '~/lib';
+import { zhCN } from '~/lib/clerkLocalizations';
+import { sansFont } from '~/lib/font';
+import { seo } from '~/lib/seo';
+
+// Load CSS files content
+const globalsCSS = fs.readFileSync(path.resolve('./globals.css'), 'utf8');
+const clerkCSS = fs.readFileSync(path.resolve('./clerk.css'), 'utf8');
+const prismCSS = fs.readFileSync(path.resolve('./prism.css'), 'utf8');
 
 // Metadata Configuration
 export const metadata: Metadata = {
@@ -56,7 +60,7 @@ export const metadata: Metadata = {
       'application/rss+xml': [{ url: 'rss', title: 'RSS 订阅' }],
     },
   },
-}
+};
 
 // Viewport Configuration
 export const viewport: Viewport = {
@@ -64,7 +68,7 @@ export const viewport: Viewport = {
     { media: '(prefers-color-scheme: dark)', color: '#000212' },
     { media: '(prefers-color-scheme: light)', color: '#fafafa' },
   ],
-}
+};
 
 // Root Layout Component
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -76,6 +80,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
       >
         <head>
+          <style>{globalsCSS}</style>
+          <style>{clerkCSS}</style>
+          <style>{prismCSS}</style>
           <link
             rel="preload"
             href="/1.woff2"
@@ -97,5 +104,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </body>
       </html>
     </ClerkProvider>
-  )
+  );
 }
