@@ -118,7 +118,7 @@ export const getSettingsQuery = () =>
       icon
     },
     "heroPhotos": heroPhotos[].asset->url,
-    "resume": resume[]{
+    "resume": resume[] {
       company,
       title,
       start,

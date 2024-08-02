@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Balancer from 'react-wrap-balancer'
+import React from 'react'
 
 import { SparkleIcon, UserSecurityIcon } from '~/assets'
 
@@ -12,15 +13,15 @@ const borderPositions = [
   '-right-[3.5px] -top-[3.5px]'
 ]
 
-const Developer = () => (
+const Developer = React.memo(() => (
   <span className="group text-2x2">
     <span className="font-mono">&lt;</span>探索者
     <span className="font-mono">/&gt;</span>
     <span className="invisible inline-flex text-zinc-300 before:content-['|'] group-hover:visible group-hover:animate-typing dark:text-zinc-500" />
   </span>
-)
+))
 
-const Designer = () => (
+const Designer = React.memo(() => (
   <span className="group relative bg-black/5 p-1 dark:bg-white/5 text-2x2">
     <span className="pointer-events-none absolute inset-0 border border-lime-700/90 opacity-70 group-hover:border-dashed group-hover:opacity-100 dark:border-lime-400/90">
       {borderPositions.map((pos) => (
@@ -29,23 +30,23 @@ const Designer = () => (
     </span>
     生活家
   </span>
-)
+))
 
-const OCD = () => (
+const OCD = React.memo(() => (
   <span className="group inline-flex items-center text-2x2">
     <SparkleIcon className="mr-1 inline-flex transform-gpu transition-transform duration-500 group-hover:rotate-180" />
     <span>记录者</span>
   </span>
-)
+))
 
-const Founder = () => (
+const Founder = React.memo(() => (
   <span className="group inline-flex items-center text-2x2">
     <UserSecurityIcon className="mr-1 inline-flex group-hover:fill-zinc-600/20 dark:group-hover:fill-zinc-200/20" />
     <span>思考者</span>
   </span>
-)
+))
 
-export const Headline = () => (
+export const Headline = React.memo(() => (
   <div className="max-w-2xl mx-auto text-center">
     <motion.h1
       className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-4xl"
@@ -60,8 +61,7 @@ export const Headline = () => (
     >
       <div className="flex flex-col items-center">
         <div className="flex flex-wrap justify-center">
-          <Developer />，<Designer />，
-          <OCD />，<Founder />
+          <Developer />，<Designer />，<OCD />，<Founder />
         </div>
       </div>
     </motion.h1>
@@ -84,4 +84,4 @@ export const Headline = () => (
       </Balancer>
     </motion.p>
   </div>
-)
+))
