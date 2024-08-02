@@ -18,24 +18,11 @@ interface Settings {
   }[];
 }
 
-// This function fetches the settings and is used in a Server Component
-const fetchSettings = async (): Promise<Settings> => {
-  try {
-    const settings = await getSettings();
-    return settings || {};
-  } catch (error) {
-    console.error('Failed to fetch settings', error);
-    return {};
-  }
-};
+interface BlogHomePageProps {
+  settings: Settings;
+}
 
-// Server Component to fetch and pass settings data to Client Component
-const SettingsServerComponent = async () => {
-  const settings = await fetchSettings();
-  return <BlogHomePageContent settings={settings} />;
-};
-
-const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => {
+const BlogHomePageContent: React.FC<BlogHomePageProps> = ({ settings }) => {
   const { heroPhotos } = settings;
 
   return (
@@ -70,7 +57,7 @@ const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => 
 // Add a display name to the component
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
-const BlogHomePage: React.FC = () => {
+const BlogHomePage: React.FC<BlogHomePageProps> = ({ settings }) => {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-screen">
@@ -80,10 +67,19 @@ const BlogHomePage: React.FC = () => {
         </div>
       </div>
     }>
-      {/* Use the server component to fetch settings */}
-      <SettingsServerComponent />
+      <BlogHomePageContent settings={settings} />
     </Suspense>
   );
+};
+
+export const getStaticProps = async () => {
+  const settings = await getSettings();
+  return {
+    props: {
+      settings: settings || {},
+    },
+    revalidate: 60, // Revalidate at most once per minute
+  };
 };
 
 export default BlogHomePage;
