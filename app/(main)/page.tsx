@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
@@ -18,11 +18,7 @@ interface Settings {
   }[];
 }
 
-export const getStaticProps = async () => {
-  const settings = await fetchSettings();
-  return { props: { settings } };
-};
-
+// This function fetches the settings and is used in a Server Component
 const fetchSettings = async (): Promise<Settings> => {
   try {
     const settings = await getSettings();
@@ -31,6 +27,12 @@ const fetchSettings = async (): Promise<Settings> => {
     console.error('Failed to fetch settings', error);
     return {};
   }
+};
+
+// Server Component to fetch and pass settings data to Client Component
+const SettingsServerComponent = async () => {
+  const settings = await fetchSettings();
+  return <BlogHomePageContent settings={settings} />;
 };
 
 const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => {
@@ -68,9 +70,9 @@ const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => 
 // Add a display name to the component
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
-const BlogHomePage: React.FC<{ settings: Settings }> = ({ settings }) => {
+const BlogHomePage: React.FC = () => {
   return (
-    <React.Suspense fallback={
+    <Suspense fallback={
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="loader" />
@@ -78,8 +80,9 @@ const BlogHomePage: React.FC<{ settings: Settings }> = ({ settings }) => {
         </div>
       </div>
     }>
-      <BlogHomePageContent settings={settings} />
-    </React.Suspense>
+      {/* Use the server component to fetch settings */}
+      <SettingsServerComponent />
+    </Suspense>
   );
 };
 
