@@ -18,11 +18,17 @@ interface Settings {
   }[];
 }
 
-interface BlogHomePageProps {
-  settings: Settings;
-}
+const fetchSettings = async (): Promise<Settings> => {
+  try {
+    const settings = await getSettings();
+    return settings || {};
+  } catch (error) {
+    console.error('Failed to fetch settings', error);
+    return {};
+  }
+};
 
-const BlogHomePageContent: React.FC<BlogHomePageProps> = ({ settings }) => {
+const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => {
   const { heroPhotos } = settings;
 
   return (
@@ -57,7 +63,7 @@ const BlogHomePageContent: React.FC<BlogHomePageProps> = ({ settings }) => {
 // Add a display name to the component
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
-const BlogHomePage: React.FC<BlogHomePageProps> = ({ settings }) => {
+const BlogHomePage: React.FC<{ settings: Settings }> = ({ settings }) => {
   return (
     <React.Suspense fallback={
       <div className="flex items-center justify-center min-h-screen">
