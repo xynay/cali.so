@@ -1,14 +1,3 @@
-const TerserPlugin = require('terser-webpack-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-
-// 只在开发或构建时加载环境变量，避免生产环境下的额外开销
-if (!process.env.SKIP_ENV_VALIDATION) {
-  (async () => {
-    await import('./env.mjs');
-  })();
-}
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -22,7 +11,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    taint: true, // 仅在需要时启用实验功能
+    taint: true,
   },
   redirects() {
     return [
@@ -87,15 +76,6 @@ const nextConfig = {
         },
       },
     };
-    // 移除 BundleAnalyzerPlugin
-    // if (dev) {
-    //   config.plugins.push(
-    //     new BundleAnalyzerPlugin({
-    //       analyzerMode: 'server',
-    //       openAnalyzer: true,
-    //     })
-    //   );
-    // }
     return config;
   },
 };
