@@ -1,8 +1,6 @@
-// pages/index.tsx
-
 import React from 'react';
+import { GetServerSideProps } from 'next';
 
-import { GetStaticProps } from 'next';
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
 import { Photos } from '~/app/(main)/Photos';
@@ -25,7 +23,7 @@ interface BlogHomePageProps {
   settings: Settings;
 }
 
-const BlogHomePage: React.FC<BlogHomePageProps> = ({ settings }) => {
+const BlogHomePageContent: React.FC<BlogHomePageProps> = ({ settings }) => {
   const { heroPhotos } = settings;
 
   return (
@@ -57,23 +55,44 @@ const BlogHomePage: React.FC<BlogHomePageProps> = ({ settings }) => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async () => {
-  try {
-    const settings = await getSettings();
-    return {
-      props: {
-        settings: settings || {},
-      },
-      revalidate: 60, // Revalidate at most once every minute
-    };
-  } catch (error) {
-    console.error('Failed to fetch settings', error);
-    return {
-      props: {
-        settings: {},
-      },
-    };
-  }
+// Add a display name to the component
+BlogHomePageContent.displayName = 'BlogHomePageContent';
+
+const BlogHomePage: React.FC<BlogHomePageProps> = (props) => {
+  return (
+    <React.Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="loader" />
+          <p>Loading...</p>
+        </div>
+      </div>
+    }>
+      <BlogHomePageContent {...props} />
+    </React.Suspense>
+  );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const settings = await fetchSettings();
+  return {
+    props: {
+      settings
+    },
+  };
 };
 
 export default BlogHomePage;
+
+export const revalidate = 60;
+
+// Helper function to fetch settings
+const fetchSettings = async (): Promise<Settings> => {
+  try {
+    const settings = await getSettings();
+    return settings || {};
+  } catch (error) {
+    console.error('Failed to fetch settings', error);
+    return {};
+  }
+};
