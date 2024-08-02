@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { getLatestBlogPosts } from '~/sanity/queries';
 import { BlogPostCard } from './BlogPostCard';
