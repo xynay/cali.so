@@ -4,7 +4,7 @@ import React, { Suspense } from 'react';
 import { Headline } from '~/app/(main)/Headline';
 import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
-import { getSettings } from '~/sanity/queries';
+//import { getSettings } from '~/sanity/queries';
 
 interface Settings {
   heroPhotos?: string[];
@@ -19,7 +19,7 @@ interface Settings {
 
 // 动态导入 BlogPosts 和 Photos 组件
 const BlogPosts = dynamic(() => import('~/app/(main)/blog/BlogPosts'));
-const Photos = dynamic(() => import('~/app/(main)/Photos'));
+//const Photos = dynamic(() => import('~/app/(main)/Photos'));
 
 const fetchSettings = async (): Promise<Settings> => {
   try {
