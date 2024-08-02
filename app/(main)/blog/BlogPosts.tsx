@@ -13,7 +13,9 @@ const BlogPosts = React.memo(({ limit = 5 }) => {
       setPosts(fetchedPosts);
     };
 
-    fetchPosts();
+    fetchPosts().catch(error => {
+      console.error('Failed to fetch posts:', error);
+    });
   }, [limit]);
 
   return (
