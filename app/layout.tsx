@@ -67,7 +67,7 @@ export const viewport: Viewport = {
 }
 
 // Root Layout Component
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+const RootLayout: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
   return (
     <ClerkProvider localization={zhCN}>
       <html
@@ -84,6 +84,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             crossOrigin="anonymous"
           />
           {/* Add additional preload links for other font formats if needed */}
+          <link
+            rel="stylesheet"
+            href="/clerk.css"
+            media="print"
+            onLoad="this.media='all'"
+          />
+          <noscript><link rel="stylesheet" href="/clerk.css" /></noscript>
         </head>
         <body className="flex h-full flex-col">
           <ThemeProvider
@@ -98,4 +105,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </html>
     </ClerkProvider>
   )
-}
+});
+
+export default RootLayout;
