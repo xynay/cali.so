@@ -1,4 +1,6 @@
 import TerserPlugin from 'terser-webpack-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 // 只在开发或构建时加载环境变量，避免生产环境下的额外开销
 if (!process.env.SKIP_ENV_VALIDATION) {
@@ -49,7 +51,32 @@ const nextConfig = {
               drop_console: true,
             },
           },
-        })
+        }),
+        new CssMinimizerPlugin() // 添加 CSS 最小化插件
+      );
+    }
+    config.cache = {
+      type: 'filesystem', // 启用持久化缓存
+    };
+    config.optimization.splitChunks = {
+      chunks: 'all',
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          filename: 'vendors.js',
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+          filename: 'common.js',
+        },
+      },
+    };
+    if (!dev) {
+      config.plugins.push(
+        new BundleAnalyzerPlugin() // 添加分析插件
       );
     }
     return config;
