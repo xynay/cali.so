@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { BlogPosts } from '~/app/(main)/blog/BlogPosts';
 import { Headline } from '~/app/(main)/Headline';
@@ -88,18 +88,7 @@ const BlogHomePageContent: React.FC = () => {
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
 const BlogHomePage: React.FC = () => {
-  return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="loader" />
-          <p>Loading...</p>
-        </div>
-      </div>
-    }>
-      <BlogHomePageContent />
-    </Suspense>
-  );
+  return <BlogHomePageContent />;
 };
 
 export default BlogHomePage;
