@@ -21,7 +21,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    taint: true, // 仅在需要时启用实验功能
+    taint: true,
   },
   redirects() {
     return [
@@ -63,19 +63,22 @@ const nextConfig = {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
           priority: -10,
-          filename: 'vendors-[contenthash].js', // 添加 [contenthash] 确保唯一性
+          filename: 'vendors-[contenthash].js',
         },
         default: {
           minChunks: 2,
           priority: -20,
           reuseExistingChunk: true,
-          filename: 'common-[contenthash].js', // 添加 [contenthash] 确保唯一性
+          filename: 'common-[contenthash].js',
         },
       },
     };
-    if (!dev) {
+    if (dev) {
       config.plugins.push(
-        new BundleAnalyzerPlugin()
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'server', // 或 'static'，用于生成报告文件
+          openAnalyzer: false, // 禁用自动打开浏览器
+        })
       );
     }
     return config;
