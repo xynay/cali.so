@@ -7,7 +7,6 @@ import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
 
 interface Settings {
-  heroPhotos?: string[];
   resume?: { 
     company: string; 
     title: string; 
@@ -17,9 +16,8 @@ interface Settings {
   }[];
 }
 
-// 动态导入 BlogPosts 和 Photos 组件
+// 动态导入 BlogPosts 组件
 const BlogPosts = dynamic(() => import('~/app/(main)/blog/BlogPosts'));
-//const Photos = dynamic(() => import('~/app/(main)/Photos'));
 
 const fetchSettings = async (): Promise<Settings> => {
   try {
@@ -32,24 +30,16 @@ const fetchSettings = async (): Promise<Settings> => {
 };
 
 const SettingsServerComponent: React.FC = async () => {
-  const _settings = await fetchSettings();
-  return <BlogHomePageContent settings={_settings} />;
+  const settings = await fetchSettings();
+  return <BlogHomePageContent settings={settings} />;
 };
 
-const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ _settings }) => {
-  // const { heroPhotos } = settings;
-
+const BlogHomePageContent: React.FC<{ settings: Settings }> = ({ settings }) => {
   return (
     <>
       <Container className="mt-10">
         <Headline />
       </Container>
-
-      {/* {heroPhotos && (
-        <Container>
-          <Photos photos={heroPhotos} />
-        </Container>
-      )} */}
 
       <Container className="mt-24 md:mt-28">
         <div className="mx-auto grid max-w-md grid-cols-1 gap-y-20 lg:max-w-none">
