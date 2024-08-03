@@ -1,36 +1,51 @@
-import { proxy } from 'valtio'
+import { proxy, batch } from 'valtio';
 
-import { type PostIDLessCommentDto } from '~/db/dto/comment.dto'
+import { type PostIDLessCommentDto } from '~/db/dto/comment.dto';
 
-type PostID = string
+type PostID = string;
+
 export const blogPostState = proxy<{
-  postId: PostID
-  currentBlockId: string | null
-  comments: PostIDLessCommentDto[]
-  replyingTo: PostIDLessCommentDto | null
+  postId: PostID;
+  currentBlockId: string | null;
+  comments: PostIDLessCommentDto[];
+  replyingTo: PostIDLessCommentDto | null;
 }>({
   postId: '',
   currentBlockId: null,
   comments: [],
   replyingTo: null,
-})
+});
+
+export function batchUpdate(updateFn: () => void) {
+  batch(updateFn);
+}
 
 export function addComment(comment: PostIDLessCommentDto) {
-  blogPostState.comments.push(comment)
+  batchUpdate(() => {
+    blogPostState.comments.push(comment);
+  });
 }
 
 export function replyTo(comment: PostIDLessCommentDto) {
-  blogPostState.replyingTo = comment
+  batchUpdate(() => {
+    blogPostState.replyingTo = comment;
+  });
 }
 
 export function clearReply() {
-  blogPostState.replyingTo = null
+  batchUpdate(() => {
+    blogPostState.replyingTo = null;
+  });
 }
 
 export function focusBlock(blockId: string | null) {
-  blogPostState.currentBlockId = blockId
+  batchUpdate(() => {
+    blogPostState.currentBlockId = blockId;
+  });
 }
 
 export function clearBlockFocus() {
-  blogPostState.currentBlockId = null
+  batchUpdate(() => {
+    blogPostState.currentBlockId = null;
+  });
 }
