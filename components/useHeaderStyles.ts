@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { useMotionValue } from 'framer-motion'
+
 import { clamp } from '~/lib/math'
 
 export function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale) {
