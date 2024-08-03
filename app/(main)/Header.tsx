@@ -295,7 +295,7 @@ const UserInfo = React.memo(() => {
   }, [user?.primaryEmailAddress?.verification.strategy]);
 
   // 确保 url(pathname).href 是一个字符串
-  const afterSignOutUrl = typeof url(pathname).href === 'string' ? url(pathname).href : '';
+  const afterSignOutUrl = (url(pathname).href as string) || '';
 
   return (
     <AnimatePresence>
