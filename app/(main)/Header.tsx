@@ -167,16 +167,10 @@ const Header = () => {
                 className="order-last mt-[calc(theme(spacing.16)-theme(spacing.3))]"
               />
               <Container
-                className="top-0 order-last -mb-3 pt-3"
-                style={{
-                  position: 'var(--header-position)',
-                }}
+                className="top-0 order-last -mb-3 pt-3 header-container"
               >
                 <motion.div
-                  className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none"
-                  style={{
-                    position: 'var(--header-inner-position)',
-                  }}
+                  className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none header-inner-container"
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
@@ -219,16 +213,10 @@ const Header = () => {
         </AnimatePresence>
         <div
           ref={headerRef}
-          className="top-0 z-10 h-16 pt-6"
-          style={{
-            position: 'var(--header-position)',
-          }}
+          className="top-0 z-10 h-16 pt-6 header-container"
         >
           <Container
-            className="top-[var(--header-top,theme(spacing.6))] w-full"
-            style={{
-              position: 'var(--header-inner-position)',
-            }}
+            className="top-[var(--header-top,theme(spacing.6))] w-full header-inner-container"
           >
             <div className="relative flex gap-4">
               <motion.div
