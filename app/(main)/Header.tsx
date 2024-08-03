@@ -1,171 +1,152 @@
 'use client'
 
-import '../globals.css';
-
 import {
   SignedIn,
   SignedOut,
   SignInButton,
   UserButton,
   useUser,
-} from '@clerk/nextjs';
-import { clsxm } from '@zolplay/utils';
+} from '@clerk/nextjs'
+import { clsxm } from '@zolplay/utils'
 import {
   AnimatePresence,
   motion,
-  type MotionValue,
   useMotionTemplate,
-  useMotionValue} from 'framer-motion';
-import throttle from 'lodash/throttle';
-import { usePathname } from 'next/navigation';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+  useMotionValue,
+} from 'framer-motion'
+import { usePathname } from 'next/navigation'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { NavigationBar } from '~/app/(main)/NavigationBar';
-import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher';
+import { NavigationBar } from '~/app/(main)/NavigationBar'
+import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
 import {
   GitHubBrandIcon,
   GoogleBrandIcon,
   MailIcon,
   UserArrowLeftIcon,
-} from '~/assets';
-import { Avatar } from '~/components/Avatar';
-import { Container } from '~/components/ui/Container';
-import { Tooltip } from '~/components/ui/Tooltip';
-import { url } from '~/lib';
-import { clamp } from '~/lib/math';
+} from '~/assets'
+import { Avatar } from '~/components/Avatar'
+import { Container } from '~/components/ui/Container'
+import { Tooltip } from '~/components/ui/Tooltip'
+import { url } from '~/lib'
+import { clamp } from '~/lib/math'
 
-const useHeaderStyles = (
-  isHomePage: boolean,
-  avatarX: MotionValue<number>,
-  avatarScale: MotionValue<number>,
-  avatarBorderX: MotionValue<number>,
-  avatarBorderScale: MotionValue<number>
-) => {
-  const headerRef = useRef<HTMLDivElement>(null);
-  const avatarRef = useRef<HTMLDivElement>(null);
-  const isInitial = useRef(true);
+function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale) {
+  const headerRef = useRef<HTMLDivElement>(null)
+  const avatarRef = useRef<HTMLDivElement>(null)
+  const isInitial = useRef(true)
 
-  const setProperty = useCallback((properties: { [key: string]: unknown }) => {
-    Object.entries(properties).forEach(([property, value]) => {
-      document.documentElement.style.setProperty(property, String(value ?? ''));
-    });
-  }, []);
-
-  const updateStyles = useCallback(() => {
-    if (!headerRef.current) return;
-    const { top, height } = headerRef.current.getBoundingClientRect();
-    const scrollY = clamp(
-      window.scrollY,
-      0,
-      document.body.scrollHeight - window.innerHeight
-    );
-    const downDelay = avatarRef.current?.offsetTop ?? 0;
-    const upDelay = 64;
-
-    const commonProperties = {
-      '--header-position': 'sticky',
-      '--content-offset': `${downDelay}px`,
-    };
-
-    if (isInitial.current) setProperty(commonProperties);
-    const isScrolledPastDownDelay = scrollY >= downDelay;
-
-    if (isInitial.current || !isScrolledPastDownDelay) {
-      setProperty({
-        '--header-height': `${downDelay + height}px`,
-        '--header-mb': `${-downDelay}px`,
-      });
-    } else if (top + height < -upDelay) {
-      const offset = downDelay - scrollY;
-      setProperty({
-        '--header-height': `${offset}px`,
-        '--header-mb': `${height - offset}px`,
-      });
-    } else if (top === 0) {
-      setProperty({
-        '--header-height': `${scrollY + height}px`,
-        '--header-mb': `${-scrollY}px`,
-      });
+  const setProperty = useCallback((properties: Record<string, unknown>) => {
+    for (const [property, value] of Object.entries(properties)) {
+      if (value !== null) {
+        document.documentElement.style.setProperty(property, value as string)
+      } else {
+        document.documentElement.style.removeProperty(property)
+      }
     }
-
-    setProperty({
-      '--header-inner-position': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? 'fixed' : 'relative',
-      '--header-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
-      '--avatar-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
-    });
-
-    if (isHomePage) {
-      const fromScale = 1;
-      const toScale = 36 / 64;
-      const fromX = 0;
-      const toX = 2 / 16;
-      const remainingScroll = downDelay - window.scrollY;
-      let scale = (remainingScroll * (fromScale - toScale)) / downDelay + toScale;
-      scale = clamp(scale, fromScale, toScale);
-      let x = (remainingScroll * (fromX - toX)) / downDelay + toX;
-      x = clamp(x, fromX, toX);
-      avatarX.set(x);
-      avatarScale.set(scale);
-      const borderScale = 1 / (toScale / scale);
-      avatarBorderX.set((-toX + x) * borderScale);
-      avatarBorderScale.set(borderScale);
-      setProperty({
-        '--avatar-border-opacity': scale === toScale ? '1' : '0',
-      });
-    }
-
-    isInitial.current = false;
-  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty]);
+  }, [])
 
   useEffect(() => {
-    const updateStyles = throttle(() => {
-      // 你的更新样式逻辑
-      if (headerRef.current && avatarRef.current) {
-        // 示例逻辑
-        const headerRect = headerRef.current.getBoundingClientRect();
-        const avatarRect = avatarRef.current.getBoundingClientRect();
-        avatarX.set(headerRect.left);
-        avatarScale.set(avatarRect.width / headerRect.width);
-        avatarBorderX.set(headerRect.left);
-        avatarBorderScale.set(avatarRect.width / headerRect.width);
+    const updateStyles = () => {
+      if (!headerRef.current) return
+      const { top, height } = headerRef.current.getBoundingClientRect()
+      const scrollY = clamp(
+        window.scrollY,
+        0,
+        document.body.scrollHeight - window.innerHeight
+      )
+      const downDelay = avatarRef.current?.offsetTop ?? 0
+      const upDelay = 64
+      const commonProperties = {
+        '--header-position': 'sticky',
+        '--content-offset': `${downDelay}px`,
       }
-    }, 100); // 每100ms触发一次
 
-    updateStyles();
-    window.addEventListener('scroll', updateStyles);
-    window.addEventListener('resize', updateStyles);
+      if (isInitial.current) setProperty(commonProperties)
+      const isScrolledPastDownDelay = scrollY >= downDelay
 
+      if (isInitial.current || !isScrolledPastDownDelay) {
+        setProperty({
+          '--header-height': `${downDelay + height}px`,
+          '--header-mb': `${-downDelay}px`,
+        })
+      } else if (top + height < -upDelay) {
+        const offset = Math.max(height, scrollY - upDelay)
+        setProperty({
+          '--header-height': `${offset}px`,
+          '--header-mb': `${height - offset}px`,
+        })
+      } else if (top === 0) {
+        setProperty({
+          '--header-height': `${scrollY + height}px`,
+          '--header-mb': `${-scrollY}px`,
+        })
+      }
+
+      setProperty({
+        '--header-inner-position': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? 'fixed' : null,
+        '--header-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
+        '--avatar-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
+      })
+
+      if (isHomePage) {
+        const fromScale = 1
+        const toScale = 36 / 64
+        const fromX = 0
+        const toX = 2 / 16
+        const remainingScroll = downDelay - window.scrollY
+        let scale = (remainingScroll * (fromScale - toScale)) / downDelay + toScale
+        scale = clamp(scale, fromScale, toScale)
+        let x = (remainingScroll * (fromX - toX)) / downDelay + toX
+        x = clamp(x, fromX, toX)
+        avatarX.set(x)
+        avatarScale.set(scale)
+        const borderScale = 1 / (toScale / scale)
+        avatarBorderX.set((-toX + x) * borderScale)
+        avatarBorderScale.set(borderScale)
+        setProperty({
+          '--avatar-border-opacity': scale === toScale ? '1' : '0',
+        })
+      }
+
+      isInitial.current = false
+    }
+
+    const onScroll = () => requestAnimationFrame(updateStyles)
+    const onResize = () => requestAnimationFrame(updateStyles)
+
+    updateStyles()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onResize)
     return () => {
-      window.removeEventListener('scroll', updateStyles);
-      window.removeEventListener('resize', updateStyles);
-    };
-  }, [avatarX, avatarScale, avatarBorderX, avatarBorderScale]);
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty])
 
-  return { headerRef, avatarRef };
-};
+  return { headerRef, avatarRef }
+}
 
-export { useHeaderStyles };
+function Header() {
+  const isHomePage = usePathname() === '/'
+  const avatarX = useMotionValue(0)
+  const avatarScale = useMotionValue(1)
+  const avatarBorderX = useMotionValue(0)
+  const avatarBorderScale = useMotionValue(1)
+  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
 
-const Header = () => {
-  const isHomePage = usePathname() === '/';
-  const avatarX = useMotionValue(0);
-  const avatarScale = useMotionValue(1);
-  const avatarBorderX = useMotionValue(0);
-  const avatarBorderScale = useMotionValue(1);
-  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false);
+  const { headerRef, avatarRef } = useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale)
 
-  const { headerRef, avatarRef } = useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale);
-
-  const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`;
-  const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`;
+  const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
+  const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
 
   const onAvatarContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      setIsShowingAltAvatar((prev) => !prev);
+      event.preventDefault()
+      setIsShowingAltAvatar((prev) => !prev)
     },
     []
-  );
+  )
 
   return (
     <>
@@ -187,10 +168,16 @@ const Header = () => {
                 className="order-last mt-[calc(theme(spacing.16)-theme(spacing.3))]"
               />
               <Container
-                className="top-0 order-last -mb-3 pt-3 header-container"
+                className="top-0 order-last -mb-3 pt-3"
+                style={{
+                  position: 'var(--header-position)' as React.CSSProperties['position'],
+                }}
               >
                 <motion.div
-                  className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none header-inner-container"
+                  className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none"
+                  style={{
+                    position: 'var(--header-inner-position)' as React.CSSProperties['position'],
+                  }}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
@@ -220,8 +207,8 @@ const Header = () => {
                       }}
                     >
                       <Avatar.Image
-                        large={true}
-                        alt={isShowingAltAvatar} // Ensure alt is always a string
+                        large
+                        alt={isShowingAltAvatar}
                         className="block h-full w-full"
                       />
                     </motion.div>
@@ -233,10 +220,16 @@ const Header = () => {
         </AnimatePresence>
         <div
           ref={headerRef}
-          className="top-0 z-10 h-16 pt-6 header-container"
+          className="top-0 z-10 h-16 pt-6"
+          style={{
+            position: 'var(--header-position)' as React.CSSProperties['position'],
+          }}
         >
           <Container
-            className="top-[var(--header-top,theme(spacing.6))] w-full header-inner-container"
+            className="top-[var(--header-top,theme(spacing.6))] w-full"
+            style={{
+              position: 'var(--header-inner-position)' as React.CSSProperties['position'],
+            }}
           >
             <div className="relative flex gap-4">
               <motion.div
@@ -257,10 +250,7 @@ const Header = () => {
                       onContextMenu={onAvatarContextMenu}
                     >
                       <Avatar>
-                        <Avatar.Image
-                          large={true} 
-                          alt={isShowingAltAvatar}
-                        />
+                        <Avatar.Image alt={isShowingAltAvatar} />
                       </Avatar>
                     </motion.div>
                   )}
@@ -286,28 +276,26 @@ const Header = () => {
       </motion.header>
       {isHomePage && <div className="h-[--content-offset]" />}
     </>
-  );
-};
+  )
+}
 
-const UserInfo = React.memo(() => {
-  const [tooltipOpen, setTooltipOpen] = useState(false);
-  const pathname = usePathname();
-  const { user } = useUser();
+function UserInfo() {
+  const [tooltipOpen, setTooltipOpen] = useState(false)
+  const pathname = usePathname()
+  const { user } = useUser()
   const StrategyIcon = useMemo(() => {
-    const strategy = user?.primaryEmailAddress?.verification.strategy;
-    if (!strategy) return null;
+    const strategy = user?.primaryEmailAddress?.verification.strategy
+    if (!strategy) return null
 
     switch (strategy) {
       case 'from_oauth_github':
-        return GitHubBrandIcon;
+        return GitHubBrandIcon
       case 'from_oauth_google':
-        return GoogleBrandIcon;
+        return GoogleBrandIcon
       default:
-        return MailIcon;
+        return MailIcon
     }
-  }, [user?.primaryEmailAddress?.verification.strategy]);
-
-  const afterSignOutUrl = (url(pathname).href ?? '');
+  }, [user?.primaryEmailAddress?.verification.strategy])
 
   return (
     <AnimatePresence>
@@ -319,7 +307,7 @@ const UserInfo = React.memo(() => {
           exit={{ opacity: 0, x: 25 }}
         >
           <UserButton
-            afterSignOutUrl={afterSignOutUrl}
+            afterSignOutUrl={url(pathname).href}
             appearance={{
               elements: {
                 avatarBox: 'w-9 h-9 ring-2 ring-white/20',
@@ -341,8 +329,8 @@ const UserInfo = React.memo(() => {
           exit={{ opacity: 0, x: 25 }}
         >
           <Tooltip.Provider disableHoverableContent>
-            <Tooltip.Root open={tooltipOpen} onOpenChange={(open: boolean) => setTooltipOpen(open)}>
-              <SignInButton mode="modal" redirectUrl={afterSignOutUrl}>
+            <Tooltip.Root open={tooltipOpen} onOpenChange={setTooltipOpen}>
+              <SignInButton mode="modal" redirectUrl={url(pathname).href}>
                 <Tooltip.Trigger asChild>
                   <button
                     type="button"
@@ -373,8 +361,7 @@ const UserInfo = React.memo(() => {
         </motion.div>
       </SignedOut>
     </AnimatePresence>
-  );
-});
-UserInfo.displayName = 'UserInfo';
+  )
+}
 
 export { Header };

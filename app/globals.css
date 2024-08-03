@@ -42,11 +42,3 @@ html.dark {
     opacity: 0;
   }
 }
-
-.header-container {
-  position: var(--header-position);
-}
-
-.header-inner-container {
-  position: var(--header-inner-position);
-}
