@@ -16,7 +16,7 @@ import {
   useMotionTemplate,
   useMotionValue,
 } from 'framer-motion';
-import throttle from 'lodash/throttle'; // Import throttle
+import throttle from 'lodash/throttle';
 import { usePathname } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -34,9 +34,15 @@ import { Tooltip } from '~/components/ui/Tooltip';
 import { url } from '~/lib';
 import { clamp } from '~/lib/math';
 
-const useHeaderStyles = (isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale) => {
-  const headerRef = useRef(null);
-  const avatarRef = useRef(null);
+const useHeaderStyles = (
+  isHomePage: boolean,
+  avatarX: any,
+  avatarScale: any,
+  avatarBorderX: any,
+  avatarBorderScale: any
+) => {
+  const headerRef = useRef<HTMLDivElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
   const isInitial = useRef(true);
 
   const setProperty = useCallback((properties: { [key: string]: unknown }) => {
@@ -114,17 +120,19 @@ const useHeaderStyles = (isHomePage, avatarX, avatarScale, avatarBorderX, avatar
   useEffect(() => {
     const onScroll = throttle(() => {
       requestAnimationFrame(updateStyles);
-    }, 100); // Adjust the throttle interval as needed
+    }, 100);
+
     const onResize = throttle(() => {
       requestAnimationFrame(updateStyles);
-    }, 100); // Adjust the throttle interval as needed
+    }, 100);
 
     updateStyles();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onResize);
+    window.addEventListener('scroll', onScroll as EventListener);
+    window.addEventListener('resize', onResize as EventListener);
+
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', onScroll as EventListener);
+      window.removeEventListener('resize', onResize as EventListener);
     };
   }, [updateStyles]);
 
@@ -145,7 +153,7 @@ const Header = () => {
   const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`;
 
   const onAvatarContextMenu = useCallback(
-    (event) => {
+    (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault();
       setIsShowingAltAvatar((prev) => !prev);
     },
@@ -242,7 +250,7 @@ const Header = () => {
                       onContextMenu={onAvatarContextMenu}
                     >
                       <Avatar>
-                        <Avatar.Image alt={isShowingAltAvatar} />
+                        <Avatar.Image alt={isShowingAltAvatar ? true : false} />
                       </Avatar>
                     </motion.div>
                   )}
@@ -323,7 +331,7 @@ const UserInfo = React.memo(() => {
           exit={{ opacity: 0, x: 25 }}
         >
           <Tooltip.Provider disableHoverableContent>
-            <Tooltip.Root open={tooltipOpen} onOpenChange={setTooltipOpen}>
+            <Tooltip.Root open={tooltipOpen} onOpenChange={(open: boolean) => setTooltipOpen(open)}>
               <SignInButton mode="modal" redirectUrl={afterSignOutUrl}>
                 <Tooltip.Trigger asChild>
                   <button
