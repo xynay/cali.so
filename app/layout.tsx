@@ -1,11 +1,13 @@
 "use client"; // 使该文件作为客户端组件处理
 
-import { useEffect } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
-import { sansFont } from '~/lib/font';
-import { zhCN } from '~/lib/clerkLocalizations';
+import { useEffect } from 'react';
+
 import { ThemeProvider } from '~/app/(main)/ThemeProvider';
-import { metadata, viewport } from './metadata'; // 导入 metadata 和 viewport
+import { zhCN } from '~/lib/clerkLocalizations';
+import { sansFont } from '~/lib/font';
+
+// 导入 metadata 和 viewport
 
 const loadCSS = (href: string) => {
   const link = document.createElement('link');
