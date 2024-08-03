@@ -1,4 +1,5 @@
-import './globals.css'; // 导入包含其他 CSS 文件的全局样式
+import './globals.css'; 
+import './clerk.css';
 
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata, Viewport } from 'next';
