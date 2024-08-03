@@ -3,7 +3,7 @@
 import { clsxm } from '@zolplay/utils'
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
@@ -33,6 +33,14 @@ function Header() {
     []
   )
 
+  const containerStyle = useMemo(() => ({
+    position: 'var(--header-position)' as React.CSSProperties['position'],
+  }), [])
+
+  const headerInnerStyle = useMemo(() => ({
+    position: 'var(--header-inner-position)' as React.CSSProperties['position'],
+  }), [])
+
   return (
     <>
       <motion.header
@@ -54,15 +62,11 @@ function Header() {
               />
               <Container
                 className="top-0 order-last -mb-3 pt-3"
-                style={{
-                  position: 'var(--header-position)' as React.CSSProperties['position'],
-                }}
+                style={containerStyle}
               >
                 <motion.div
                   className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none"
-                  style={{
-                    position: 'var(--header-inner-position)' as React.CSSProperties['position'],
-                  }}
+                  style={headerInnerStyle}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
@@ -106,15 +110,11 @@ function Header() {
         <div
           ref={headerRef}
           className="top-0 z-10 h-16 pt-6"
-          style={{
-            position: 'var(--header-position)' as React.CSSProperties['position'],
-          }}
+          style={containerStyle}
         >
           <Container
             className="top-[var(--header-top,theme(spacing.6))] w-full"
-            style={{
-              position: 'var(--header-inner-position)' as React.CSSProperties['position'],
-            }}
+            style={headerInnerStyle}
           >
             <div className="relative flex gap-4">
               <motion.div
