@@ -46,6 +46,7 @@ const listVariants = {
     },
   },
 } satisfies Variants
+
 const itemVariants = {
   hidden: {
     opacity: 0,
@@ -62,40 +63,41 @@ const itemVariants = {
 export function BlogPostTableOfContents({ headings }: { headings: Node[] }) {
   const outline = parseOutline(headings)
   const { scrollY } = useScroll()
-  const [highlightedHeadingId, setHighlightedHeadingId] = React.useState<
-    string | null
-  >(null)
+  const [highlightedHeadingId, setHighlightedHeadingId] = React.useState<string | null>(null)
 
   React.useEffect(() => {
+    const articleElement = document.querySelector<HTMLElement>('article[data-postid]')
+    const outlineElements = outline.map((node) =>
+      document.querySelector<HTMLAnchorElement>(`article ${node.style}:where([id="${node.id}"]) > a`)
+    )
+
     const handleScroll = () => {
-      const articleElement = document.querySelector<HTMLElement>(
-        'article[data-postid]'
-      )
-      const outlineYs = outline.map((node) => {
-        const el = document.querySelector<HTMLAnchorElement>(
-          `article ${node.style}:where([id="${node.id}"]) > a`
-        )
-        if (!el) return 0
+      if (!articleElement) return
 
-        return el.getBoundingClientRect().top
-      })
+      const articleBottom = articleElement.getBoundingClientRect().bottom
+      const scrollTop = scrollY.get()
 
-      if (articleElement) {
-        if (scrollY.get() > articleElement.scrollHeight) {
-          setHighlightedHeadingId(null)
-        } else {
-          const idx = outlineYs.findIndex((y) => y > 0)
-          if (idx === -1) {
-            setHighlightedHeadingId(outline[outline.length - 1]?.id ?? null)
-          } else {
-            setHighlightedHeadingId(outline[idx]?.id ?? null)
+      if (scrollTop > articleBottom) {
+        setHighlightedHeadingId(null)
+        return
+      }
+
+      let highlightedId: string | null = null
+      for (let i = 0; i < outlineElements.length; i++) {
+        const el = outlineElements[i]
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          if (rect.top <= window.innerHeight / 2) {
+            highlightedId = outline[i]?.id ?? null
           }
         }
       }
+
+      setHighlightedHeadingId(highlightedId)
     }
 
+    handleScroll() // Initial check
     window.addEventListener('scroll', handleScroll)
-
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
