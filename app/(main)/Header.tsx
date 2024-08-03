@@ -70,7 +70,6 @@ const useHeaderStyles = (isHomePage, avatarX, avatarScale, avatarBorderX, avatar
           '--header-mb': `${-downDelay}px`,
         });
       } else if (top + height < -upDelay) {
-        const scrollY = clamp(window.scrollY as number, 0, (document.body.scrollHeight - window.innerHeight) as number);
         const offset = downDelay - scrollY;
         setProperty({
           '--header-height': `${offset}px`,
@@ -84,7 +83,7 @@ const useHeaderStyles = (isHomePage, avatarX, avatarScale, avatarBorderX, avatar
       }
 
       setProperty({
-        '--header-inner-position': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? 'fixed' : null,
+        '--header-inner-position': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? 'fixed' : 'relative',
         '--header-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
         '--avatar-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
       });
