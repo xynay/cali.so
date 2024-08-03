@@ -1,5 +1,3 @@
-"use client"; // 使该文件作为客户端组件处理
-
 import { useEffect } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata, Viewport } from 'next';
@@ -34,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: {
       default: seo.title,
-      template: '%s | Cali Castle',
+      template: '%s | 辛壬癸的命理笔记',
     },
     description: seo.description,
     siteName: '辛壬癸的命理笔记',
@@ -55,14 +53,14 @@ export const metadata: Metadata = {
       'application/rss+xml': [{ url: 'rss', title: 'RSS 订阅' }],
     },
   },
-}
+};
 
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#000212' },
     { media: '(prefers-color-scheme: light)', color: '#fafafa' },
   ],
-}
+};
 
 const loadCSS = (href: string) => {
   const link = document.createElement('link');
