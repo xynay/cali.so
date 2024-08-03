@@ -1,6 +1,6 @@
-"use client";
-
 import { ClerkProvider } from '@clerk/nextjs';
+import Script from 'next/script';
+
 import { ThemeProvider } from '~/app/(main)/ThemeProvider';
 import { zhCN } from '~/lib/clerkLocalizations';
 import { sansFont } from '~/lib/font';
@@ -14,12 +14,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
       >
         <head>
-          <link rel="preload" href="/globals.css" as="style" />
-          <link rel="preload" href="/clerk.css" as="style" />
-          <link rel="preload" href="/prism.css" as="style" />
-          <link rel="stylesheet" href="/globals.css" />
-          <link rel="stylesheet" href="/clerk.css" />
-          <link rel="stylesheet" href="/prism.css" />
+          <Script
+            id="load-css"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  var links = [
+                    '/globals.css',
+                    '/clerk.css',
+                    '/prism.css'
+                  ];
+                  links.forEach(function(href) {
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = href;
+                    link.media = 'print'; // 初始设置为 print 以避免阻塞渲染
+                    link.onload = function() {
+                      link.media = 'all'; // 加载完成后设置为 all
+                    };
+                    document.head.appendChild(link);
+                  });
+                })();
+              `,
+            }}
+          />
         </head>
         <body className="flex h-full flex-col">
           <ThemeProvider
