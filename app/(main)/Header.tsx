@@ -13,10 +13,9 @@ import { clsxm } from '@zolplay/utils';
 import {
   AnimatePresence,
   motion,
+  type MotionValue,
   useMotionTemplate,
-  useMotionValue,
-  MotionValue
-} from 'framer-motion';
+  useMotionValue} from 'framer-motion';
 import throttle from 'lodash/throttle';
 import { usePathname } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
