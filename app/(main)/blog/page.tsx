@@ -27,6 +27,7 @@ export const metadata = {
 const MemoizedDescription = React.memo(() => (
   <Balancer>{description}</Balancer>
 ));
+MemoizedDescription.displayName = 'MemoizedDescription';
 
 const BlogPage: React.FC = () => {
   return (
@@ -48,6 +49,8 @@ const BlogPage: React.FC = () => {
     </Container>
   );
 }
+
+BlogPage.displayName = 'BlogPage';
 
 export default React.memo(BlogPage);
 
