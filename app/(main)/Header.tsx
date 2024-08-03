@@ -9,7 +9,7 @@ import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
 import { Avatar } from '~/components/Avatar'
 import { Container } from '~/components/ui/Container'
-import { useHeaderStyles } from '~/components/useHeaderStyles'
+import { useHeaderStyles } from '~/hooks/useHeaderStyles'
 import { UserInfo } from '~/components/UserInfo'
 
 function Header() {
