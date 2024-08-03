@@ -1,27 +1,26 @@
-"use client"; // 使该文件作为客户端组件处理
+"use client";
 
-import { ClerkProvider } from '@clerk/nextjs';
 import { useEffect } from 'react';
-
+import { ClerkProvider } from '@clerk/nextjs';
 import { ThemeProvider } from '~/app/(main)/ThemeProvider';
 import { zhCN } from '~/lib/clerkLocalizations';
 import { sansFont } from '~/lib/font';
 
-// 导入 metadata 和 viewport
-
+// 动态加载 CSS 的函数
 const loadCSS = (href: string) => {
   const link = document.createElement('link');
   link.rel = 'stylesheet';
   link.href = href;
-  link.media = 'print';
+  link.media = 'print'; // 设置为 print 以避免阻塞渲染
   link.onload = () => {
-    link.media = 'all';
+    link.media = 'all'; // 加载完成后设置为 all
   };
   document.head.appendChild(link);
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    // 在组件挂载时加载 CSS
     loadCSS('/globals.css');
     loadCSS('/clerk.css');
     loadCSS('/prism.css');
