@@ -214,7 +214,7 @@ const Header = () => {
                       }}
                     >
                       <Avatar.Image
-                        large
+                        large={true}
                         alt={isShowingAltAvatar ? 'Alt Avatar' : 'Avatar'} // Ensure alt is always a string
                         className="block h-full w-full"
                       />
@@ -251,7 +251,10 @@ const Header = () => {
                       onContextMenu={onAvatarContextMenu}
                     >
                       <Avatar>
-                        <Avatar.Image alt={isShowingAltAvatar ? 'Alt Avatar' : 'Avatar'} />
+                        <Avatar.Image
+                          large={true} 
+                          alt={isShowingAltAvatar ? 'Alt Avatar' : 'Avatar'} 
+                        />
                       </Avatar>
                     </motion.div>
                   )}
