@@ -1,6 +1,7 @@
 // app/metadata.ts
 
 import type { Metadata, Viewport } from 'next';
+
 import { url } from '~/lib';
 import { seo } from '~/lib/seo';
 
