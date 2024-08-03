@@ -1,7 +1,7 @@
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs'
 import { AnimatePresence, motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useCallback,useMemo, useState } from 'react'
 
 import { GitHubBrandIcon, GoogleBrandIcon, MailIcon, UserArrowLeftIcon } from '~/assets'
 import { Tooltip } from '~/components/ui/Tooltip'
@@ -11,6 +11,7 @@ export function UserInfo() {
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const pathname = usePathname()
   const { user } = useUser()
+
   const StrategyIcon = useMemo(() => {
     const strategy = user?.primaryEmailAddress?.verification.strategy
     if (!strategy) return null
@@ -25,6 +26,12 @@ export function UserInfo() {
     }
   }, [user?.primaryEmailAddress?.verification.strategy])
 
+  const handleTooltipOpenChange = useCallback((open: boolean) => {
+    setTooltipOpen(open)
+  }, [])
+
+  const afterSignOutUrl = useMemo(() => url(pathname).href, [pathname])
+
   return (
     <AnimatePresence>
       <SignedIn key="user-info">
@@ -35,7 +42,7 @@ export function UserInfo() {
           exit={{ opacity: 0, x: 25 }}
         >
           <UserButton
-            afterSignOutUrl={url(pathname).href}
+            afterSignOutUrl={afterSignOutUrl}
             appearance={{
               elements: {
                 avatarBox: 'w-9 h-9 ring-2 ring-white/20',
@@ -57,8 +64,8 @@ export function UserInfo() {
           exit={{ opacity: 0, x: 25 }}
         >
           <Tooltip.Provider disableHoverableContent>
-            <Tooltip.Root open={tooltipOpen} onOpenChange={setTooltipOpen}>
-              <SignInButton mode="modal" redirectUrl={url(pathname).href}>
+            <Tooltip.Root open={tooltipOpen} onOpenChange={handleTooltipOpenChange}>
+              <SignInButton mode="modal" redirectUrl={afterSignOutUrl}>
                 <Tooltip.Trigger asChild>
                   <button
                     type="button"
