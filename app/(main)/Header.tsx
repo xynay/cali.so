@@ -215,7 +215,7 @@ const Header = () => {
                     >
                       <Avatar.Image
                         large={true}
-                        alt={isShowingAltAvatar ? 'Alt Avatar' : 'Avatar'} // Ensure alt is always a string
+                        alt={isShowingAltAvatar} // Ensure alt is always a string
                         className="block h-full w-full"
                       />
                     </motion.div>
@@ -253,7 +253,7 @@ const Header = () => {
                       <Avatar>
                         <Avatar.Image
                           large={true} 
-                          alt={isShowingAltAvatar ? 'Alt Avatar' : 'Avatar'} 
+                          alt={isShowingAltAvatar}
                         />
                       </Avatar>
                     </motion.div>
