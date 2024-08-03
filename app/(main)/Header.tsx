@@ -38,7 +38,7 @@ const useHeaderStyles = (isHomePage, avatarX, avatarScale, avatarBorderX, avatar
 
   const setProperty = useCallback((properties) => {
     Object.entries(properties).forEach(([property, value]) => {
-      document.documentElement.style.setProperty(property, value ?? '');
+      document.documentElement.style.setProperty(property, value?.toString() ?? '');
     });
   }, []);
 
@@ -295,7 +295,7 @@ const UserInfo = React.memo(() => {
   }, [user?.primaryEmailAddress?.verification.strategy]);
 
   // 确保 url(pathname).href 是一个字符串
-  const afterSignOutUrl = (url(pathname).href as string) || '';
+  const afterSignOutUrl = (url(pathname).href ?? '') as string;
 
   return (
     <AnimatePresence>
