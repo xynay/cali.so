@@ -118,26 +118,33 @@ const useHeaderStyles = (
   }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty]);
 
   useEffect(() => {
-    const onScroll = throttle(() => {
-      requestAnimationFrame(updateStyles);
-    }, 100);
-
-    const onResize = throttle(() => {
-      requestAnimationFrame(updateStyles);
-    }, 100);
+    const updateStyles = throttle(() => {
+      // 你的更新样式逻辑
+      if (headerRef.current && avatarRef.current) {
+        // 示例逻辑
+        const headerRect = headerRef.current.getBoundingClientRect();
+        const avatarRect = avatarRef.current.getBoundingClientRect();
+        avatarX.set(headerRect.left);
+        avatarScale.set(avatarRect.width / headerRect.width);
+        avatarBorderX.set(headerRect.left);
+        avatarBorderScale.set(avatarRect.width / headerRect.width);
+      }
+    }, 100); // 每100ms触发一次
 
     updateStyles();
-    window.addEventListener('scroll', onScroll as EventListener);
-    window.addEventListener('resize', onResize as EventListener);
+    window.addEventListener('scroll', updateStyles);
+    window.addEventListener('resize', updateStyles);
 
     return () => {
-      window.removeEventListener('scroll', onScroll as EventListener);
-      window.removeEventListener('resize', onResize as EventListener);
+      window.removeEventListener('scroll', updateStyles);
+      window.removeEventListener('resize', updateStyles);
     };
-  }, [updateStyles]);
+  }, [avatarX, avatarScale, avatarBorderX, avatarBorderScale]);
 
   return { headerRef, avatarRef };
 };
+
+export { useHeaderStyles };
 
 const Header = () => {
   const isHomePage = usePathname() === '/';
