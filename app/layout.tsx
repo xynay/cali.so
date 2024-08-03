@@ -35,7 +35,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
       >
         <head>
-          {/* Removed the preload link for 1.woff2 */}
+          <link rel="preload" href="/globals.css" as="style" />
+          <link rel="preload" href="/clerk.css" as="style" />
+          <link rel="preload" href="/prism.css" as="style" />
         </head>
         <body className="flex h-full flex-col">
           <ThemeProvider
