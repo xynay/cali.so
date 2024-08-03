@@ -1,5 +1,3 @@
-'use client';
-
 import '../globals.css';
 
 import {
@@ -215,7 +213,7 @@ const Header = () => {
                     >
                       <Avatar.Image
                         large
-                        alt={isShowingAltAvatar ? 'Alt Avatar' : 'Avatar'}
+                        alt={isShowingAltAvatar ? 'Alt Avatar' : 'Avatar'} // Ensure alt is always a string
                         className="block h-full w-full"
                       />
                     </motion.div>
