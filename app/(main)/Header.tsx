@@ -15,6 +15,7 @@ import {
   motion,
   useMotionTemplate,
   useMotionValue,
+  MotionValue
 } from 'framer-motion';
 import throttle from 'lodash/throttle';
 import { usePathname } from 'next/navigation';
@@ -36,10 +37,10 @@ import { clamp } from '~/lib/math';
 
 const useHeaderStyles = (
   isHomePage: boolean,
-  avatarX: any,
-  avatarScale: any,
-  avatarBorderX: any,
-  avatarBorderScale: any
+  avatarX: MotionValue<number>,
+  avatarScale: MotionValue<number>,
+  avatarBorderX: MotionValue<number>,
+  avatarBorderScale: MotionValue<number>
 ) => {
   const headerRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
@@ -214,7 +215,7 @@ const Header = () => {
                     >
                       <Avatar.Image
                         large
-                        alt={isShowingAltAvatar}
+                        alt={isShowingAltAvatar ? 'Alt Avatar' : 'Avatar'}
                         className="block h-full w-full"
                       />
                     </motion.div>
@@ -250,7 +251,7 @@ const Header = () => {
                       onContextMenu={onAvatarContextMenu}
                     >
                       <Avatar>
-                        <Avatar.Image alt={isShowingAltAvatar ? true : false} />
+                        <Avatar.Image alt={isShowingAltAvatar ? 'Alt Avatar' : 'Avatar'} />
                       </Avatar>
                     </motion.div>
                   )}
