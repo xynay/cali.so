@@ -22,9 +22,9 @@ const loadCSS = (href: string) => {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    loadCSS('./globals.css');
-    loadCSS('./clerk.css');
-    loadCSS('./prism.css');
+    loadCSS('/globals.css');
+    loadCSS('/clerk.css');
+    loadCSS('/prism.css');
   }, []);
 
   return (
