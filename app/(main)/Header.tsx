@@ -1,5 +1,7 @@
 'use client';
 
+import './globals.css';
+
 import {
   SignedIn,
   SignedOut,
@@ -295,7 +297,7 @@ const UserInfo = React.memo(() => {
   }, [user?.primaryEmailAddress?.verification.strategy]);
 
   // 确保 url(pathname).href 是一个字符串
-  const afterSignOutUrl = (url(pathname).href ?? '') as string;
+  const afterSignOutUrl = (url(pathname).href ?? '');
 
   return (
     <AnimatePresence>
