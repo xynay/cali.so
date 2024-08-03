@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
+import { useEffect } from 'react';
+
 import { ThemeProvider } from '~/app/(main)/ThemeProvider';
 import { zhCN } from '~/lib/clerkLocalizations';
 import { sansFont } from '~/lib/font';
