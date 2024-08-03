@@ -1,8 +1,10 @@
 .comment__message {
+  /* Apply base leading for all elements */
   * {
     @apply leading-6;
   }
 
+  /* Headings styling */
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight font-semibold;
   }
@@ -12,11 +14,12 @@
   }
 
   h2 {
+    @apply text-lg font-bold;
     font-size: 1.065rem;
     line-height: 1.75rem;
-    @apply font-bold;
   }
 
+  /* General styling */
   hr {
     @apply my-1.5 border-zinc-400 opacity-20;
   }
@@ -51,6 +54,7 @@
   }
 }
 
+/* Dark mode adjustments */
 .dark .comment__message {
   hr {
     @apply border-zinc-100 opacity-20;
