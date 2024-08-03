@@ -294,6 +294,9 @@ const UserInfo = React.memo(() => {
     }
   }, [user?.primaryEmailAddress?.verification.strategy]);
 
+  // 确保 url(pathname).href 是一个字符串
+  const afterSignOutUrl = typeof url(pathname).href === 'string' ? url(pathname).href : '';
+
   return (
     <AnimatePresence>
       <SignedIn key="user-info">
@@ -304,7 +307,7 @@ const UserInfo = React.memo(() => {
           exit={{ opacity: 0, x: 25 }}
         >
           <UserButton
-            afterSignOutUrl={url(pathname).href}
+            afterSignOutUrl={afterSignOutUrl}
             appearance={{
               elements: {
                 avatarBox: 'w-9 h-9 ring-2 ring-white/20',
@@ -327,7 +330,7 @@ const UserInfo = React.memo(() => {
         >
           <Tooltip.Provider disableHoverableContent>
             <Tooltip.Root open={tooltipOpen} onOpenChange={setTooltipOpen}>
-              <SignInButton mode="modal" redirectUrl={url(pathname).href}>
+              <SignInButton mode="modal" redirectUrl={afterSignOutUrl}>
                 <Tooltip.Trigger asChild>
                   <button
                     type="button"
