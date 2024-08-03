@@ -71,6 +71,7 @@ const useHeaderStyles = (isHomePage, avatarX, avatarScale, avatarBorderX, avatar
         });
       } else if (top + height < -upDelay) {
         const scrollY = clamp(window.scrollY as number, 0, (document.body.scrollHeight - window.innerHeight) as number);
+        const offset = downDelay - scrollY;
         setProperty({
           '--header-height': `${offset}px`,
           '--header-mb': `${height - offset}px`,
