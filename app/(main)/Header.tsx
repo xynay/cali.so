@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
   SignedIn,
@@ -6,147 +6,144 @@ import {
   SignInButton,
   UserButton,
   useUser,
-} from '@clerk/nextjs'
-import { clsxm } from '@zolplay/utils'
+} from '@clerk/nextjs';
+import { clsxm } from '@zolplay/utils';
 import {
   AnimatePresence,
   motion,
   useMotionTemplate,
   useMotionValue,
-} from 'framer-motion'
-import { usePathname } from 'next/navigation'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+} from 'framer-motion';
+import { usePathname } from 'next/navigation';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { NavigationBar } from '~/app/(main)/NavigationBar'
-import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
+import { NavigationBar } from '~/app/(main)/NavigationBar';
+import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher';
 import {
   GitHubBrandIcon,
   GoogleBrandIcon,
   MailIcon,
   UserArrowLeftIcon,
-} from '~/assets'
-import { Avatar } from '~/components/Avatar'
-import { Container } from '~/components/ui/Container'
-import { Tooltip } from '~/components/ui/Tooltip'
-import { url } from '~/lib'
-import { clamp } from '~/lib/math'
+} from '~/assets';
+import { Avatar } from '~/components/Avatar';
+import { Container } from '~/components/ui/Container';
+import { Tooltip } from '~/components/ui/Tooltip';
+import { url } from '~/lib';
+import { clamp } from '~/lib/math';
 
-function useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale) {
-  const headerRef = useRef<HTMLDivElement>(null)
-  const avatarRef = useRef<HTMLDivElement>(null)
-  const isInitial = useRef(true)
+const useHeaderStyles = (isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale) => {
+  const headerRef = useRef(null);
+  const avatarRef = useRef(null);
+  const isInitial = useRef(true);
 
-  const setProperty = useCallback((properties: Record<string, unknown>) => {
-    for (const [property, value] of Object.entries(properties)) {
-      if (value !== null) {
-        document.documentElement.style.setProperty(property, value as string)
-      } else {
-        document.documentElement.style.removeProperty(property)
-      }
-    }
-  }, [])
+  const setProperty = useCallback((properties) => {
+    Object.entries(properties).forEach(([property, value]) => {
+      document.documentElement.style.setProperty(property, value ?? '');
+    });
+  }, []);
 
   useEffect(() => {
     const updateStyles = () => {
-      if (!headerRef.current) return
-      const { top, height } = headerRef.current.getBoundingClientRect()
+      if (!headerRef.current) return;
+      const { top, height } = headerRef.current.getBoundingClientRect();
       const scrollY = clamp(
         window.scrollY,
         0,
         document.body.scrollHeight - window.innerHeight
-      )
-      const downDelay = avatarRef.current?.offsetTop ?? 0
-      const upDelay = 64
+      );
+      const downDelay = avatarRef.current?.offsetTop ?? 0;
+      const upDelay = 64;
+
       const commonProperties = {
         '--header-position': 'sticky',
         '--content-offset': `${downDelay}px`,
-      }
+      };
 
-      if (isInitial.current) setProperty(commonProperties)
-      const isScrolledPastDownDelay = scrollY >= downDelay
+      if (isInitial.current) setProperty(commonProperties);
+      const isScrolledPastDownDelay = scrollY >= downDelay;
 
       if (isInitial.current || !isScrolledPastDownDelay) {
         setProperty({
           '--header-height': `${downDelay + height}px`,
           '--header-mb': `${-downDelay}px`,
-        })
+        });
       } else if (top + height < -upDelay) {
-        const offset = Math.max(height, scrollY - upDelay)
+        const offset = Math.max(height, scrollY - upDelay);
         setProperty({
           '--header-height': `${offset}px`,
           '--header-mb': `${height - offset}px`,
-        })
+        });
       } else if (top === 0) {
         setProperty({
           '--header-height': `${scrollY + height}px`,
           '--header-mb': `${-scrollY}px`,
-        })
+        });
       }
 
       setProperty({
         '--header-inner-position': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? 'fixed' : null,
         '--header-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
         '--avatar-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
-      })
+      });
 
       if (isHomePage) {
-        const fromScale = 1
-        const toScale = 36 / 64
-        const fromX = 0
-        const toX = 2 / 16
-        const remainingScroll = downDelay - window.scrollY
-        let scale = (remainingScroll * (fromScale - toScale)) / downDelay + toScale
-        scale = clamp(scale, fromScale, toScale)
-        let x = (remainingScroll * (fromX - toX)) / downDelay + toX
-        x = clamp(x, fromX, toX)
-        avatarX.set(x)
-        avatarScale.set(scale)
-        const borderScale = 1 / (toScale / scale)
-        avatarBorderX.set((-toX + x) * borderScale)
-        avatarBorderScale.set(borderScale)
+        const fromScale = 1;
+        const toScale = 36 / 64;
+        const fromX = 0;
+        const toX = 2 / 16;
+        const remainingScroll = downDelay - window.scrollY;
+        let scale = (remainingScroll * (fromScale - toScale)) / downDelay + toScale;
+        scale = clamp(scale, fromScale, toScale);
+        let x = (remainingScroll * (fromX - toX)) / downDelay + toX;
+        x = clamp(x, fromX, toX);
+        avatarX.set(x);
+        avatarScale.set(scale);
+        const borderScale = 1 / (toScale / scale);
+        avatarBorderX.set((-toX + x) * borderScale);
+        avatarBorderScale.set(borderScale);
         setProperty({
           '--avatar-border-opacity': scale === toScale ? '1' : '0',
-        })
+        });
       }
 
-      isInitial.current = false
-    }
+      isInitial.current = false;
+    };
 
-    const onScroll = () => requestAnimationFrame(updateStyles)
-    const onResize = () => requestAnimationFrame(updateStyles)
+    const onScroll = () => requestAnimationFrame(updateStyles);
+    const onResize = () => requestAnimationFrame(updateStyles);
 
-    updateStyles()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onResize)
+    updateStyles();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onResize)
-    }
-  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty])
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty]);
 
-  return { headerRef, avatarRef }
-}
+  return { headerRef, avatarRef };
+};
 
-function Header() {
-  const isHomePage = usePathname() === '/'
-  const avatarX = useMotionValue(0)
-  const avatarScale = useMotionValue(1)
-  const avatarBorderX = useMotionValue(0)
-  const avatarBorderScale = useMotionValue(1)
-  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
+const Header = () => {
+  const isHomePage = usePathname() === '/';
+  const avatarX = useMotionValue(0);
+  const avatarScale = useMotionValue(1);
+  const avatarBorderX = useMotionValue(0);
+  const avatarBorderScale = useMotionValue(1);
+  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false);
 
-  const { headerRef, avatarRef } = useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale)
+  const { headerRef, avatarRef } = useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale);
 
-  const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
-  const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
+  const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`;
+  const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`;
 
   const onAvatarContextMenu = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      event.preventDefault()
-      setIsShowingAltAvatar((prev) => !prev)
+    (event) => {
+      event.preventDefault();
+      setIsShowingAltAvatar((prev) => !prev);
     },
     []
-  )
+  );
 
   return (
     <>
@@ -170,13 +167,13 @@ function Header() {
               <Container
                 className="top-0 order-last -mb-3 pt-3"
                 style={{
-                  position: 'var(--header-position)' as React.CSSProperties['position'],
+                  position: 'var(--header-position)',
                 }}
               >
                 <motion.div
                   className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none"
                   style={{
-                    position: 'var(--header-inner-position)' as React.CSSProperties['position'],
+                    position: 'var(--header-inner-position)',
                   }}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -222,13 +219,13 @@ function Header() {
           ref={headerRef}
           className="top-0 z-10 h-16 pt-6"
           style={{
-            position: 'var(--header-position)' as React.CSSProperties['position'],
+            position: 'var(--header-position)',
           }}
         >
           <Container
             className="top-[var(--header-top,theme(spacing.6))] w-full"
             style={{
-              position: 'var(--header-inner-position)' as React.CSSProperties['position'],
+              position: 'var(--header-inner-position)',
             }}
           >
             <div className="relative flex gap-4">
@@ -276,26 +273,26 @@ function Header() {
       </motion.header>
       {isHomePage && <div className="h-[--content-offset]" />}
     </>
-  )
-}
+  );
+};
 
-function UserInfo() {
-  const [tooltipOpen, setTooltipOpen] = useState(false)
-  const pathname = usePathname()
-  const { user } = useUser()
+const UserInfo = React.memo(() => {
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const pathname = usePathname();
+  const { user } = useUser();
   const StrategyIcon = useMemo(() => {
-    const strategy = user?.primaryEmailAddress?.verification.strategy
-    if (!strategy) return null
+    const strategy = user?.primaryEmailAddress?.verification.strategy;
+    if (!strategy) return null;
 
     switch (strategy) {
       case 'from_oauth_github':
-        return GitHubBrandIcon
+        return GitHubBrandIcon;
       case 'from_oauth_google':
-        return GoogleBrandIcon
+        return GoogleBrandIcon;
       default:
-        return MailIcon
+        return MailIcon;
     }
-  }, [user?.primaryEmailAddress?.verification.strategy])
+  }, [user?.primaryEmailAddress?.verification.strategy]);
 
   return (
     <AnimatePresence>
@@ -361,7 +358,7 @@ function UserInfo() {
         </motion.div>
       </SignedOut>
     </AnimatePresence>
-  )
-}
+  );
+});
 
 export { Header };
