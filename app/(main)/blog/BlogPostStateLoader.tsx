@@ -9,7 +9,7 @@ import { type Post } from '~/sanity/schemas/post'
 
 export function BlogPostStateLoader({ post }: { post: Post }) {
   // Fetch comments data
-  const { data: comments = [], refetch } = useQuery(
+  const { data: comments = [] } = useQuery(
     ['comments', post._id],
     async () => {
       const res = await fetch(`/api/comments/${post._id}`)
