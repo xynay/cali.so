@@ -8,7 +8,8 @@ import { type PostIDLessCommentDto } from '~/db/dto/comment.dto'
 import { type Post } from '~/sanity/schemas/post'
 
 export function BlogPostStateLoader({ post }: { post: Post }) {
-  const { data: comments } = useQuery(
+  // Fetch comments data
+  const { data: comments = [], refetch } = useQuery(
     ['comments', post._id],
     async () => {
       const res = await fetch(`/api/comments/${post._id}`)
@@ -24,7 +25,8 @@ export function BlogPostStateLoader({ post }: { post: Post }) {
 
   React.useEffect(() => {
     const existingCommentIds = new Set(blogPostState.comments.map((c) => c.id))
-    comments?.forEach((comment) => {
+    
+    comments.forEach((comment) => {
       if (!existingCommentIds.has(comment.id)) {
         addComment(comment)
         existingCommentIds.add(comment.id)
