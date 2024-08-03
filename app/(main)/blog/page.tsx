@@ -1,12 +1,13 @@
-import Balancer from 'react-wrap-balancer'
+import React from 'react';
+import Balancer from 'react-wrap-balancer';
 
-import { SocialLink } from '~/components/links/SocialLink'
-import { Container } from '~/components/ui/Container'
-
-import { BlogPosts } from './BlogPosts'
+import { SocialLink } from '~/components/links/SocialLink';
+import { Container } from '~/components/ui/Container';
+import { BlogPosts } from './BlogPosts';
 
 const description =
-  '写博客文章是我比较喜欢的沉淀分享方式，我希望能够把好用的技术知识传递给更多的人。我比较喜欢围绕着技术为主的话题，但是也会写一些非技术的话题，比如设计、创业、企业管理、生活随笔等等。'
+  '写博客文章是我比较喜欢的沉淀分享方式，我希望能够把好用的技术知识传递给更多的人。我比较喜欢围绕着技术为主的话题，但是也会写一些非技术的话题，比如设计、创业、企业管理、生活随笔等等。';
+
 export const metadata = {
   title: '我的博客',
   description,
@@ -19,10 +20,14 @@ export const metadata = {
     description,
     card: 'summary_large_image',
   },
-}
+};
 
-// TODO: add pagination or infinite scroll
-export default function BlogPage() {
+// Memoize the description to avoid recalculating
+const MemoizedDescription = React.memo(() => (
+  <Balancer>{description}</Balancer>
+));
+
+const BlogPage: React.FC = () => {
   return (
     <Container className="mt-16 sm:mt-24">
       <header className="max-w-2xl">
@@ -30,7 +35,7 @@ export default function BlogPage() {
           欢迎光临我的博客
         </h1>
         <p className="my-6 text-base text-zinc-600 dark:text-zinc-400">
-          <Balancer>{description}</Balancer>
+          <MemoizedDescription />
         </p>
         <p className="flex items-center">
           <SocialLink href="/feed.xml" platform="rss" />
@@ -40,7 +45,9 @@ export default function BlogPage() {
         <BlogPosts limit={20} />
       </div>
     </Container>
-  )
+  );
 }
 
-export const revalidate = 60
+export default React.memo(BlogPage);
+
+export const revalidate = 60;
