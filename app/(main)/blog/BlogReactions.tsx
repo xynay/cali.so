@@ -13,6 +13,7 @@ import React from 'react'
 import { prettifyNumber } from '~/lib/math'
 import { type Post } from '~/sanity/schemas/post'
 
+// Helper function to map mood to reactions
 function moodToReactions(mood: Post['mood']) {
   switch (mood) {
     case 'happy':
@@ -29,6 +30,7 @@ export function BlogReactions({
   mood,
   reactions,
 }: Pick<Post, '_id' | 'mood'> & { reactions?: number[] }) {
+  // Initialize mouseY motion value
   const mouseY = useMotionValue(Infinity)
   const onMouseMove = React.useCallback(
     (e: React.MouseEvent) => {
@@ -36,9 +38,11 @@ export function BlogReactions({
     },
     [mouseY]
   )
-  const [cachedReactions, setCachedReactions] = React.useState(
-    reactions ?? [0, 0, 0, 0]
-  )
+
+  // Cache reactions state
+  const [cachedReactions, setCachedReactions] = React.useState<number[]>(reactions ?? [0, 0, 0, 0])
+
+  // Handle reaction click
   const onClick = React.useCallback(
     async (index: number) => {
       // Optimistic update
@@ -48,11 +52,16 @@ export function BlogReactions({
         return next
       })
 
-      const res = await fetch(`/api/reactions?id=${_id}&index=${index}`, {
-        method: 'PATCH',
-      })
-      const { data } = (await res.json()) as { data: number[] }
-      setCachedReactions(data)
+      try {
+        const res = await fetch(`/api/reactions?id=${_id}&index=${index}`, {
+          method: 'PATCH',
+        })
+        if (!res.ok) throw new Error('Network response was not ok')
+        const { data } = await res.json() as { data: number[] }
+        setCachedReactions(data)
+      } catch (error) {
+        console.error('Failed to update reactions:', error)
+      }
     },
     [_id]
   )
@@ -106,12 +115,13 @@ function ReactIcon({
 }) {
   const ref = React.useRef<HTMLButtonElement>(null)
 
+  // Compute distance from mouse to the center of the button
   const distance = useTransform(y, (val) => {
     const bounds = ref.current?.getBoundingClientRect() ?? { y: 0, height: 0 }
-
-    return val - bounds.y - bounds.height / 2
+    return val - (bounds.y + bounds.height / 2)
   })
 
+  // Sync height with distance
   const heightSync = useTransform(distance, [-120, 0, 120], [24, 56, 24])
   const height = useSpring(heightSync, {
     mass: 0.1,
