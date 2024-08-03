@@ -1,3 +1,5 @@
+"use client"; // 使该文件作为客户端组件处理
+
 import { useEffect } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata, Viewport } from 'next';
@@ -75,9 +77,9 @@ const loadCSS = (href: string) => {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    loadCSS('/globals.css'); // 确保路径正确
-    loadCSS('/clerk.css');
-    loadCSS('/prism.css');
+    loadCSS('./globals.css');
+    loadCSS('./clerk.css');
+    loadCSS('./prism.css');
   }, []);
 
   return (
