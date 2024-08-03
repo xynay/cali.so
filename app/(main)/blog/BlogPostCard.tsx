@@ -2,18 +2,12 @@ import { parseDateTime } from '@zolplay/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import {
-  CalendarIcon,
-  HourglassIcon,
-  ScriptIcon,
-} from '~/assets';
+import { CalendarIcon, HourglassIcon, ScriptIcon } from '~/assets';
 import { type Post } from '~/sanity/schemas/post';
 
-function BlogPostCard({ post: { title, slug, mainImage, publishedAt, categories, readingTime } }: { post: Post }) {
-  const foreground = mainImage.asset.dominant?.foreground;
-  const background = mainImage.asset.dominant?.background;
-  const imageUrl = mainImage.asset.url;
-  const lqip = mainImage.asset.lqip;
+function BlogPostCard({ post }: { post: Post }) {
+  const { title, slug, mainImage, publishedAt, categories, readingTime } = post;
+  const { dominant: { foreground, background } = {}, url: imageUrl, lqip } = mainImage.asset;
 
   return (
     <Link
@@ -33,7 +27,9 @@ function BlogPostCard({ post: { title, slug, mainImage, publishedAt, categories,
           className="rounded-t-3xl object-cover"
           placeholder="blur"
           blurDataURL={lqip}
-          fill
+          layout="responsive"
+          width={240}
+          height={135}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw"
           loading="lazy"
         />
