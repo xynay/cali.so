@@ -38,9 +38,9 @@ const useHeaderStyles = (isHomePage, avatarX, avatarScale, avatarBorderX, avatar
   const avatarRef = useRef(null);
   const isInitial = useRef(true);
 
-  const setProperty = useCallback((properties) => {
+  const setProperty = useCallback((properties: { [key: string]: unknown }) => {
     Object.entries(properties).forEach(([property, value]) => {
-      document.documentElement.style.setProperty(property, value?.toString() ?? '');
+      document.documentElement.style.setProperty(property, String(value ?? ''));
     });
   }, []);
 
@@ -70,7 +70,7 @@ const useHeaderStyles = (isHomePage, avatarX, avatarScale, avatarBorderX, avatar
           '--header-mb': `${-downDelay}px`,
         });
       } else if (top + height < -upDelay) {
-        const offset = Math.max(height, scrollY - upDelay);
+        const scrollY = clamp(window.scrollY as number, 0, (document.body.scrollHeight - window.innerHeight) as number);
         setProperty({
           '--header-height': `${offset}px`,
           '--header-mb': `${height - offset}px`,
@@ -353,5 +353,6 @@ const UserInfo = React.memo(() => {
     </AnimatePresence>
   );
 });
+UserInfo.displayName = 'UserInfo';
 
 export { Header };
