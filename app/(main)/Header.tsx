@@ -16,6 +16,7 @@ import {
   useMotionTemplate,
   useMotionValue,
 } from 'framer-motion';
+import throttle from 'lodash/throttle'; // Import throttle
 import { usePathname } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -32,7 +33,6 @@ import { Container } from '~/components/ui/Container';
 import { Tooltip } from '~/components/ui/Tooltip';
 import { url } from '~/lib';
 import { clamp } from '~/lib/math';
-import throttle from 'lodash/throttle'; // Import throttle
 
 const useHeaderStyles = (isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale) => {
   const headerRef = useRef(null);
