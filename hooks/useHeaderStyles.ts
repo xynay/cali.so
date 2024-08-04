@@ -18,24 +18,18 @@ export function useHeaderStyles(
   const isInitial = useRef(true);
 
   const setProperty = useCallback((properties: Record<string, string | null>) => {
-    for (const [property, value] of Object.entries(properties)) {
-      if (value !== null) {
-        document.documentElement.style.setProperty(property, value);
-      } else {
-        document.documentElement.style.removeProperty(property);
-      }
-    }
+    Object.entries(properties).forEach(([property, value]) => {
+      value !== null 
+        ? document.documentElement.style.setProperty(property, value)
+        : document.documentElement.style.removeProperty(property);
+    });
   }, []);
 
   const updateStyles = useCallback(() => {
     if (!headerRef.current || !avatarRef.current) return;
 
     const { top, height } = headerRef.current.getBoundingClientRect();
-    const scrollY = clamp(
-      window.scrollY,
-      0,
-      document.body.scrollHeight - window.innerHeight
-    );
+    const scrollY = clamp(window.scrollY, 0, document.body.scrollHeight - window.innerHeight);
     const downDelay = avatarRef.current.offsetTop;
     const upDelay = 64;
 
@@ -45,27 +39,19 @@ export function useHeaderStyles(
     };
 
     if (isInitial.current) setProperty(commonProperties);
+
     const isScrolledPastDownDelay = scrollY >= downDelay;
 
-    if (isInitial.current || !isScrolledPastDownDelay) {
-      setProperty({
-        '--header-height': `${downDelay + height}px`,
-        '--header-mb': `${-downDelay}px`,
-      });
-    } else if (top + height < -upDelay) {
-      const offset = Math.max(height, scrollY - upDelay);
-      setProperty({
-        '--header-height': `${offset}px`,
-        '--header-mb': `${height - offset}px`,
-      });
-    } else if (top === 0) {
-      setProperty({
-        '--header-height': `${scrollY + height}px`,
-        '--header-mb': `${-scrollY}px`,
-      });
-    }
+    const headerHeight = isScrolledPastDownDelay 
+      ? (top + height < -upDelay ? Math.max(height, scrollY - upDelay) : scrollY + height) 
+      : downDelay + height;
+    const headerMB = isScrolledPastDownDelay 
+      ? (top + height < -upDelay ? height - headerHeight : -scrollY) 
+      : -downDelay;
 
     setProperty({
+      '--header-height': `${headerHeight}px`,
+      '--header-mb': `${headerMB}px`,
       '--header-inner-position': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? 'fixed' : null,
       '--header-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
       '--avatar-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
@@ -77,10 +63,8 @@ export function useHeaderStyles(
       const fromX = 0;
       const toX = 2 / 16;
       const remainingScroll = downDelay - window.scrollY;
-      let scale = (remainingScroll * (fromScale - toScale)) / downDelay + toScale;
-      scale = clamp(scale, toScale, fromScale);
-      let x = (remainingScroll * (fromX - toX)) / downDelay + toX;
-      x = clamp(x, toX, fromX);
+      const scale = clamp((remainingScroll * (fromScale - toScale)) / downDelay + toScale, toScale, fromScale);
+      const x = clamp((remainingScroll * (fromX - toX)) / downDelay + toX, toX, fromX);
       avatarX.set(x);
       avatarScale.set(scale);
       const borderScale = 1 / (toScale / scale);
