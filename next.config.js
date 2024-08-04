@@ -35,12 +35,6 @@ const nextConfig = {
         }),
         new CssMinimizerPlugin()
       );
-
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        'react': 'react/cjs/react.production.min.js',
-        'react-dom': 'react-dom/cjs/react-dom.production.min.js',
-      };
     }
 
     config.cache = {
