@@ -1,6 +1,7 @@
 import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 
+// ensure environment variables are loaded before configuration
 if (!process.env.SKIP_ENV_VALIDATION) {
   (async () => {
     await import('./env.mjs');
@@ -16,7 +17,7 @@ const nextConfig = {
         hostname: 'cdn.sanity.io',
         port: '',
         pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/**`,
-      }
+      },
     ],
   },
   experimental: {
@@ -24,7 +25,8 @@ const nextConfig = {
   },
   webpack(config, { dev, isServer }) {
     if (!dev && !isServer) {
-      config.optimization.minimizer.push(
+      // minimize javascript and css in production builds
+      config.optimization.minimizer = [
         new TerserPlugin({
           terserOptions: {
             compress: {
@@ -33,11 +35,15 @@ const nextConfig = {
           },
         }),
         new CssMinimizerPlugin()
-      );
+      ];
     }
+
+    // enable filesystem caching for faster rebuilds
     config.cache = {
       type: 'filesystem',
     };
+
+    // optimize chunk splitting
     config.optimization.splitChunks = {
       chunks: 'all',
       cacheGroups: {
@@ -52,6 +58,7 @@ const nextConfig = {
         },
       },
     };
+
     return config;
   },
 };

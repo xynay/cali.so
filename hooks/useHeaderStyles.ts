@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { clamp } from '~/lib/math';
 
@@ -27,21 +27,22 @@ export function useHeaderStyles(
     }
   }, []);
 
-  const downDelay = avatarRef.current?.offsetTop ?? 0;
-  const commonProperties = useMemo(() => ({
-    '--header-position': 'sticky',
-    '--content-offset': `${downDelay}px`,
-  }), [downDelay]);
-
   const updateStyles = useCallback(() => {
     if (!headerRef.current || !avatarRef.current) return;
+
     const { top, height } = headerRef.current.getBoundingClientRect();
     const scrollY = clamp(
       window.scrollY,
       0,
       document.body.scrollHeight - window.innerHeight
     );
+    const downDelay = avatarRef.current.offsetTop;
     const upDelay = 64;
+
+    const commonProperties = {
+      '--header-position': 'sticky',
+      '--content-offset': `${downDelay}px`,
+    };
 
     if (isInitial.current) setProperty(commonProperties);
     const isScrolledPastDownDelay = scrollY >= downDelay;
@@ -77,9 +78,9 @@ export function useHeaderStyles(
       const toX = 2 / 16;
       const remainingScroll = downDelay - window.scrollY;
       let scale = (remainingScroll * (fromScale - toScale)) / downDelay + toScale;
-      scale = clamp(scale, fromScale, toScale);
+      scale = clamp(scale, toScale, fromScale);
       let x = (remainingScroll * (fromX - toX)) / downDelay + toX;
-      x = clamp(x, fromX, toX);
+      x = clamp(x, toX, fromX);
       avatarX.set(x);
       avatarScale.set(scale);
       const borderScale = 1 / (toScale / scale);
@@ -91,7 +92,7 @@ export function useHeaderStyles(
     }
 
     isInitial.current = false;
-  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty, commonProperties, downDelay]);
+  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty]);
 
   useEffect(() => {
     const onScroll = () => requestAnimationFrame(updateStyles);
