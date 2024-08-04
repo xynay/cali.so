@@ -1,5 +1,6 @@
 import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import CompressionPlugin from 'compression-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import dotenv from 'dotenv';
 
@@ -25,6 +26,15 @@ const nextConfig = {
         }),
         new CssMinimizerPlugin(),
       ];
+
+      // 添加 CompressionPlugin 进行 gzip 压缩
+      config.plugins.push(new CompressionPlugin({
+        filename: '[path][base].gz',
+        algorithm: 'gzip',
+        test: /\.(js|css|html|svg)$/,
+        threshold: 8192,
+        minRatio: 0.8,
+      }));
 
       // 添加 Bundle Analyzer 插件
       config.plugins.push(new BundleAnalyzerPlugin({
