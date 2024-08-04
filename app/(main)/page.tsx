@@ -1,35 +1,15 @@
 import dynamic from 'next/dynamic';
-import React, { memo,Suspense } from 'react';
+import React, { memo, Suspense, useEffect, useState } from 'react';
 
 import Headline from '~/app/(main)/Headline';
 import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
 
-interface Settings {
-  resume?: {
-    company: string;
-    title: string;
-    logo: string;
-    start: string;
-    end?: string;
-  }[];
-}
-
 // 动态导入 BlogPosts 组件
 const BlogPosts = dynamic(() => import('~/app/(main)/blog/BlogPosts'), {
   suspense: true,
 });
-
-const fetchSettings = async (): Promise<Settings> => {
-  try {
-    const settings = await getSettings();
-    return settings || {};
-  } catch (error) {
-    console.error('Failed to fetch settings', error);
-    return {};
-  }
-};
 
 const BlogHomePageContent: React.FC = memo(() => {
   return (
@@ -58,9 +38,51 @@ const BlogHomePageContent: React.FC = memo(() => {
 // Add a display name to the component
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
-const BlogHomePage = async () => {
-  // Fetch settings on the server but do not use them directly
-  await fetchSettings();
+const BlogHomePage: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const settingsData = await getSettings();
+        // 如果需要使用 settingsData，可以在此处处理
+        console.log(settingsData);
+      } catch (error) {
+        console.error('Failed to fetch settings', error);
+        setError('Failed to fetch settings');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData().catch((error) => {
+      console.error('Failed to fetch settings', error);
+      setError('Failed to fetch settings');
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="loader" />
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Suspense fallback={
