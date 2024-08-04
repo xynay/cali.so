@@ -1,5 +1,4 @@
-'use client'
-
+// 你这代码有点像是拿着锤子到处找钉子
 import {
   SignedIn,
   SignedOut,
@@ -7,6 +6,7 @@ import {
   UserButton,
   useUser,
 } from '@clerk/nextjs'
+
 import { clsxm } from '@zolplay/utils'
 import {
   AnimatePresence,
@@ -14,6 +14,7 @@ import {
   useMotionTemplate,
   useMotionValue,
 } from 'framer-motion'
+
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
@@ -30,18 +31,18 @@ import { Container } from '~/components/ui/Container'
 import { Tooltip } from '~/components/ui/Tooltip'
 import { url } from '~/lib'
 import { clamp } from '~/lib/math'
+
 export function Header() {
   const isHomePage = usePathname() === '/'
-
-  const headerRef = React.useRef<HTMLDivElement>(null)
-  const avatarRef = React.useRef<HTMLDivElement>(null)
-  const isInitial = React.useRef(true)
-
   const avatarX = useMotionValue(0)
   const avatarScale = useMotionValue(1)
   const avatarBorderX = useMotionValue(0)
   const avatarBorderScale = useMotionValue(1)
 
+  const headerRef = React.useRef<HTMLDivElement>(null)
+  const avatarRef = React.useRef<HTMLDivElement>(null)
+
+  // 你这代码也太啰嗦了
   React.useEffect(() => {
     const downDelay = avatarRef.current?.offsetTop ?? 0
     const upDelay = 64
@@ -55,9 +56,7 @@ export function Header() {
     }
 
     function updateHeaderStyles() {
-      if (!headerRef.current) {
-        return
-      }
+      if (!headerRef.current) return
 
       const { top, height } = headerRef.current.getBoundingClientRect()
       const scrollY = clamp(
@@ -66,13 +65,9 @@ export function Header() {
         document.body.scrollHeight - window.innerHeight
       )
 
-      if (isInitial.current) {
-        setProperty('--header-position', 'sticky')
-      }
-
       setProperty('--content-offset', `${downDelay}px`)
 
-      if (isInitial.current || scrollY < downDelay) {
+      if (scrollY < downDelay) {
         setProperty('--header-height', `${downDelay + height}px`)
         setProperty('--header-mb', `${-downDelay}px`)
       } else if (top + height < -upDelay) {
@@ -96,9 +91,7 @@ export function Header() {
     }
 
     function updateAvatarStyles() {
-      if (!isHomePage) {
-        return
-      }
+      if (!isHomePage) return
 
       const fromScale = 1
       const toScale = 36 / 64
@@ -127,7 +120,6 @@ export function Header() {
     function updateStyles() {
       updateHeaderStyles()
       updateAvatarStyles()
-      isInitial.current = false
     }
 
     updateStyles()
@@ -138,7 +130,6 @@ export function Header() {
       window.removeEventListener('scroll', updateStyles)
       window.removeEventListener('resize', updateStyles)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHomePage])
 
   const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
@@ -175,15 +166,13 @@ export function Header() {
               <Container
                 className="top-0 order-last -mb-3 pt-3"
                 style={{
-                  position:
-                    'var(--header-position)' as React.CSSProperties['position'],
+                  position: 'var(--header-position)' as React.CSSProperties['position'],
                 }}
               >
                 <motion.div
                   className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none"
                   style={{
-                    position:
-                      'var(--header-inner-position)' as React.CSSProperties['position'],
+                    position: 'var(--header-inner-position)' as React.CSSProperties['position'],
                   }}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -230,15 +219,13 @@ export function Header() {
           ref={headerRef}
           className="top-0 z-10 h-16 pt-6"
           style={{
-            position:
-              'var(--header-position)' as React.CSSProperties['position'],
+            position: 'var(--header-position)' as React.CSSProperties['position'],
           }}
         >
           <Container
             className="top-[var(--header-top,theme(spacing.6))] w-full"
             style={{
-              position:
-                'var(--header-inner-position)' as React.CSSProperties['position'],
+              position: 'var(--header-inner-position)' as React.CSSProperties['position'],
             }}
           >
             <div className="relative flex gap-4">
@@ -280,22 +267,6 @@ export function Header() {
                   <ThemeSwitcher />
                 </div>
               </motion.div>
-              {/* 
-              <AnimatePresence>
-                {!isHomePage && (
-                  <motion.div
-                    className="absolute left-14 top-1 flex h-8 items-center"
-                    initial={{ opacity: 0, scale: 0.3 }}
-                    animate={{
-                      opacity: 1,
-                      scale: 1,
-                      transition: { delay: 1 },
-                    }}
-                  >
-                    <Activity />
-                  </motion.div>
-                )}
-              </AnimatePresence> */}
             </div>
           </Container>
         </div>
@@ -317,9 +288,7 @@ function UserInfo() {
 
     switch (strategy) {
       case 'from_oauth_github':
-        return GitHubBrandIcon as (
-          props: React.ComponentProps<'svg'>
-        ) => JSX.Element
+        return GitHubBrandIcon as (props: React.ComponentProps<'svg'>) => JSX.Element
       case 'from_oauth_google':
         return GoogleBrandIcon
       default:
