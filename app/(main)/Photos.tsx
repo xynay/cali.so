@@ -5,7 +5,7 @@ import Image from 'next/image';
 import React from 'react';
 
 // 计算宽度的函数
-const calculateWidth = (photosLength: number, isCompact: boolean) => {
+const calculateWidth = (photosLength: number) => {
   if (window.innerWidth < 640) {
     return window.innerWidth / 2 - 64;
   }
@@ -14,17 +14,14 @@ const calculateWidth = (photosLength: number, isCompact: boolean) => {
 
 // 照片组件
 const Photos: React.FC<{ photos: string[] }> = React.memo(({ photos }) => {
-  const [width, setWidth] = React.useState(() => calculateWidth(photos.length, false));
-  const [isCompact, setIsCompact] = React.useState(false);
+  const [width, setWidth] = React.useState(() => calculateWidth(photos.length));
 
   // 计算扩展宽度
   const expandedWidth = React.useMemo(() => width * 1.38, [width]);
 
   // 处理窗口大小变化
   const handleResize = React.useCallback(() => {
-    const isCompactView = window.innerWidth < 640;
-    setIsCompact(isCompactView);
-    setWidth(calculateWidth(photos.length, isCompactView));
+    setWidth(calculateWidth(photos.length));
   }, [photos.length]);
 
   // 监听窗口大小变化
@@ -54,19 +51,15 @@ const Photos: React.FC<{ photos: string[] }> = React.memo(({ photos }) => {
             className="relative h-40 flex-none shrink-0 snap-start overflow-hidden rounded-xl bg-zinc-100 ring-2 ring-lime-800/20 dark:bg-zinc-800 dark:ring-lime-300/10 md:h-72 md:rounded-3xl"
             animate={{
               width,
-              opacity: isCompact ? 1 : 0.85,
-              filter: isCompact ? 'grayscale(0)' : 'grayscale(0.5)',
+              opacity: 0.85,
+              filter: 'grayscale(0.5)',
               rotate: idx % 2 === 0 ? 2 : -1,
             }}
-            whileHover={
-              isCompact
-                ? {}
-                : {
-                    width: expandedWidth,
-                    opacity: 1,
-                    filter: 'grayscale(0)',
-                  }
-            }
+            whileHover={{
+              width: expandedWidth,
+              opacity: 1,
+              filter: 'grayscale(0)',
+            }}
             layout
           >
             <Image
