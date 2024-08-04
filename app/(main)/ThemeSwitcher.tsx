@@ -19,20 +19,20 @@ const themes = [
     icon: MoonIcon,
   },
 ]
+
 export function ThemeSwitcher() {
   const [mounted, setMounted] = React.useState(false)
   const [open, setOpen] = React.useState(false)
   const { setTheme, theme, resolvedTheme } = useTheme()
-  const ThemeIcon = React.useMemo(
-    () => themes.find((t) => t.value === theme)?.icon ?? LightningIcon,
-    [theme]
-  )
+  const themeInfo = React.useMemo(() => themes.find((t) => t.value === theme), [theme])
+  const ThemeIcon = themeInfo ? themeInfo.icon : LightningIcon
+  const themeLabel = themeInfo ? themeInfo.label : "系统模式"
 
   React.useEffect(() => setMounted(true), [])
 
-  function toggleTheme() {
+  const toggleTheme = React.useCallback(() => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
-  }
+  }, [resolvedTheme, setTheme])
 
   if (!mounted) {
     return null
@@ -60,7 +60,7 @@ export function ThemeSwitcher() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                 >
-                  {themes.find((t) => t.value === theme)?.label || "系统模式"}
+                  {themeLabel}
                 </motion.div>
               </Tooltip.Content>
             </Tooltip.Portal>
