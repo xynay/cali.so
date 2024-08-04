@@ -38,7 +38,10 @@ const ResumeItem = React.memo(({ role }: { role: Resume }) => (
       </dd>
     </dl>
   </li>
-));
+))
+
+// 设置 displayName
+ResumeItem.displayName = 'ResumeItem'
 
 export function Resume({ resume }: { resume: Resume[] }) {
   return (
