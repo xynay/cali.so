@@ -8,15 +8,15 @@ import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
 
+// 动态引入 BlogPosts
 const BlogPosts = dynamic(() => import('~/app/(main)/blog/BlogPosts'), {
   suspense: true,
 });
 
+// BlogHomePageContent 组件
 const BlogHomePageContent: React.FC = memo(() => (
-  <>
-    <Container className="mt-10">
-      <Headline />
-    </Container>
+  <Container className="mt-10">
+    <Headline />
     <Container className="mt-24 md:mt-28">
       <div className="mx-auto grid max-w-md grid-cols-1 gap-y-20 lg:max-w-none">
         <div className="flex flex-col gap-6 pt-4 w-full items-center">
@@ -32,11 +32,12 @@ const BlogHomePageContent: React.FC = memo(() => (
         </div>
       </div>
     </Container>
-  </>
+  </Container>
 ));
 
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
+// BlogHomePage 组件
 const BlogHomePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,22 +55,15 @@ const BlogHomePage: React.FC = () => {
       }
     };
 
-    void fetchData();
+    fetchData();
   }, []);
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  if (error) {
-    return <ErrorScreen error={error} />;
-  }
-
-  return (
-    <BlogHomePageContent />
-  );
+  if (loading) return <LoadingScreen />;
+  if (error) return <ErrorScreen error={error} />;
+  return <BlogHomePageContent />;
 };
 
+// LoadingScreen 组件
 const LoadingScreen = () => (
   <div className="flex items-center justify-center min-h-screen">
     <div className="text-center">
@@ -79,6 +73,7 @@ const LoadingScreen = () => (
   </div>
 );
 
+// ErrorScreen 组件
 const ErrorScreen = ({ error }: { error: string }) => (
   <div className="flex items-center justify-center min-h-screen">
     <div className="text-center">
@@ -87,6 +82,7 @@ const ErrorScreen = ({ error }: { error: string }) => (
   </div>
 );
 
+// BlogPostsSkeleton 组件
 const BlogPostsSkeleton = () => (
   <div className="w-full mx-auto mb-8 max-w-md animate-pulse">
     <div className="h-6 bg-gray-300 rounded mb-4"></div>
