@@ -26,7 +26,9 @@ const BlogHomePageContent: React.FC = memo(() => (
             <span className="ml-2">近期文章</span>
           </h2>
           <div className="w-full mx-auto mb-8 max-w-md">
-            <BlogPosts />
+            <Suspense fallback={<LoadingSpinner />}>
+              <BlogPosts />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -53,7 +55,6 @@ const BlogHomePage: React.FC = () => {
       }
     };
 
-    // 使用void操作符来忽略Promise的返回值
     void fetchData();
   }, []);
 
@@ -66,9 +67,7 @@ const BlogHomePage: React.FC = () => {
   }
 
   return (
-    <Suspense fallback={<LoadingScreen />}>
-      <BlogHomePageContent />
-    </Suspense>
+    <BlogHomePageContent />
   );
 };
 
@@ -86,6 +85,12 @@ const ErrorScreen = ({ error }: { error: string }) => (
     <div className="text-center">
       <p>{error}</p>
     </div>
+  </div>
+);
+
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center w-full h-full">
+    <div className="loader" />
   </div>
 );
 
