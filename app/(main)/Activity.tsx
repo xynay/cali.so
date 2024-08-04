@@ -38,6 +38,16 @@ const fetchActivity = async () => {
   return response.json();
 };
 
+const tooltipTransition = {
+  duration: 1.5,
+  repeat: Infinity,
+};
+
+const tooltipAnimation = {
+  opacity: [0, 0.65, 0],
+  scale: [1, 1.4, 1],
+};
+
 export function Activity() {
   const { data } = useQuery<{ app: string }>('activity', fetchActivity, {
     refetchInterval: 5000,
@@ -59,11 +69,8 @@ export function Activity() {
           <div className="pointer-events-auto relative flex items-center">
             <motion.div
               className="absolute left-1 top-1 h-6 w-6 select-none rounded-[6px] bg-zinc-500/10 dark:bg-zinc-200/10"
-              animate={{ opacity: [0, 0.65, 0], scale: [1, 1.4, 1] }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-              }}
+              animate={tooltipAnimation}
+              transition={tooltipTransition}
             />
             <Image
               width={32}
