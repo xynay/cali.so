@@ -3,7 +3,7 @@
 import { clsxm } from '@zolplay/utils'
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { memo,useCallback, useMemo, useState } from 'react'
 
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
@@ -11,6 +11,34 @@ import { Avatar } from '~/components/Avatar'
 import { Container } from '~/components/ui/Container'
 import { UserInfo } from '~/components/UserInfo'
 import { useHeaderStyles } from '~/hooks/useHeaderStyles'
+
+const AvatarComponent = memo(({ isShowingAltAvatar, avatarTransform, avatarBorderTransform, onContextMenu }) => (
+  <motion.div
+    className="relative inline-flex"
+    layoutId="avatar"
+    layout
+    onContextMenu={onContextMenu}
+  >
+    <motion.div
+      className="absolute left-0 top-3 origin-left opacity-[var(--avatar-border-opacity,0)] transition-opacity"
+      style={{ transform: avatarBorderTransform }}
+    >
+      <Avatar />
+    </motion.div>
+    <motion.div
+      className="block h-16 w-16 origin-left"
+      style={{ transform: avatarTransform }}
+    >
+      <Avatar.Image
+        large
+        alt={isShowingAltAvatar}
+        className="block h-full w-full"
+      />
+    </motion.div>
+  </motion.div>
+));
+
+AvatarComponent.displayName = 'AvatarComponent'; // 添加 displayName
 
 function Header() {
   const isHomePage = usePathname() === '/'
@@ -26,7 +54,7 @@ function Header() {
   const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
 
   const onAvatarContextMenu = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
+    (event) => {
       event.preventDefault()
       setIsShowingAltAvatar((prev) => !prev)
     },
@@ -34,11 +62,11 @@ function Header() {
   )
 
   const containerStyle = useMemo(() => ({
-    position: 'var(--header-position)' as React.CSSProperties['position'],
+    position: 'var(--header-position)',
   }), [])
 
   const headerInnerStyle = useMemo(() => ({
-    position: 'var(--header-inner-position)' as React.CSSProperties['position'],
+    position: 'var(--header-inner-position)',
   }), [])
 
   return (
@@ -75,33 +103,12 @@ function Header() {
                     stiffness: 200,
                   }}
                 >
-                  <motion.div
-                    className="relative inline-flex"
-                    layoutId="avatar"
-                    layout
+                  <AvatarComponent
+                    isShowingAltAvatar={isShowingAltAvatar}
+                    avatarTransform={avatarTransform}
+                    avatarBorderTransform={avatarBorderTransform}
                     onContextMenu={onAvatarContextMenu}
-                  >
-                    <motion.div
-                      className="absolute left-0 top-3 origin-left opacity-[var(--avatar-border-opacity,0)] transition-opacity"
-                      style={{
-                        transform: avatarBorderTransform,
-                      }}
-                    >
-                      <Avatar />
-                    </motion.div>
-                    <motion.div
-                      className="block h-16 w-16 origin-left"
-                      style={{
-                        transform: avatarTransform,
-                      }}
-                    >
-                      <Avatar.Image
-                        large
-                        alt={isShowingAltAvatar}
-                        className="block h-full w-full"
-                      />
-                    </motion.div>
-                  </motion.div>
+                  />
                 </motion.div>
               </Container>
             </>
