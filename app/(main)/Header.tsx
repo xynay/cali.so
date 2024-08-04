@@ -9,7 +9,7 @@ import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
 import { Avatar } from '~/components/Avatar'
 import { Container } from '~/components/ui/Container'
-import { UserInfo } from '~/components/UserInfo'
+import UserInfo from '~/components/UserInfo'
 import { useHeaderStyles } from '~/hooks/useHeaderStyles'
 
 interface AvatarComponentProps {
