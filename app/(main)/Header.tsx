@@ -1,4 +1,4 @@
-'use client' // 你不加这个就别怪我翻车
+'use client'
 
 import {
   SignedIn,
@@ -7,7 +7,6 @@ import {
   UserButton,
   useUser,
 } from '@clerk/nextjs'
-
 import { clsxm } from '@zolplay/utils'
 import {
   AnimatePresence,
@@ -15,7 +14,6 @@ import {
   useMotionTemplate,
   useMotionValue,
 } from 'framer-motion'
-
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
@@ -130,7 +128,7 @@ export function Header() {
       window.removeEventListener('scroll', updateStyles)
       window.removeEventListener('resize', updateStyles)
     }
-  }, [isHomePage])
+  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale])
 
   const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
   const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
