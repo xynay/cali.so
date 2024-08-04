@@ -53,7 +53,8 @@ const BlogHomePage: React.FC = () => {
       }
     };
 
-    fetchData();
+    // 使用void操作符来忽略Promise的返回值
+    void fetchData();
   }, []);
 
   if (loading) {
