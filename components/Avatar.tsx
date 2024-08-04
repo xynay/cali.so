@@ -1,7 +1,8 @@
-import { type ComponentProps, memo } from '@zolplay/react'
+import { type ComponentProps } from '@zolplay/react'
 import { clsxm } from '@zolplay/utils'
 import Image from 'next/image'
 import Link, { type LinkProps } from 'next/link'
+import { memo } from 'react'
 
 import portraitImage from '~/assets/Portrait.png'
 import portraitAltImage from '~/assets/PortraitAlt.jpg'
@@ -17,6 +18,7 @@ const AvatarContainer = memo(({ className, ...props }: ComponentProps) => {
     />
   )
 });
+AvatarContainer.displayName = 'AvatarContainer';
 
 type AvatarImageProps = ComponentProps &
   Omit<LinkProps, 'href'> & {
@@ -52,5 +54,6 @@ const AvatarImage = memo(({
     </Link>
   )
 });
+AvatarImage.displayName = 'AvatarImage';
 
 export const Avatar = Object.assign(AvatarContainer, { Image: AvatarImage });
