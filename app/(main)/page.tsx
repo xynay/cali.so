@@ -1,3 +1,5 @@
+"use client";
+
 import dynamic from 'next/dynamic';
 import React, { memo, Suspense, useEffect, useState } from 'react';
 
