@@ -21,7 +21,7 @@ const nextConfig = {
     domains: ['cdn.sanity.io'],  // 允许的图像域名
   },
   experimental: {
-    taint: true,
+    appDir: true,  // 启用 app 目录实验性功能
   },
   webpack(config, { dev, isServer }) {
     if (!dev && !isServer) {
