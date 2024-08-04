@@ -3,7 +3,7 @@
 import { clsxm } from '@zolplay/utils';
 import { AnimatePresence, motion, type MotionValue, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect,useMemo, useState } from 'react';
 
 import { NavigationBar } from '~/app/(main)/NavigationBar';
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher';
@@ -76,6 +76,10 @@ function Header() {
   const headerInnerStyle = useMemo(() => ({
     position: 'var(--header-inner-position)' as React.CSSProperties['position'],
   }), []);
+
+  useEffect(() => {
+    console.log('Header updated');
+  }, [isHomePage]);
 
   return (
     <>
