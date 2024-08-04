@@ -12,7 +12,14 @@ import { Container } from '~/components/ui/Container'
 import { UserInfo } from '~/components/UserInfo'
 import { useHeaderStyles } from '~/hooks/useHeaderStyles'
 
-const AvatarComponent = memo(({ isShowingAltAvatar, avatarTransform, avatarBorderTransform, onContextMenu }) => (
+interface AvatarComponentProps {
+  isShowingAltAvatar: boolean;
+  avatarTransform: string;
+  avatarBorderTransform: string;
+  onContextMenu: (event: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+const AvatarComponent: React.FC<AvatarComponentProps> = memo(({ isShowingAltAvatar, avatarTransform, avatarBorderTransform, onContextMenu }) => (
   <motion.div
     className="relative inline-flex"
     layoutId="avatar"
@@ -54,7 +61,7 @@ function Header() {
   const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
 
   const onAvatarContextMenu = useCallback(
-    (event) => {
+    (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault()
       setIsShowingAltAvatar((prev) => !prev)
     },
