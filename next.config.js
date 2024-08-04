@@ -1,6 +1,6 @@
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-require('./env.mjs');
+require('./env.cjs');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
