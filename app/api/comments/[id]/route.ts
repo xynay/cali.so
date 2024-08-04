@@ -1,4 +1,3 @@
-// app/api/[id]/route.js
 import { clerkClient, currentUser } from '@clerk/nextjs'
 import { asc, eq } from 'drizzle-orm'
 import { type NextRequest, NextResponse } from 'next/server'
