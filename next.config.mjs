@@ -1,27 +1,16 @@
 import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import dotenv from 'dotenv';
 
-// ensure environment variables are loaded before configuration
-if (!process.env.SKIP_ENV_VALIDATION) {
-  (async () => {
-    await import('./env.mjs');
-  })();
-}
+// 同步加载环境变量
+dotenv.config({ path: './env.mjs' });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true, // 启用 React 严格模式
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cdn.sanity.io',
-        port: '',
-        pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/**`,
-      },
-    ],
-  },
-  experimental: {
-    taint: true,
+    domains: ['cdn.sanity.io'], // 允许的图像域名
   },
   webpack(config, { dev, isServer }) {
     if (!dev && !isServer) {
@@ -34,8 +23,15 @@ const nextConfig = {
             },
           },
         }),
-        new CssMinimizerPlugin()
+        new CssMinimizerPlugin(),
       ];
+
+      // 添加 Bundle Analyzer 插件
+      config.plugins.push(new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        reportFilename: 'bundle-analyzer.html',
+        openAnalyzer: false,
+      }));
     }
 
     // enable filesystem caching for faster rebuilds
