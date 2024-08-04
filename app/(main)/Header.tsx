@@ -3,7 +3,7 @@
 import { clsxm } from '@zolplay/utils'
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import React, { memo,useCallback, useMemo, useState } from 'react'
+import React, { memo, useCallback, useMemo, useState } from 'react'
 
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
@@ -69,11 +69,11 @@ function Header() {
   )
 
   const containerStyle = useMemo(() => ({
-    position: 'var(--header-position)',
+    position: 'var(--header-position)' as React.CSSProperties['position'],
   }), [])
 
   const headerInnerStyle = useMemo(() => ({
-    position: 'var(--header-inner-position)',
+    position: 'var(--header-inner-position)' as React.CSSProperties['position'],
   }), [])
 
   return (
