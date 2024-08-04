@@ -102,7 +102,7 @@ const Page: React.FC = () => {
   }, [])
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex flex-col items-center justify-center">
       {loading ? (
         <div className="text-center">
           <div className="loader mb-4" />
