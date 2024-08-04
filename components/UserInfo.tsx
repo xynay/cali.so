@@ -26,7 +26,7 @@ const UserInfo = () => {
     }
   }, [user?.primaryEmailAddress?.verification.strategy]);
 
-  const handleTooltipOpenChange = useCallback((open) => {
+  const handleTooltipOpenChange = useCallback((open: boolean) => {
     setTooltipOpen(open);
   }, []);
 
