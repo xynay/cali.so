@@ -55,7 +55,7 @@ const BlogHomePage: React.FC = () => {
       }
     };
 
-    fetchData();
+    void fetchData(); // 确保 Promise 被正确处理
   }, []);
 
   if (loading) return <LoadingScreen />;
