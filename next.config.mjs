@@ -1,6 +1,11 @@
-const TerserPlugin = require('terser-webpack-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-require('./env.cjs');
+import TerserPlugin from 'terser-webpack-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+
+if (!process.env.SKIP_ENV_VALIDATION) {
+  (async () => {
+    await import('./env.mjs');
+  })();
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -51,4 +56,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
