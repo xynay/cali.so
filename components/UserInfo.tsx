@@ -1,7 +1,7 @@
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { useCallback, useMemo, useState, memo } from 'react';
+import { memo,useCallback, useMemo, useState } from 'react';
 
 import { GitHubBrandIcon, GoogleBrandIcon, MailIcon, UserArrowLeftIcon } from '~/assets';
 import { Tooltip } from '~/components/ui/Tooltip';
