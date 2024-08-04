@@ -91,16 +91,6 @@ const Headline: React.FC = () => (
 )
 Headline.displayName = 'Headline'
 
-const Skeleton: React.FC = () => (
-  <div className="max-w-2xl mx-auto text-center">
-    <div className="animate-pulse">
-      <div className="h-10 bg-gray-300 rounded mb-4"></div>
-      <div className="h-6 bg-gray-300 rounded mb-4"></div>
-      <div className="h-6 bg-gray-300 rounded mb-4"></div>
-    </div>
-  </div>
-)
-
 const Page: React.FC = () => {
   const [loading, setLoading] = React.useState(true)
 
@@ -111,11 +101,18 @@ const Page: React.FC = () => {
     }, 2000)
   }, [])
 
-  if (loading) {
-    return <Skeleton />
-  }
-
-  return <Headline />
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      {loading ? (
+        <div className="text-center">
+          <div className="loader mb-4" />
+          <p>Loading...</p>
+        </div>
+      ) : (
+        <Headline />
+      )}
+    </div>
+  )
 }
 
 export default Page
