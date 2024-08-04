@@ -1,4 +1,4 @@
-import { type ComponentProps } from '@zolplay/react'
+import { type ComponentProps, memo } from '@zolplay/react'
 import { clsxm } from '@zolplay/utils'
 import Image from 'next/image'
 import Link, { type LinkProps } from 'next/link'
@@ -6,7 +6,7 @@ import Link, { type LinkProps } from 'next/link'
 import portraitImage from '~/assets/Portrait.png'
 import portraitAltImage from '~/assets/PortraitAlt.jpg'
 
-function AvatarContainer({ className, ...props }: ComponentProps) {
+const AvatarContainer = memo(({ className, ...props }: ComponentProps) => {
   return (
     <div
       className={clsxm(
@@ -16,7 +16,7 @@ function AvatarContainer({ className, ...props }: ComponentProps) {
       {...props}
     />
   )
-}
+});
 
 type AvatarImageProps = ComponentProps &
   Omit<LinkProps, 'href'> & {
@@ -24,13 +24,14 @@ type AvatarImageProps = ComponentProps &
     href?: string
     alt?: boolean
   }
-function AvatarImage({
+
+const AvatarImage = memo(({
   large = false,
   className,
   href,
   alt,
   ...props
-}: AvatarImageProps) {
+}: AvatarImageProps) => {
   return (
     <Link
       aria-label="主页"
@@ -50,6 +51,6 @@ function AvatarImage({
       />
     </Link>
   )
-}
+});
 
-export const Avatar = Object.assign(AvatarContainer, { Image: AvatarImage })
+export const Avatar = Object.assign(AvatarContainer, { Image: AvatarImage });
