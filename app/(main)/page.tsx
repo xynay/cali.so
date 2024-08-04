@@ -1,3 +1,4 @@
+import { type GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
 import React, { memo,Suspense } from 'react';
 
@@ -21,19 +22,13 @@ const BlogPosts = dynamic(() => import('~/app/(main)/blog/BlogPosts'), {
   suspense: true,
 });
 
-const fetchSettings = async (): Promise<Settings> => {
-  try {
-    const settings = await getSettings();
-    return settings || {};
-  } catch (error) {
-    console.error('Failed to fetch settings', error);
-    return {};
-  }
-};
-
-const SettingsServerComponent: React.FC = async () => {
-  await fetchSettings(); // Fetch settings but don't use them directly
-  return <BlogHomePageContent />;
+export const getServerSideProps: GetServerSideProps = async () => {
+  const settings = await getSettings();
+  return {
+    props: {
+      settings: settings || {},
+    },
+  };
 };
 
 const BlogHomePageContent: React.FC = memo(() => {
@@ -63,7 +58,8 @@ const BlogHomePageContent: React.FC = memo(() => {
 // Add a display name to the component
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
-const BlogHomePage: React.FC = () => {
+// 解决 ESLint 错误，将参数命名为 `_settings`
+const BlogHomePage: React.FC<{ settings: Settings }> = ({ _settings }) => {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-screen">
@@ -73,7 +69,7 @@ const BlogHomePage: React.FC = () => {
         </div>
       </div>
     }>
-      <SettingsServerComponent />
+      <BlogHomePageContent />
     </Suspense>
   );
 };
