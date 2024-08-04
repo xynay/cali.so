@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { clamp } from '~/lib/math';
 
 interface AnimationControl {
-  set: React.Dispatch<React.SetStateAction<number>>;
+  set: (value: number) => void;
 }
 
 export function useHeaderStyles(
@@ -66,9 +66,9 @@ export function useHeaderStyles(
     }
 
     setProperty({
-      '--header-inner-position': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? 'fixed' : null,
-      '--header-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
-      '--avatar-top': top === 0 && scrollY > 0 && isScrolledPastDownDelay ? null : '0px',
+      '--header-inner-position': (top === 0 && scrollY > 0 && isScrolledPastDownDelay) ? 'fixed' : null,
+      '--header-top': (top === 0 && scrollY > 0 && isScrolledPastDownDelay) ? null : '0px',
+      '--avatar-top': (top === 0 && scrollY > 0 && isScrolledPastDownDelay) ? null : '0px',
     });
 
     if (isHomePage) {
