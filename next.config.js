@@ -18,6 +18,7 @@ const nextConfig = {
         pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/**`,
       }
     ],
+    domains: ['cdn.sanity.io'],  // 允许的图像域名
   },
   experimental: {
     taint: true,
@@ -34,16 +35,30 @@ const nextConfig = {
         }),
         new CssMinimizerPlugin()
       );
+
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'react': 'react/cjs/react.production.min.js',
+        'react-dom': 'react-dom/cjs/react-dom.production.min.js',
+      };
     }
+
     config.cache = {
       type: 'filesystem',
+      buildDependencies: {
+        config: [__filename],
+      },
     };
+
     config.optimization.splitChunks = {
       chunks: 'all',
+      minSize: 20000,
+      maxSize: 70000,
       cacheGroups: {
-        vendors: {
+        defaultVendors: {
           test: /[\\/]node_modules[\\/]/,
           priority: -10,
+          reuseExistingChunk: true,
         },
         default: {
           minChunks: 2,
@@ -52,6 +67,13 @@ const nextConfig = {
         },
       },
     };
+
+    config.optimization = {
+      ...config.optimization,
+      usedExports: true,
+      sideEffects: true,
+    };
+
     return config;
   },
 };
