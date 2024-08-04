@@ -7,12 +7,12 @@ import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
 
 interface Settings {
-  resume?: { 
-    company: string; 
-    title: string; 
-    logo: string; 
-    start: string; 
-    end?: string; 
+  resume?: {
+    company: string;
+    title: string;
+    logo: string;
+    start: string;
+    end?: string;
   }[];
 }
 
@@ -59,7 +59,8 @@ const BlogHomePageContent: React.FC = memo(() => {
 BlogHomePageContent.displayName = 'BlogHomePageContent';
 
 const BlogHomePage = async () => {
-  const settings = await fetchSettings(); // Fetch settings on the server
+  // Fetch settings on the server but do not use them directly
+  await fetchSettings();
 
   return (
     <Suspense fallback={
