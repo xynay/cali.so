@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React from 'react';
 
+// 计算宽度的函数
 const calculateWidth = (photosLength: number, isCompact: boolean) => {
   if (window.innerWidth < 640) {
     return window.innerWidth / 2 - 64;
@@ -11,21 +12,25 @@ const calculateWidth = (photosLength: number, isCompact: boolean) => {
   return window.innerWidth / photosLength - 4 * photosLength;
 };
 
+// 照片组件
 const Photos: React.FC<{ photos: string[] }> = React.memo(({ photos }) => {
   const [width, setWidth] = React.useState(() => calculateWidth(photos.length, false));
   const [isCompact, setIsCompact] = React.useState(false);
 
+  // 计算扩展宽度
   const expandedWidth = React.useMemo(() => width * 1.38, [width]);
 
+  // 处理窗口大小变化
   const handleResize = React.useCallback(() => {
     const isCompactView = window.innerWidth < 640;
     setIsCompact(isCompactView);
     setWidth(calculateWidth(photos.length, isCompactView));
   }, [photos.length]);
 
+  // 监听窗口大小变化
   React.useEffect(() => {
     window.addEventListener('resize', handleResize);
-    handleResize(); // Initialize on mount
+    handleResize(); // 初始化时调用
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -79,5 +84,8 @@ const Photos: React.FC<{ photos: string[] }> = React.memo(({ photos }) => {
     </motion.div>
   );
 });
+
+// 为组件添加显示名称
+Photos.displayName = 'Photos';
 
 export default Photos;
