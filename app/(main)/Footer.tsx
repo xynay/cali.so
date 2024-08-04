@@ -10,24 +10,16 @@ import { subscribers } from '~/db/schema'
 
 import Newsletter from './Newsletter'
 
-function NavLink({
-  href,
-  children,
-}: {
-  href: string
-  children: React.ReactNode
-}) {
+const NavLink = React.memo(({ href, children }: { href: string; children: React.ReactNode }) => {
   return (
-    <Link
-      href={href}
-      className="transition hover:text-lime-500 dark:hover:text-lime-400"
-    >
+    <Link href={href} className="transition hover:text-lime-500 dark:hover:text-lime-400">
       {children}
     </Link>
   )
-}
+})
+NavLink.displayName = 'NavLink'
 
-function Links() {
+const Links = React.memo(() => {
   return (
     <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
       {navigationItems.map(({ href, text }) => (
@@ -37,7 +29,8 @@ function Links() {
       ))}
     </nav>
   )
-}
+})
+Links.displayName = 'Links'
 
 export async function Footer() {
   const [subs] = await db
