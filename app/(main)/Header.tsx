@@ -1,16 +1,16 @@
-'use client'
+'use client';
 
-import { clsxm } from '@zolplay/utils'
-import { AnimatePresence, motion, type MotionValue,useMotionTemplate, useMotionValue } from 'framer-motion'
-import { usePathname } from 'next/navigation'
-import React, { memo, useCallback, useMemo, useState } from 'react'
+import { clsxm } from '@zolplay/utils';
+import { AnimatePresence, motion, type MotionValue, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { usePathname } from 'next/navigation';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 
-import { NavigationBar } from '~/app/(main)/NavigationBar'
-import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
-import { Avatar } from '~/components/Avatar'
-import { Container } from '~/components/ui/Container'
-import UserInfo from '~/components/UserInfo'
-import { useHeaderStyles } from '~/hooks/useHeaderStyles'
+import { NavigationBar } from '~/app/(main)/NavigationBar';
+import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher';
+import { Avatar } from '~/components/Avatar';
+import { Container } from '~/components/ui/Container';
+import UserInfo from '~/components/UserInfo';
+import { useHeaderStyles } from '~/hooks/useHeaderStyles';
 
 interface AvatarComponentProps {
   isShowingAltAvatar: boolean;
@@ -45,36 +45,37 @@ const AvatarComponent: React.FC<AvatarComponentProps> = memo(({ isShowingAltAvat
   </motion.div>
 ));
 
-AvatarComponent.displayName = 'AvatarComponent'; // 添加 displayName
+AvatarComponent.displayName = 'AvatarComponent';
 
 function Header() {
-  const isHomePage = usePathname() === '/'
-  const avatarX = useMotionValue(0)
-  const avatarScale = useMotionValue(1)
-  const avatarBorderX = useMotionValue(0)
-  const avatarBorderScale = useMotionValue(1)
-  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false)
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
+  const avatarX = useMotionValue(0);
+  const avatarScale = useMotionValue(1);
+  const avatarBorderX = useMotionValue(0);
+  const avatarBorderScale = useMotionValue(1);
+  const [isShowingAltAvatar, setIsShowingAltAvatar] = useState(false);
 
-  const { headerRef, avatarRef } = useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale)
+  const { headerRef, avatarRef } = useHeaderStyles(isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale);
 
-  const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`
-  const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`
+  const avatarTransform = useMotionTemplate`translate3d(${avatarX}rem, 0, 0) scale(${avatarScale})`;
+  const avatarBorderTransform = useMotionTemplate`translate3d(${avatarBorderX}rem, 0, 0) scale(${avatarBorderScale})`;
 
   const onAvatarContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      event.preventDefault()
-      setIsShowingAltAvatar((prev) => !prev)
+      event.preventDefault();
+      setIsShowingAltAvatar((prev) => !prev);
     },
     []
-  )
+  );
 
   const containerStyle = useMemo(() => ({
     position: 'var(--header-position)' as React.CSSProperties['position'],
-  }), [])
+  }), []);
 
   const headerInnerStyle = useMemo(() => ({
     position: 'var(--header-inner-position)' as React.CSSProperties['position'],
-  }), [])
+  }), []);
 
   return (
     <>
@@ -175,7 +176,7 @@ function Header() {
       </motion.header>
       {isHomePage && <div className="h-[--content-offset]" />}
     </>
-  )
+  );
 }
 
-export { Header }
+export { Header };
