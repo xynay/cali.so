@@ -1,4 +1,5 @@
-// 你这代码有点像是拿着锤子到处找钉子
+'use client' // 你不加这个就别怪我翻车
+
 import {
   SignedIn,
   SignedOut,
@@ -42,7 +43,6 @@ export function Header() {
   const headerRef = React.useRef<HTMLDivElement>(null)
   const avatarRef = React.useRef<HTMLDivElement>(null)
 
-  // 你这代码也太啰嗦了
   React.useEffect(() => {
     const downDelay = avatarRef.current?.offsetTop ?? 0
     const upDelay = 64
