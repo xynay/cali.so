@@ -8,7 +8,6 @@ import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
 
-// 动态导入 BlogPosts 组件
 const BlogPosts = dynamic(() => import('~/app/(main)/blog/BlogPosts'), {
   suspense: true,
 });
@@ -26,7 +25,7 @@ const BlogHomePageContent: React.FC = memo(() => (
             <span className="ml-2">近期文章</span>
           </h2>
           <div className="w-full mx-auto mb-8 max-w-md">
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<BlogPostsSkeleton />}>
               <BlogPosts />
             </Suspense>
           </div>
@@ -88,9 +87,11 @@ const ErrorScreen = ({ error }: { error: string }) => (
   </div>
 );
 
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center w-full h-full">
-    <div className="loader" />
+const BlogPostsSkeleton = () => (
+  <div className="w-full mx-auto mb-8 max-w-md animate-pulse">
+    <div className="h-6 bg-gray-300 rounded mb-4"></div>
+    <div className="h-6 bg-gray-300 rounded mb-4"></div>
+    <div className="h-6 bg-gray-300 rounded mb-4"></div>
   </div>
 );
 
