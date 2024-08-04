@@ -1,13 +1,16 @@
 import { parseDateTime } from '@zolplay/utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import { memo } from 'react';
 
 import { CalendarIcon, HourglassIcon, ScriptIcon } from '~/assets';
 import { type Post } from '~/sanity/schemas/post';
 
-function BlogPostCard({ post }: { post: Post }) {
+const BlogPostCard = memo(({ post }: { post: Post }) => {
   const { title, slug, mainImage, publishedAt, categories, readingTime } = post;
   const { dominant: { foreground, background } = {}, url: imageUrl, lqip } = mainImage.asset;
+
+  const formattedDate = parseDateTime({ date: new Date(publishedAt) })?.format('YYYY/MM/DD');
 
   return (
     <Link
@@ -42,7 +45,7 @@ function BlogPostCard({ post }: { post: Post }) {
           <span className="inline-flex items-center space-x-3">
             <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] md:text-sm">
               <CalendarIcon />
-              <span>{parseDateTime({ date: new Date(publishedAt) })?.format('YYYY/MM/DD')}</span>
+              <span>{formattedDate}</span>
             </span>
             {Array.isArray(categories) && (
               <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] md:text-sm">
@@ -61,6 +64,8 @@ function BlogPostCard({ post }: { post: Post }) {
       </span>
     </Link>
   );
-}
+});
+
+BlogPostCard.displayName = 'BlogPostCard';
 
 export { BlogPostCard };
