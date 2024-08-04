@@ -24,6 +24,7 @@ export function Header() {
 
   const headerRef = React.useRef<HTMLDivElement>(null)
   const avatarRef = React.useRef<HTMLDivElement>(null)
+  const isInitial = React.useRef(true)
 
   React.useEffect(() => {
     const downDelay = avatarRef.current?.offsetTop ?? 0
@@ -47,9 +48,13 @@ export function Header() {
         document.body.scrollHeight - window.innerHeight
       )
 
+      if (isInitial.current) {
+        setProperty('--header-position', 'sticky')
+      }
+
       setProperty('--content-offset', `${downDelay}px`)
 
-      if (scrollY < downDelay) {
+      if (isInitial.current || scrollY < downDelay) {
         setProperty('--header-height', `${downDelay + height}px`)
         setProperty('--header-mb', `${-downDelay}px`)
       } else if (top + height < -upDelay) {
@@ -102,6 +107,7 @@ export function Header() {
     function updateStyles() {
       updateHeaderStyles()
       updateAvatarStyles()
+      isInitial.current = false
     }
 
     updateStyles()
