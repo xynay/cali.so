@@ -1,6 +1,7 @@
 import './blog/[slug]/blog.css';
+
 import { Analytics } from '@vercel/analytics/react';
-import { Suspense, memo } from 'react';
+import { memo,Suspense } from 'react';
 
 import { Footer } from '~/app/(main)/Footer';
 import { Header } from '~/app/(main)/Header';
