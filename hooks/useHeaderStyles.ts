@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo,useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { clamp } from '~/lib/math';
 
@@ -8,16 +8,16 @@ interface StyleProperties {
 
 export function useHeaderStyles(
   isHomePage: boolean,
-  avatarX: { set: (value: number) => void },
-  avatarScale: { set: (value: number) => void },
-  avatarBorderX: { set: (value: number) => void },
-  avatarBorderScale: { set: (value: number) => void }
+  avatarX: any,
+  avatarScale: any,
+  avatarBorderX: any,
+  avatarBorderScale: any
 ) {
   const headerRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
   const isInitial = useRef(true);
 
-  const setProperty = useCallback((properties: StyleProperties) => {
+  const setProperty = useCallback((properties: Record<string, string | null>) => {
     for (const [property, value] of Object.entries(properties)) {
       if (value !== null) {
         document.documentElement.style.setProperty(property, value);
@@ -27,20 +27,22 @@ export function useHeaderStyles(
     }
   }, []);
 
-  const commonProperties = useMemo<StyleProperties>(() => ({
-    '--header-position': 'sticky',
-    '--content-offset': `${avatarRef.current?.offsetTop ?? 0}px`,
-  }), []);
-
   const updateStyles = useCallback(() => {
     if (!headerRef.current) return;
     const { top, height } = headerRef.current.getBoundingClientRect();
-    const scrollY = clamp(window.scrollY, 0, document.body.scrollHeight - window.innerHeight);
+    const scrollY = clamp(
+      window.scrollY,
+      0,
+      document.body.scrollHeight - window.innerHeight
+    );
     const downDelay = avatarRef.current?.offsetTop ?? 0;
     const upDelay = 64;
+    const commonProperties = {
+      '--header-position': 'sticky',
+      '--content-offset': `${downDelay}px`,
+    };
 
     if (isInitial.current) setProperty(commonProperties);
-
     const isScrolledPastDownDelay = scrollY >= downDelay;
 
     if (isInitial.current || !isScrolledPastDownDelay) {
@@ -88,7 +90,7 @@ export function useHeaderStyles(
     }
 
     isInitial.current = false;
-  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty, commonProperties]);
+  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty]);
 
   useEffect(() => {
     const onScroll = () => requestAnimationFrame(updateStyles);
