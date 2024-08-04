@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { clamp } from '~/lib/math';
 
-interface StyleProperties {
-  [key: string]: string | null;
+interface AnimationControl {
+  set: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function useHeaderStyles(
   isHomePage: boolean,
-  avatarX: any,
-  avatarScale: any,
-  avatarBorderX: any,
-  avatarBorderScale: any
+  avatarX: AnimationControl,
+  avatarScale: AnimationControl,
+  avatarBorderX: AnimationControl,
+  avatarBorderScale: AnimationControl
 ) {
   const headerRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
@@ -27,20 +27,21 @@ export function useHeaderStyles(
     }
   }, []);
 
+  const downDelay = avatarRef.current?.offsetTop ?? 0;
+  const commonProperties = useMemo(() => ({
+    '--header-position': 'sticky',
+    '--content-offset': `${downDelay}px`,
+  }), [downDelay]);
+
   const updateStyles = useCallback(() => {
-    if (!headerRef.current) return;
+    if (!headerRef.current || !avatarRef.current) return;
     const { top, height } = headerRef.current.getBoundingClientRect();
     const scrollY = clamp(
       window.scrollY,
       0,
       document.body.scrollHeight - window.innerHeight
     );
-    const downDelay = avatarRef.current?.offsetTop ?? 0;
     const upDelay = 64;
-    const commonProperties = {
-      '--header-position': 'sticky',
-      '--content-offset': `${downDelay}px`,
-    };
 
     if (isInitial.current) setProperty(commonProperties);
     const isScrolledPastDownDelay = scrollY >= downDelay;
@@ -90,7 +91,7 @@ export function useHeaderStyles(
     }
 
     isInitial.current = false;
-  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty]);
+  }, [isHomePage, avatarX, avatarScale, avatarBorderX, avatarBorderScale, setProperty, commonProperties, downDelay]);
 
   useEffect(() => {
     const onScroll = () => requestAnimationFrame(updateStyles);
