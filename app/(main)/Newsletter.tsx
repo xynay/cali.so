@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import va from '@vercel/analytics'
 import { clsxm } from '@zolplay/utils'
 import { AnimatePresence, motion } from 'framer-motion'
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useReward } from 'react-rewards'
 import { z } from 'zod'
@@ -20,7 +20,7 @@ export const newsletterFormSchema = z.object({
 })
 export type NewsletterForm = z.infer<typeof newsletterFormSchema>
 
-const Newsletter = React.memo(({ subCount }: { subCount?: string }) => {
+const Newsletter: React.FC<{ subCount?: string }> = React.memo(({ subCount }) => {
   const {
     register,
     handleSubmit,
@@ -30,14 +30,14 @@ const Newsletter = React.memo(({ subCount }: { subCount?: string }) => {
     defaultValues: { formId },
     resolver: zodResolver(newsletterFormSchema),
   })
-  const [isSubscribed, setIsSubscribed] = React.useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
   const { reward } = useReward('newsletter-rewards', 'emoji', {
     position: 'absolute',
     emoji: ['🤓', '😊', '🥳', '🤩', '🤪', '🤯', '🥰', '😎', '🤑', '🤗', '😇'],
     elementCount: 32,
   })
 
-  const onSubmit = React.useCallback(async (data: NewsletterForm) => {
+  const onSubmit = useCallback(async (data: NewsletterForm) => {
     if (isSubmitting) return
     va.track('Newsletter:Subscribe')
     try {
@@ -60,7 +60,7 @@ const Newsletter = React.memo(({ subCount }: { subCount?: string }) => {
     }
   }, [isSubmitting, reset, reward])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isSubscribed) {
       const timer = setTimeout(() => setIsSubscribed(false), 60000)
       return () => clearTimeout(timer)
@@ -75,7 +75,7 @@ const Newsletter = React.memo(({ subCount }: { subCount?: string }) => {
       )}
       onSubmit={handleSubmit(onSubmit)}
     >
-      <input type="hidden" className="hidden" {...register('formId')} />
+      <input type="hidden" {...register('formId')} />
       <h2 className="flex items-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
         <TiltedSendIcon className="h-5 w-5 flex-none" />
         <span className="ml-2">动态更新</span>
@@ -90,7 +90,7 @@ const Newsletter = React.memo(({ subCount }: { subCount?: string }) => {
         )}
         <span>每月一封，随时可以取消订阅。</span>
       </p>
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {!isSubscribed ? (
           <motion.div
             className="mt-6 flex h-10"
@@ -106,11 +106,7 @@ const Newsletter = React.memo(({ subCount }: { subCount?: string }) => {
               className="min-w-0 flex-auto appearance-none rounded-lg border border-zinc-900/10 bg-white px-3 py-[calc(theme(spacing.2)-1px)] placeholder:text-zinc-400 focus:border-lime-500 focus:outline-none focus:ring-4 focus:ring-lime-500/10 dark:border-zinc-700 dark:bg-zinc-700/[0.15] dark:text-zinc-200 dark:placeholder:text-zinc-500 dark:focus:border-lime-400/50 dark:focus:ring-lime-400/5 sm:text-sm"
               {...register('email')}
             />
-            <Button
-              type="submit"
-              className="ml-2 flex-none"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" className="ml-2 flex-none" disabled={isSubmitting}>
               订阅
             </Button>
           </motion.div>
