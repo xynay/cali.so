@@ -91,4 +91,36 @@ const Headline: React.FC = () => (
 )
 Headline.displayName = 'Headline'
 
-export default React.memo(Headline)
+const Skeleton: React.FC = () => (
+  <div className="max-w-2xl mx-auto text-center">
+    <div className="animate-pulse">
+      <div className="h-10 bg-gray-300 rounded mb-4"></div>
+      <div className="h-6 bg-gray-300 rounded mb-4"></div>
+      <div className="h-6 bg-gray-300 rounded mb-4"></div>
+    </div>
+  </div>
+)
+
+const Page: React.FC = () => {
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    // 模拟数据加载
+    setTimeout(() => {
+      setLoading(false)
+    }, 2000)
+  }, [])
+
+  if (loading) {
+    return <Skeleton />
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500">{error}</div>
+  }
+
+  return <Headline />
+}
+
+export default Page
