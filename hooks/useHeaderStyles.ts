@@ -1,19 +1,23 @@
-import { useCallback, useEffect, useRef, useMemo } from 'react';
+import { useCallback, useEffect, useMemo,useRef } from 'react';
 
 import { clamp } from '~/lib/math';
 
+interface StyleProperties {
+  [key: string]: string | null;
+}
+
 export function useHeaderStyles(
-  isHomePage,
-  avatarX,
-  avatarScale,
-  avatarBorderX,
-  avatarBorderScale
+  isHomePage: boolean,
+  avatarX: { set: (value: number) => void },
+  avatarScale: { set: (value: number) => void },
+  avatarBorderX: { set: (value: number) => void },
+  avatarBorderScale: { set: (value: number) => void }
 ) {
-  const headerRef = useRef(null);
-  const avatarRef = useRef(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
   const isInitial = useRef(true);
 
-  const setProperty = useCallback((properties) => {
+  const setProperty = useCallback((properties: StyleProperties) => {
     for (const [property, value] of Object.entries(properties)) {
       if (value !== null) {
         document.documentElement.style.setProperty(property, value);
@@ -23,7 +27,7 @@ export function useHeaderStyles(
     }
   }, []);
 
-  const commonProperties = useMemo(() => ({
+  const commonProperties = useMemo<StyleProperties>(() => ({
     '--header-position': 'sticky',
     '--content-offset': `${avatarRef.current?.offsetTop ?? 0}px`,
   }), []);
