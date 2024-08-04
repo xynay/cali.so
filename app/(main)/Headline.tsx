@@ -103,7 +103,6 @@ const Skeleton: React.FC = () => (
 
 const Page: React.FC = () => {
   const [loading, setLoading] = React.useState(true)
-  const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     // 模拟数据加载
@@ -114,10 +113,6 @@ const Page: React.FC = () => {
 
   if (loading) {
     return <Skeleton />
-  }
-
-  if (error) {
-    return <div className="text-center text-red-500">{error}</div>
   }
 
   return <Headline />
