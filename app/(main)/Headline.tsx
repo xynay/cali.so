@@ -22,6 +22,7 @@ const Developer: React.FC = React.memo(() => (
     <span className="invisible inline-flex text-zinc-300 before:content-['|'] group-hover:visible group-hover:animate-typing dark:text-zinc-500" />
   </span>
 ))
+Developer.displayName = 'Developer'
 
 const Designer: React.FC = React.memo(() => (
   <span className="group relative bg-black/5 p-1 dark:bg-white/5 text-2x2">
@@ -33,6 +34,7 @@ const Designer: React.FC = React.memo(() => (
     生活家
   </span>
 ))
+Designer.displayName = 'Designer'
 
 const OCD: React.FC = React.memo(() => (
   <span className="group inline-flex items-center text-2x2">
@@ -40,6 +42,7 @@ const OCD: React.FC = React.memo(() => (
     <span>记录者</span>
   </span>
 ))
+OCD.displayName = 'OCD'
 
 const Founder: React.FC = React.memo(() => (
   <span className="group inline-flex items-center text-2x2">
@@ -47,6 +50,7 @@ const Founder: React.FC = React.memo(() => (
     <span>思考者</span>
   </span>
 ))
+Founder.displayName = 'Founder'
 
 const Headline: React.FC = () => (
   <div className="max-w-2xl mx-auto text-center">
@@ -85,5 +89,6 @@ const Headline: React.FC = () => (
     </motion.p>
   </div>
 )
+Headline.displayName = 'Headline'
 
 export default React.memo(Headline)
