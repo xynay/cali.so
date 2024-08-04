@@ -4,7 +4,7 @@ import CompressionPlugin from 'compression-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import dotenv from 'dotenv';
 
-// 同步加载环境变量
+// 加载环境变量
 dotenv.config({ path: './env.mjs' });
 
 /** @type {import('next').NextConfig} */
@@ -64,6 +64,9 @@ const nextConfig = {
         },
       },
     };
+
+    // tree shaking
+    config.optimization.usedExports = true;
 
     return config;
   },
