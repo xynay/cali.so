@@ -1,36 +1,36 @@
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs'
-import { AnimatePresence, motion } from 'framer-motion'
-import { usePathname } from 'next/navigation'
-import { useCallback,useMemo, useState } from 'react'
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
+import { AnimatePresence, motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
+import { useCallback, useMemo, useState, memo } from 'react';
 
-import { GitHubBrandIcon, GoogleBrandIcon, MailIcon, UserArrowLeftIcon } from '~/assets'
-import { Tooltip } from '~/components/ui/Tooltip'
-import { url } from '~/lib'
+import { GitHubBrandIcon, GoogleBrandIcon, MailIcon, UserArrowLeftIcon } from '~/assets';
+import { Tooltip } from '~/components/ui/Tooltip';
+import { url } from '~/lib';
 
-export function UserInfo() {
-  const [tooltipOpen, setTooltipOpen] = useState(false)
-  const pathname = usePathname()
-  const { user } = useUser()
+const UserInfo = () => {
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const pathname = usePathname();
+  const { user } = useUser();
 
   const StrategyIcon = useMemo(() => {
-    const strategy = user?.primaryEmailAddress?.verification.strategy
-    if (!strategy) return null
+    const strategy = user?.primaryEmailAddress?.verification.strategy;
+    if (!strategy) return null;
 
     switch (strategy) {
       case 'from_oauth_github':
-        return GitHubBrandIcon
+        return GitHubBrandIcon;
       case 'from_oauth_google':
-        return GoogleBrandIcon
+        return GoogleBrandIcon;
       default:
-        return MailIcon
+        return MailIcon;
     }
-  }, [user?.primaryEmailAddress?.verification.strategy])
+  }, [user?.primaryEmailAddress?.verification.strategy]);
 
-  const handleTooltipOpenChange = useCallback((open: boolean) => {
-    setTooltipOpen(open)
-  }, [])
+  const handleTooltipOpenChange = useCallback((open) => {
+    setTooltipOpen(open);
+  }, []);
 
-  const afterSignOutUrl = useMemo(() => url(pathname).href, [pathname])
+  const afterSignOutUrl = useMemo(() => url(pathname).href, [pathname]);
 
   return (
     <AnimatePresence>
@@ -40,6 +40,7 @@ export function UserInfo() {
           initial={{ opacity: 0, x: 25 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 25 }}
+          style={{ willChange: 'opacity, transform' }}
         >
           <UserButton
             afterSignOutUrl={afterSignOutUrl}
@@ -62,6 +63,7 @@ export function UserInfo() {
           initial={{ opacity: 0, x: 25 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 25 }}
+          style={{ willChange: 'opacity, transform' }}
         >
           <Tooltip.Provider disableHoverableContent>
             <Tooltip.Root open={tooltipOpen} onOpenChange={handleTooltipOpenChange}>
@@ -84,6 +86,7 @@ export function UserInfo() {
                         initial={{ opacity: 0, scale: 0.96 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
+                        style={{ willChange: 'opacity, transform' }}
                       >
                         登录
                       </motion.div>
@@ -96,5 +99,7 @@ export function UserInfo() {
         </motion.div>
       </SignedOut>
     </AnimatePresence>
-  )
-}
+  );
+};
+
+export default memo(UserInfo);
