@@ -13,7 +13,8 @@ const OuterContainer = React.memo(
         <div className="mx-auto max-w-7xl lg:px-8">{children}</div>
       </div>
     );
-  })
+  }),
+  (prevProps, nextProps) => prevProps.className === nextProps.className && prevProps.children === nextProps.children
 );
 
 const InnerContainer = React.memo(
@@ -30,7 +31,8 @@ const InnerContainer = React.memo(
         <div className="mx-auto max-w-2xl lg:max-w-5xl">{children}</div>
       </div>
     );
-  })
+  }),
+  (prevProps, nextProps) => prevProps.className === nextProps.className && prevProps.children === nextProps.children
 );
 
 const ContainerComponent = React.forwardRef<HTMLDivElement, ContainerProps>(
