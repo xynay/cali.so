@@ -1,3 +1,4 @@
+// app/api/[id]/route.js
 import { clerkClient, currentUser } from '@clerk/nextjs'
 import { asc, eq } from 'drizzle-orm'
 import { type NextRequest, NextResponse } from 'next/server'
@@ -20,6 +21,7 @@ import { client } from '~/sanity/lib/client'
 type Params = { params: { id: string } }
 
 export async function GET(req: NextRequest, { params }: Params) {
+  console.log('GET request received with params:', params)
   try {
     const postId = params.id
 
@@ -36,6 +38,8 @@ export async function GET(req: NextRequest, { params }: Params) {
       .where(eq(comments.postId, postId))
       .orderBy(asc(comments.createdAt))
 
+    console.log('Data fetched from DB:', data)
+
     return NextResponse.json(
       data.map(
         ({ id, parentId, ...rest }) =>
@@ -47,7 +51,8 @@ export async function GET(req: NextRequest, { params }: Params) {
       )
     )
   } catch (error) {
-    return NextResponse.json({ error }, { status: 400 })
+    console.error('Error in GET request:', error)
+    return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 400 })
   }
 }
 
@@ -60,8 +65,10 @@ const CreateCommentSchema = z.object({
 })
 
 export async function POST(req: NextRequest, { params }: Params) {
+  console.log('POST request received with params:', params)
   const user = await currentUser()
   if (!user) {
+    console.error('User not authenticated')
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
@@ -76,11 +83,13 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
   )
   if (!post) {
+    console.error('Post not found for ID:', postId)
     return NextResponse.json({ error: 'Post not found' }, { status: 412 })
   }
 
   try {
     const data = await req.json()
+    console.log('Data received in POST request:', data)
     const { body, parentId: hashedParentId } = CreateCommentSchema.parse(data)
 
     const [parentId] = CommentHashids.decode(hashedParentId ?? '')
@@ -135,6 +144,8 @@ export async function POST(req: NextRequest, { params }: Params) {
         newId: comments.id,
       })
 
+    console.log('New comment inserted:', newComment)
+
     return NextResponse.json({
       ...commentData,
       id: CommentHashids.encode(newComment.newId),
@@ -142,6 +153,7 @@ export async function POST(req: NextRequest, { params }: Params) {
       parentId: hashedParentId,
     } satisfies CommentDto)
   } catch (error) {
-    return NextResponse.json({ error }, { status: 400 })
+    console.error('Error in POST request:', error)
+    return NextResponse.json({ error: 'Failed to create comment' }, { status: 400 })
   }
 }
