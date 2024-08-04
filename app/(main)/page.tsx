@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { Suspense } from 'react';
+import React, { memo,Suspense } from 'react';
 
 import Headline from '~/app/(main)/Headline';
 import { PencilSwooshIcon } from '~/assets';
@@ -17,7 +17,9 @@ interface Settings {
 }
 
 // 动态导入 BlogPosts 组件
-const BlogPosts = dynamic(() => import('~/app/(main)/blog/BlogPosts'));
+const BlogPosts = dynamic(() => import('~/app/(main)/blog/BlogPosts'), {
+  suspense: true,
+});
 
 const fetchSettings = async (): Promise<Settings> => {
   try {
@@ -34,7 +36,7 @@ const SettingsServerComponent: React.FC = async () => {
   return <BlogHomePageContent />;
 };
 
-const BlogHomePageContent: React.FC = () => {
+const BlogHomePageContent: React.FC = memo(() => {
   return (
     <>
       <Container className="mt-10">
@@ -56,7 +58,7 @@ const BlogHomePageContent: React.FC = () => {
       </Container>
     </>
   );
-};
+});
 
 // Add a display name to the component
 BlogHomePageContent.displayName = 'BlogHomePageContent';
