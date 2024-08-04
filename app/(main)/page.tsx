@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 import React, { Suspense } from 'react';
 
-import { Headline } from '~/app/(main)/Headline';
+import Headline from '~/app/(main)/Headline';
 import { PencilSwooshIcon } from '~/assets';
 import { Container } from '~/components/ui/Container';
 import { getSettings } from '~/sanity/queries';
