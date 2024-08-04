@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import React from 'react'
+import React, { type ReactNode } from 'react'
 import Balancer from 'react-wrap-balancer'
 
 import { SparkleIcon, UserSecurityIcon } from '~/assets'
@@ -15,14 +15,19 @@ const generateBorderPositions = () => [
   '-right-[3.5px] -top-[3.5px]'
 ]
 
-const RoleComponent = React.memo(({ children, className }) => (
+interface RoleComponentProps {
+  children: ReactNode
+  className?: string
+}
+
+const RoleComponent: React.FC<RoleComponentProps> = React.memo(({ children, className }) => (
   <span className={`group ${className}`}>
     {children}
   </span>
 ))
 RoleComponent.displayName = 'RoleComponent'
 
-const Developer = () => (
+const Developer: React.FC = () => (
   <RoleComponent className="text-2x2">
     <span className="font-mono">&lt;</span>探索者
     <span className="font-mono">/&gt;</span>
@@ -30,7 +35,7 @@ const Developer = () => (
   </RoleComponent>
 )
 
-const Designer = () => (
+const Designer: React.FC = () => (
   <RoleComponent className="relative bg-black/5 p-1 dark:bg-white/5 text-2x2">
     <span className="pointer-events-none absolute inset-0 border border-lime-700/90 opacity-70 group-hover:border-dashed group-hover:opacity-100 dark:border-lime-400/90">
       {generateBorderPositions().map((pos, index) => (
@@ -41,21 +46,21 @@ const Designer = () => (
   </RoleComponent>
 )
 
-const OCD = () => (
+const OCD: React.FC = () => (
   <RoleComponent className="inline-flex items-center text-2x2">
     <SparkleIcon className="mr-1 inline-flex transform-gpu transition-transform duration-500 group-hover:rotate-180" />
     <span>记录者</span>
   </RoleComponent>
 )
 
-const Founder = () => (
+const Founder: React.FC = () => (
   <RoleComponent className="inline-flex items-center text-2x2">
     <UserSecurityIcon className="mr-1 inline-flex group-hover:fill-zinc-600/20 dark:group-hover:fill-zinc-200/20" />
     <span>思考者</span>
   </RoleComponent>
 )
 
-const Headline = () => (
+const Headline: React.FC = () => (
   <div className="max-w-2xl mx-auto text-center">
     <motion.h1
       className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-4xl"
