@@ -1,30 +1,14 @@
 'use client'
 
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-  useUser,
-} from '@clerk/nextjs'
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs'
 import { clsxm } from '@zolplay/utils'
-import {
-  AnimatePresence,
-  motion,
-  useMotionTemplate,
-  useMotionValue,
-} from 'framer-motion'
+import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
-import {
-  GitHubBrandIcon,
-  GoogleBrandIcon,
-  MailIcon,
-  UserArrowLeftIcon,
-} from '~/assets'
+import { GitHubBrandIcon, GoogleBrandIcon, MailIcon, UserArrowLeftIcon } from '~/assets'
 import { Avatar } from '~/components/Avatar'
 import { Container } from '~/components/ui/Container'
 import { Tooltip } from '~/components/ui/Tooltip'
