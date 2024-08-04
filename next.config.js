@@ -1,11 +1,6 @@
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-
-if (!process.env.SKIP_ENV_VALIDATION) {
-  (async () => {
-    await import('./env.mjs');
-  })();
-}
+require('./env.mjs');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -18,7 +13,9 @@ const nextConfig = {
         pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/**`,
       }
     ],
-    domains: ['cdn.sanity.io'],  // 允许的图像域名
+  },
+  experimental: {
+    taint: true,
   },
   webpack(config, { dev, isServer }) {
     if (!dev && !isServer) {
@@ -33,23 +30,15 @@ const nextConfig = {
         new CssMinimizerPlugin()
       );
     }
-
     config.cache = {
       type: 'filesystem',
-      buildDependencies: {
-        config: [__filename],
-      },
     };
-
     config.optimization.splitChunks = {
       chunks: 'all',
-      minSize: 20000,
-      maxSize: 70000,
       cacheGroups: {
-        defaultVendors: {
+        vendors: {
           test: /[\\/]node_modules[\\/]/,
           priority: -10,
-          reuseExistingChunk: true,
         },
         default: {
           minChunks: 2,
@@ -58,13 +47,6 @@ const nextConfig = {
         },
       },
     };
-
-    config.optimization = {
-      ...config.optimization,
-      usedExports: true,
-      sideEffects: true,
-    };
-
     return config;
   },
 };
