@@ -9,7 +9,7 @@ import React from 'react'
 
 import { navigationItems } from '~/config/nav'
 
-function NavItem({
+const NavItem = React.memo(function NavItem({
   href,
   children,
 }: {
@@ -39,9 +39,9 @@ function NavItem({
       </Link>
     </li>
   )
-}
+})
 
-function Desktop({
+const Desktop = React.memo(function Desktop({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
@@ -88,9 +88,9 @@ function Desktop({
       </ul>
     </nav>
   )
-}
+})
 
-function MobileNavItem({
+const MobileNavItem = React.memo(function MobileNavItem({
   href,
   children,
 }: {
@@ -104,9 +104,9 @@ function MobileNavItem({
       </Popover.Button>
     </li>
   )
-}
+})
 
-function Mobile(props: PopoverProps<'div'>) {
+const Mobile = React.memo(function Mobile(props: PopoverProps<'div'>) {
   return (
     <Popover {...props}>
       <Popover.Button className="group flex items-center rounded-full bg-gradient-to-b from-zinc-50/20 to-white/80 px-4 py-2 text-sm font-medium text-zinc-800 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur-md focus:outline-none focus-visible:ring-2 dark:from-zinc-900/30 dark:to-zinc-800/80 dark:text-zinc-200 dark:ring-white/10 dark:hover:ring-white/20 dark:focus-visible:ring-yellow-500/80">
@@ -186,7 +186,7 @@ function Mobile(props: PopoverProps<'div'>) {
       </Transition.Root>
     </Popover>
   )
-}
+})
 
 export const NavigationBar = {
   Desktop,
