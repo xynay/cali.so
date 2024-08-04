@@ -2,7 +2,6 @@ import { authMiddleware } from '@clerk/nextjs'
 import { get } from '@vercel/edge-config'
 import { type NextRequest, NextResponse } from 'next/server'
 
-import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
 import countries from '~/lib/countries.json'
 import { getIP } from '~/lib/ip'
@@ -39,11 +38,12 @@ async function beforeAuthMiddleware(req: NextRequest) {
 
   if (geo && !isApi && env.VERCEL_ENV === 'production') {
     const country = geo.country
-    const city = geo.city
 
     const countryInfo = countries.find((x) => x.cca2 === country)
     if (countryInfo) {
-      const flag = countryInfo.flag
+      // Remove the unused variables
+      // const flag = countryInfo.flag
+      // const city = geo.city
       // Remove the Redis interaction
       // await redis.set(kvKeys.currentVisitor, { country, city, flag })
     }

@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import * as React from 'react'
 import ReactMarkdown from 'react-markdown'
 
@@ -20,9 +21,12 @@ const NewslettersTemplate = (props: {
             components={{
               img: ({ src, alt }) => {
                 return (
-                  <img
-                    src={src}
-                    alt={alt}
+                  <Image
+                    src={src ?? ''}
+                    alt={alt ?? ''}
+                    width={465}
+                    height={0}
+                    layout="responsive"
                     className="mx-auto my-0 max-w-[465px]"
                   />
                 )
