@@ -1,7 +1,7 @@
 'use client'
 
 import { clsxm } from '@zolplay/utils'
-import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from 'framer-motion'
+import { AnimatePresence, motion, type MotionValue,useMotionTemplate, useMotionValue } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import React, { memo, useCallback, useMemo, useState } from 'react'
 
@@ -14,8 +14,8 @@ import { useHeaderStyles } from '~/hooks/useHeaderStyles'
 
 interface AvatarComponentProps {
   isShowingAltAvatar: boolean;
-  avatarTransform: string;
-  avatarBorderTransform: string;
+  avatarTransform: MotionValue<string>;
+  avatarBorderTransform: MotionValue<string>;
   onContextMenu: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
