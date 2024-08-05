@@ -1,4 +1,4 @@
-import './globals.css'; 
+import './globals.css';
 import './clerk.css';
 
 import { ClerkProvider } from '@clerk/nextjs';
@@ -15,9 +15,9 @@ export const metadata: Metadata = {
   metadataBase: seo.url,
   title: {
     template: '%s | 辛壬癸的命理笔记',
-    default: seo.title,
+    default: seo.title, 
   },
-  description: seo.description,
+  description: seo.description, 
   keywords: '生活记录,命理研究,杂谈,个人博客,辛壬癸,日常笔记,命运解析,生活智慧,命理学,日常生活',
   manifest: '/site.webmanifest',
   robots: {
@@ -33,10 +33,10 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: {
-      default: seo.title,
+      default: seo.title, 
       template: '%s | 辛壬癸的命理笔记',
     },
-    description: seo.description,
+    description: seo.description, 
     siteName: '辛壬癸的命理笔记',
     locale: 'zh_CN',
     type: 'website',
@@ -46,11 +46,11 @@ export const metadata: Metadata = {
     site: '@thecalicastle',
     creator: '@thecalicastle',
     card: 'summary_large_image',
-    title: seo.title,
+    title: seo.title, 
     description: seo.description,
   },
   alternates: {
-    canonical: url('/'),
+    canonical: url('/'), 
     types: {
       'application/rss+xml': [{ url: 'rss', title: 'RSS 订阅' }],
     },

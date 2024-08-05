@@ -10,16 +10,15 @@ import { subscribers } from '~/db/schema'
 
 import Newsletter from './Newsletter'
 
-const NavLink = React.memo(({ href, children }: { href: string; children: React.ReactNode }) => {
+const NavLink = ({ href, children }) => {
   return (
     <Link href={href} className="transition hover:text-lime-500 dark:hover:text-lime-400">
       {children}
     </Link>
   )
-})
-NavLink.displayName = 'NavLink'
+}
 
-const Links = React.memo(() => {
+const Links = () => {
   return (
     <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
       {navigationItems.map(({ href, text }) => (
@@ -29,10 +28,9 @@ const Links = React.memo(() => {
       ))}
     </nav>
   )
-})
-Links.displayName = 'Links'
+}
 
-export async function Footer() {
+export async function getServerSideProps() {
   const [subs] = await db
     .select({
       subCount: count(),
@@ -40,13 +38,21 @@ export async function Footer() {
     .from(subscribers)
     .where(isNotNull(subscribers.subscribedAt))
 
+  return {
+    props: {
+      subCount: subs?.subCount ?? '0',
+    },
+  }
+}
+
+export function Footer({ subCount }) {
   return (
     <footer className="mt-32">
       <Container.Outer>
         <div className="border-t border-zinc-100 pb-16 pt-10 dark:border-zinc-700/40">
           <Container.Inner>
             <div className="mx-auto mb-8 max-w-md">
-              <Newsletter subCount={`${subs?.subCount ?? '0'}`} />
+              <Newsletter subCount={subCount} />
             </div>
             <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
               <p className="text-sm text-zinc-500/80 dark:text-zinc-400/80">
