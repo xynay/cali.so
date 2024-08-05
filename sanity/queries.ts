@@ -9,7 +9,7 @@ import { type Project } from '~/sanity/schemas/project';
 const currentDate = getDate().toISOString();
 
 // Common query conditions
-const postConditions = `(_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current))`;
+const postConditions = `_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current)`;
 
 // Query to fetch all latest blog post slugs
 export const getAllLatestBlogPostSlugsQuery = groq`
@@ -117,7 +117,7 @@ export const getBlogPostQuery = groq`
 // Fetch a single blog post with parameterized slug
 export const getBlogPost = async (slug: string) => {
   try {
-    return await client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, { slug });
+    return await client.fetch<PostDetail | undefined, { slug: string; currentDate: string }>(getBlogPostQuery, { slug, currentDate });
   } catch (error) {
     console.error('Error fetching blog post:', error);
     throw error;
