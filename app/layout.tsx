@@ -89,3 +89,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </ClerkProvider>
   );
 }
+
+// Example of getServerSideProps if you need to fetch data from server-side
+export const getServerSideProps = () => {
+  return {
+    props: {
+      // Pass data to the page via props
+      // data,
+    },
+  };
+};
