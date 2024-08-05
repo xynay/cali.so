@@ -12,7 +12,12 @@ import { subscribers } from '~/db/schema'
 
 import Newsletter from './Newsletter'
 
-const NavLink = React.memo(({ href, children }) => {
+interface NavLinkProps {
+  href: string
+  children: React.ReactNode
+}
+
+const NavLink = React.memo(({ href, children }: NavLinkProps) => {
   return (
     <Link href={href} className="transition hover:text-lime-500 dark:hover:text-lime-400">
       {children}
@@ -47,7 +52,7 @@ const Footer = () => {
           .from(subscribers)
           .where(isNotNull(subscribers.subscribedAt))
         
-        setSubCount(subs?.subCount ?? '0')
+        setSubCount(subs?.subCount.toString() ?? '0')
       } catch (error) {
         console.error('Failed to fetch subscriber count:', error)
       }
