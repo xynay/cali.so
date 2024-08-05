@@ -8,16 +8,22 @@ import { type Project } from '~/sanity/schemas/project';
 // Cache the current date to avoid recalculating it multiple times
 const currentDate = getDate().toISOString();
 
+// Common query conditions
+const postConditions = `(_type == "post" && !(_id in path("drafts.**")) && publishedAt <= $currentDate && defined(slug.current))`;
+
 // Query to fetch all latest blog post slugs
 export const getAllLatestBlogPostSlugsQuery = groq`
-  *[_type == "post" && !(_id in path("drafts.**")) 
-  && publishedAt <= $currentDate 
-  && defined(slug.current)] | order(publishedAt desc).slug.current
+  *[${postConditions}] | order(publishedAt desc).slug.current
 `;
 
 // Fetch slugs with parameterized date
-export const getAllLatestBlogPostSlugs = () => {
-  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery, { currentDate });
+export const getAllLatestBlogPostSlugs = async () => {
+  try {
+    return await client.fetch<string[]>(getAllLatestBlogPostSlugsQuery, { currentDate });
+  } catch (error) {
+    console.error('Error fetching blog post slugs:', error);
+    throw error;
+  }
 };
 
 // Options type for fetching blog posts
@@ -33,9 +39,7 @@ export const getLatestBlogPostsQuery = ({
   offset = 0,
   forDisplay = true,
 }: GetBlogPostsOptions) => groq`
-  *[_type == "post" && !(_id in path("drafts.**")) 
-  && publishedAt <= $currentDate 
-  && defined(slug.current)] | order(publishedAt desc)[${offset}...${offset + limit}] {
+  *[${postConditions}] | order(publishedAt desc)[${offset}...${offset + limit}] {
     _id,
     title,
     "slug": slug.current,
@@ -53,12 +57,18 @@ export const getLatestBlogPostsQuery = ({
   }`;
 
 // Fetch latest blog posts with parameterized date
-export const getLatestBlogPosts = (options: GetBlogPostsOptions) => 
-  client.fetch<Post[] | null>(getLatestBlogPostsQuery(options), { currentDate });
+export const getLatestBlogPosts = async (options: GetBlogPostsOptions) => {
+  try {
+    return await client.fetch<Post[] | null>(getLatestBlogPostsQuery(options), { currentDate });
+  } catch (error) {
+    console.error('Error fetching latest blog posts:', error);
+    throw error;
+  }
+};
 
 // Query to fetch a single blog post by slug
 export const getBlogPostQuery = groq`
-  *[_type == "post" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
+  *[${postConditions} && slug.current == $slug][0] {
     _id,
     title,
     "slug": slug.current,
@@ -84,7 +94,7 @@ export const getBlogPostQuery = groq`
         "lqip": metadata.lqip
       }
     },
-    "related": *[_type == "post" && slug.current != $slug 
+    "related": *[${postConditions} && slug.current != $slug 
       && count(categories[@._ref in ^.^.categories[]._ref]) > 0] 
       | order(publishedAt desc, _createdAt desc) [0..2] {
       _id,
@@ -105,8 +115,14 @@ export const getBlogPostQuery = groq`
   }`;
 
 // Fetch a single blog post with parameterized slug
-export const getBlogPost = (slug: string) =>
-  client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, { slug });
+export const getBlogPost = async (slug: string) => {
+  try {
+    return await client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, { slug });
+  } catch (error) {
+    console.error('Error fetching blog post:', error);
+    throw error;
+  }
+};
 
 // Query to fetch settings
 export const getSettingsQuery = groq`
@@ -129,15 +145,21 @@ export const getSettingsQuery = groq`
   }`;
 
 // Fetch settings
-export const getSettings = () =>
-  client.fetch<{
-    projects: Project[] | null;
-    heroPhotos?: string[] | null;
-    resume?: {
-      company: string;
-      title: string;
-      logo: string;
-      start: string;
-      end?: string;
-    }[] | null;
-  }>(getSettingsQuery);
+export const getSettings = async () => {
+  try {
+    return await client.fetch<{
+      projects: Project[] | null;
+      heroPhotos?: string[] | null;
+      resume?: {
+        company: string;
+        title: string;
+        logo: string;
+        start: string;
+        end?: string;
+      }[] | null;
+    }>(getSettingsQuery);
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+    throw error;
+  }
+};
