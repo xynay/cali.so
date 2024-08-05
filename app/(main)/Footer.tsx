@@ -45,7 +45,11 @@ export async function getServerSideProps() {
   }
 }
 
-export function Footer({ subCount }) {
+interface FooterProps {
+  subCount: any
+}
+
+export function Footer({ subCount }: FooterProps) {
   return (
     <footer className="mt-32">
       <Container.Outer>
