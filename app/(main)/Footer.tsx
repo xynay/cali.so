@@ -49,7 +49,7 @@ interface FooterProps {
   subCount: any
 }
 
-export function Footer({ subCount }: FooterProps) {
+const Footer = ({ subCount }: FooterProps) => {
   return (
     <footer className="mt-32">
       <Container.Outer>
@@ -73,3 +73,13 @@ export function Footer({ subCount }: FooterProps) {
     </footer>
   )
 }
+
+const Page = ({ subCount }) => {
+  return (
+    <div>
+      <Footer subCount={subCount} />
+    </div>
+  )
+}
+
+export default Page
