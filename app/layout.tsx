@@ -4,6 +4,7 @@ import './clerk.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { count, isNotNull } from 'drizzle-orm';
 import type { Metadata, Viewport } from 'next';
+import { useEffect, useState } from 'react';
 
 import Footer from '~/app/(main)/Footer'; // 修正导入
 import { ThemeProvider } from '~/app/(main)/ThemeProvider';
@@ -68,27 +69,29 @@ export const viewport: Viewport = {
   ],
 };
 
-export async function getServerSideProps() {
-  const subs = await db
-    .select({
-      subCount: count(),
-    })
-    .from(subscribers)
-    .where(isNotNull(subscribers.subscribedAt));
+const FooterWithSubCount = () => {
+  const [subCount, setSubCount] = useState('0');
 
-  return {
-    props: {
-      subCount: subs[0]?.subCount ?? '0',
-    },
-  };
-}
+  useEffect(() => {
+    const fetchSubCount = async () => {
+      try {
+        const subs = await db
+          .select({
+            subCount: count(),
+          })
+          .from(subscribers)
+          .where(isNotNull(subscribers.subscribedAt));
 
-const Page = ({ subCount }) => {
-  return (
-    <div>
-      <Footer subCount={subCount} />
-    </div>
-  );
+        setSubCount(subs[0]?.subCount ?? '0');
+      } catch (error) {
+        console.error('Failed to fetch subscription count:', error);
+      }
+    };
+
+    void fetchSubCount(); // 使用 void 操作符来处理 Promise
+  }, []);
+
+  return <Footer subCount={subCount} />;
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -110,6 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             disableTransitionOnChange
           >
             {children}
+            <FooterWithSubCount />
           </ThemeProvider>
         </body>
       </html>
