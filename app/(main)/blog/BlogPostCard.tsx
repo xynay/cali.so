@@ -33,7 +33,6 @@ const BlogPostCard = memo(({ post }: { post: Post }) => {
           width={240}
           height={135}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw"
-          loading="lazy"
           priority
         />
       </div>
