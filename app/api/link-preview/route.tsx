@@ -7,7 +7,6 @@ import { env } from '~/env.mjs'
 const width = 1200
 const height = 750
 
-export const runtime = 'edge'
 export const revalidate = 3600 // 1 hour
 
 export function GET(req: NextRequest) {
